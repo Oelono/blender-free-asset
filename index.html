@@ -1,1 +1,302 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vaultframe — Free Blender Assets for 3D Artists</title>
+<meta name="description" content="A free, community-fed library of high-quality Blender assets — characters, environments, shaders and animations, ready to drop into your scene.">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0B0C10;
+    --bg-raised:#101319;
+    --line:#1E2430;
+    --cyan:#00F0FF;
+    --purple:#9D4EDD;
+    --magenta:#FF3D9A;
+    --ink:#E8ECF1;
+    --ink-dim:#8A93A6;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  .font-display{ font-family:'Chakra Petch',sans-serif; }
+
+  /* faint circuit / grid backdrop */
+  .grid-veil{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+
+  .glow-text{
+    text-shadow: 0 0 24px rgba(0,240,255,0.35);
+  }
+
+  .btn-primary{
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color:#03060A;
+    font-weight:700;
+    transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 0 0 0 rgba(0,240,255,0);
+  }
+  .btn-primary:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px -8px rgba(0,240,255,0.55);
+  }
+  .btn-primary:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border:1px solid var(--line);
+    backdrop-filter: blur(6px);
+    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  .card:hover{
+    border-color: rgba(0,240,255,0.45);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px -20px rgba(157,78,221,0.35), 0 0 0 1px rgba(0,240,255,0.08) inset;
+  }
+
+  .chip{
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    transition: all .2s ease;
+  }
+  .chip.active, .chip:hover{
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: rgba(0,240,255,0.06);
+  }
+
+  .badge{
+    font-family:'Chakra Petch',sans-serif;
+    letter-spacing:.02em;
+    font-size:11px;
+    border:1px solid rgba(0,240,255,0.35);
+    color:var(--cyan);
+    background:rgba(0,240,255,0.06);
+  }
+
+  input[type="text"]::placeholder{ color:#5C6579; }
+
+  #download-modal{
+    background: rgba(4,5,8,0.78);
+    backdrop-filter: blur(6px);
+  }
+  .modal-panel{
+    background: linear-gradient(180deg, var(--bg-raised), #0B0C10);
+    border:1px solid var(--line);
+  }
+
+  .ring-progress{
+    transition: stroke-dashoffset 1s linear;
+  }
+
+  ::-webkit-scrollbar{ width:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg); }
+  ::-webkit-scrollbar-thumb{ background:#232838; border-radius:8px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+
+  .skeleton{
+    background: linear-gradient(90deg, #12151C 25%, #171B25 37%, #12151C 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  @keyframes shimmer{
+    0%{ background-position: 100% 0; }
+    100%{ background-position: 0 0; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- NAV -->
+<header class="sticky top-0 z-40 border-b border-[var(--line)] bg-[#0B0C10]/85 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2.5">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="url(#lg)" stroke-width="1.6"/>
+        <path d="M12 2V22M3 7L12 12L21 7M3 17L12 12L12 22" stroke="url(#lg)" stroke-width="1.2" opacity="0.6"/>
+        <defs><linearGradient id="lg" x1="3" y1="2" x2="21" y2="22"><stop stop-color="#00F0FF"/><stop offset="1" stop-color="#9D4EDD"/></linearGradient></defs>
+      </svg>
+      <span class="font-display text-lg font-bold tracking-tight">Vaultframe</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm text-[var(--ink-dim)]">
+      <a href="#library" class="hover:text-[var(--cyan)] transition-colors">Library</a>
+      <a href="#how-it-works" class="hover:text-[var(--cyan)] transition-colors">How it works</a>
+      <a href="https://github.com/" target="_blank" rel="noopener" class="hover:text-[var(--cyan)] transition-colors">GitHub</a>
+    </nav>
+    <a href="#library" class="btn-primary text-sm px-4 py-2 rounded-md">Browse assets</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="top" class="relative border-b border-[var(--line)]">
+  <div class="grid-veil"></div>
+  <div class="relative max-w-7xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-24">
+    <div class="max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--line)] text-xs text-[var(--ink-dim)] mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-[var(--cyan)] shadow-[0_0_8px_var(--cyan)]"></span>
+        Built by artists, for artists
+      </div>
+      <h1 class="font-display text-4xl md:text-6xl font-bold leading-[1.05] glow-text">
+        Free 3D models &amp; Blender assets — powered by creators.
+      </h1>
+      <p class="mt-5 text-lg text-[var(--ink-dim)] max-w-xl">
+        A growing library of rigged characters, environments, shaders and animation kits. Every file is community-sourced, checked, and free to download — no accounts, no watermarks.
+      </p>
+
+      <!-- search -->
+      <div class="mt-9 max-w-xl">
+        <div class="relative">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-dim)]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="search-input" type="text" placeholder="Search assets — try “cyberpunk character”"
+            class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-[var(--cyan)] focus:ring-1 focus:ring-[var(--cyan)]/40 transition-colors">
+        </div>
+        <div id="category-chips" class="flex flex-wrap gap-2 mt-4">
+          <button data-cat="All" class="chip active px-3.5 py-1.5 rounded-full text-xs">All</button>
+          <button data-cat="Characters" class="chip px-3.5 py-1.5 rounded-full text-xs">Characters</button>
+          <button data-cat="Environments" class="chip px-3.5 py-1.5 rounded-full text-xs">Environments</button>
+          <button data-cat="Shaders" class="chip px-3.5 py-1.5 rounded-full text-xs">Shaders</button>
+          <button data-cat="Animations" class="chip px-3.5 py-1.5 rounded-full text-xs">Animations</button>
+          <button data-cat="Assets" class="chip px-3.5 py-1.5 rounded-full text-xs">Assets</button>
+        </div>
+      </div>
+
+      <!-- stats -->
+      <div class="mt-14 grid grid-cols-3 max-w-lg border-t border-[var(--line)] pt-6">
+        <div>
+          <div class="font-display text-2xl md:text-3xl font-bold text-[var(--cyan)]" id="stat-assets">500+</div>
+          <div class="text-xs text-[var(--ink-dim)] mt-1">Assets available</div>
+        </div>
+        <div class="border-l border-[var(--line)] pl-6">
+          <div class="font-display text-2xl md:text-3xl font-bold text-[var(--purple)]">100k+</div>
+          <div class="text-xs text-[var(--ink-dim)] mt-1">Downloads served</div>
+        </div>
+        <div class="border-l border-[var(--line)] pl-6">
+          <div class="font-display text-2xl md:text-3xl font-bold text-[var(--magenta)]">100%</div>
+          <div class="text-xs text-[var(--ink-dim)] mt-1">Free, always</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIBRARY -->
+<section id="library" class="max-w-7xl mx-auto px-6 py-16 md:py-20">
+  <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
+    <div>
+      <h2 class="font-display text-2xl md:text-3xl font-bold">The library</h2>
+      <p class="text-[var(--ink-dim)] text-sm mt-1">Every file is inspected before it's listed. New drops weekly.</p>
+    </div>
+    <div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
+  </div>
+
+  <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+  <div id="empty-state" class="hidden text-center py-20">
+    <p class="font-display text-xl text-[var(--ink-dim)]">No assets match that search.</p>
+    <p class="text-sm text-[var(--ink-dim)] mt-2">Try a different keyword or clear the category filter.</p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40">
+  <div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
+    <h2 class="font-display text-2xl md:text-3xl font-bold mb-10">How a download works</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div>
+        <div class="font-display text-[var(--cyan)] text-sm mb-2">01</div>
+        <h3 class="font-semibold mb-1.5">Pick your asset</h3>
+        <p class="text-sm text-[var(--ink-dim)]">Browse or search the library, then open any asset's download panel to see its specs.</p>
+      </div>
+      <div>
+        <div class="font-display text-[var(--purple)] text-sm mb-2">02</div>
+        <h3 class="font-semibold mb-1.5">Unlock the link</h3>
+        <p class="text-sm text-[var(--ink-dim)]">A short sponsor page opens in a new tab — this is what keeps the library free to run.</p>
+      </div>
+      <div>
+        <div class="font-display text-[var(--magenta)] text-sm mb-2">03</div>
+        <h3 class="font-semibold mb-1.5">Grab the file</h3>
+        <p class="text-sm text-[var(--ink-dim)]">Your Google Drive link unlocks right after — no login, no waiting rooms.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-[var(--line)]">
+  <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--ink-dim)]">
+    <span>© <span id="year"></span> Vaultframe. Built by the community.</span>
+    <div class="flex gap-6">
+      <a href="/admin/" class="hover:text-[var(--cyan)] transition-colors">Admin</a>
+      <a href="#top" class="hover:text-[var(--cyan)] transition-colors">Back to top</a>
+    </div>
+  </div>
+</footer>
+
+<!-- DOWNLOAD MODAL -->
+<div id="download-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+  <div class="modal-panel relative w-full max-w-md rounded-xl p-6 md:p-7">
+    <button id="modal-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <span id="modal-badge" class="badge inline-block px-2.5 py-1 rounded mb-4"></span>
+    <h3 id="modal-title" class="font-display text-xl font-bold pr-6"></h3>
+    <p id="modal-desc" class="text-sm text-[var(--ink-dim)] mt-2 leading-relaxed"></p>
+
+    <dl class="grid grid-cols-2 gap-y-3 mt-5 text-sm border-t border-[var(--line)] pt-5">
+      <dt class="text-[var(--ink-dim)]">File size</dt>
+      <dd id="modal-filesize" class="text-right"></dd>
+      <dt class="text-[var(--ink-dim)]">Render engine</dt>
+      <dd id="modal-engine" class="text-right"></dd>
+      <dt class="text-[var(--ink-dim)]">License</dt>
+      <dd id="modal-license" class="text-right"></dd>
+    </dl>
+
+    <div class="mt-6">
+      <button id="unlock-btn" class="btn-primary w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2" disabled>
+        <svg id="unlock-ring" width="18" height="18" viewBox="0 0 36 36" class="shrink-0">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(3,6,10,0.25)" stroke-width="3"/>
+          <circle id="unlock-ring-progress" class="ring-progress" cx="18" cy="18" r="15.5" fill="none" stroke="#03060A" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+        </svg>
+        <span id="unlock-label">Unlocking in 5s…</span>
+      </button>
+
+      <a id="drive-btn" target="_blank" rel="noopener"
+        class="hidden btn-primary w-full py-3 rounded-lg text-sm items-center justify-center gap-2 mt-3">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14m0 0-5-5m5 5 5-5M5 21h14"/></svg>
+        Open Google Drive file
+      </a>
+
+      <p id="modal-hint" class="text-xs text-[var(--ink-dim)] text-center mt-3">A sponsor page opens in a new tab to keep this library free.</p>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
