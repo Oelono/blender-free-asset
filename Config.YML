@@ -1,0 +1,56 @@
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/YOUR_REPO_NAME   # e.g. jane-doe/vaultframe
+  branch: main
+  base_url: https://your-oauth-provider.example.com   # see setup instructions, step 4
+  auth_endpoint: auth
+
+# Where uploaded thumbnail images are stored in the repo,
+# and the path used to reference them on the live site.
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+# Products are stored as a single JSON file (data/products.json)
+# rather than one markdown file per asset, so the site's script.js
+# can fetch it directly with no build step — GitHub Pages friendly.
+collections:
+  - name: "products"
+    label: "Products"
+    files:
+      - name: "products"
+        label: "Product Library"
+        file: "data/products.json"
+        format: "json"
+        fields:
+          - label: "Products"
+            name: "products"
+            widget: "list"
+            summary: "{{fields.title}} — {{fields.category}}"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Slug / ID", name: "id", widget: "string", hint: "Unique, no spaces, e.g. cyber-samurai-rig" }
+              - { label: "Description", name: "description", widget: "text" }
+              - label: "Category"
+                name: "category"
+                widget: "select"
+                options: ["Characters", "Environments", "Shaders", "Animations", "Assets"]
+              - label: "Thumbnail"
+                name: "thumbnail"
+                widget: "image"
+                hint: "Upload an image, or paste an external image URL"
+              - { label: "Blender Version", name: "blenderVersion", widget: "string", hint: "e.g. 4.2+" }
+              - label: "Render Engine"
+                name: "engine"
+                widget: "select"
+                options: ["Cycles", "Eevee", "Cycles / Eevee"]
+              - { label: "File Size", name: "fileSize", widget: "string", hint: "e.g. 184 MB" }
+              - { label: "License", name: "license", widget: "string", default: "CC0 — Free for personal & commercial use" }
+              - label: "Monetized Link"
+                name: "monetizedLink"
+                widget: "string"
+                hint: "Monetag / Adsterra direct link — opens first when a user clicks Download"
+              - label: "Google Drive Link"
+                name: "driveLink"
+                widget: "string"
+                hint: "The real file — revealed after the sponsor link is unlocked"
+              - { label: "Featured", name: "featured", widget: "boolean", default: false, required: false }
