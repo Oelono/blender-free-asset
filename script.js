@@ -327,9 +327,32 @@ const COUNTDOWN_SECONDS = 5;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 15.5; // matches r=15.5 in the SVG
 let countdownTimer = null;
 let activeProduct = null;
+let activeStage = 0;
+
+// Returns the ordered list of sponsor links for a product.
+// Supports the new "sponsorLinks" list field, and falls back to the
+// old single "monetizedLink" field for products created before this change.
+function getSponsorLinks(product) {
+  if (Array.isArray(product.sponsorLinks) && product.sponsorLinks.length) {
+    return product.sponsorLinks
+      .map(link => (typeof link === "string" ? link : link.url))
+      .filter(Boolean);
+  }
+  return product.monetizedLink ? [product.monetizedLink] : [];
+}
+
+function stageHintText(n, total) {
+  const hints = {
+    en: `Sponsor link ${n} of ${total} — opening in a new tab…`,
+    ar: `رابط الراعي ${n} من ${total} — يفتح في تبويب جديد…`,
+    ru: `Спонсорская ссылка ${n} из ${total} — открывается в новой вкладке…`,
+  };
+  return hints[state.lang] || hints.en;
+}
 
 function openModal(product) {
   activeProduct = product;
+  activeStage = 0;
 
   modalBadge.textContent = product.blenderVersion || "Blender";
   modalTitle.textContent = product.title;
@@ -345,7 +368,11 @@ function openModal(product) {
   unlockBtn.disabled = true;
   unlockRingProgress.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
   unlockRingProgress.style.strokeDashoffset = "0";
-  modalHint.textContent = t("modal_hint_default");
+
+  const sponsorLinks = getSponsorLinks(product);
+  modalHint.textContent = sponsorLinks.length
+    ? stageHintText(1, sponsorLinks.length)
+    : t("modal_hint_default");
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
@@ -377,11 +404,23 @@ function startCountdown() {
 unlockBtn.addEventListener("click", () => {
   if (unlockBtn.disabled || !activeProduct) return;
 
-  // Open the monetized (Monetag/Adsterra) link in a new tab.
-  const adUrl = activeProduct.monetizedLink;
-  if (adUrl) window.open(adUrl, "_blank", "noopener");
+  const sponsorLinks = getSponsorLinks(activeProduct);
 
-  // Reveal the real Google Drive link right after.
+  // Open this stage's sponsor link in a new tab.
+  const link = sponsorLinks[activeStage];
+  if (link) window.open(link, "_blank", "noopener");
+
+  activeStage += 1;
+
+  if (activeStage < sponsorLinks.length) {
+    // More sponsor links to go through — restart the countdown for the next one.
+    unlockBtn.disabled = true;
+    modalHint.textContent = stageHintText(activeStage + 1, sponsorLinks.length);
+    startCountdown();
+    return;
+  }
+
+  // All sponsor stages done — reveal the real Google Drive link.
   driveBtn.href = activeProduct.driveLink || "#";
   unlockBtn.classList.add("hidden");
   driveBtn.classList.remove("hidden");
