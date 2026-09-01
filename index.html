@@ -232,8 +232,10 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <div id="container-b0a70462aab028233ddf977a15e416ff"></div>
 </div>
 
-<!-- 160x600 SMART LINK BANNER (fixed skyscraper, desktop only) -->
-<div id="sidebar-ad" class="hidden xl:block fixed top-24 right-4 z-30" style="width:160px;height:600px;">
+<!-- 160x600 SMART LINK BANNER (fixed skyscraper). Only shown once the viewport
+     has genuine spare room beside the max-w-7xl content column, so browser
+     zoom / narrower windows can't make it overlap the page text. -->
+<div id="sidebar-ad" class="hidden min-[1700px]:block fixed top-24 right-4 z-30" style="width:160px;height:600px;">
 <script type="text/javascript">
 atOptions = {
   'key' : '65eeb729b2e37d03a0903b13c2428823',
@@ -329,7 +331,7 @@ var ctx = canvas.getContext('2d');
 var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var W, H, DPR;
 var grains = [];
-var GRAIN_COUNT = 70;
+var GRAIN_COUNT = 160;
 var running = true;
 var rafId = null;
 var lastFrame = 0;
@@ -350,12 +352,12 @@ function makeGrain(){
 return {
 x: Math.random() * W,
 y: Math.random() * H,
-r: Math.random() * 1.1 + 0.3,
-speedX: (Math.random() - 0.5) * 0.5,
-speedY: Math.random() * 0.4 + 0.15,
+r: Math.random() * 1.3 + 0.35,
+speedX: (Math.random() - 0.5) * 0.9,
+speedY: Math.random() * 0.7 + 0.25,
 drift: Math.random() * Math.PI * 2,
-driftSpeed: (Math.random() * 0.018) + 0.006,
-alpha: Math.random() * 0.5 + 0.15
+driftSpeed: (Math.random() * 0.03) + 0.01,
+alpha: Math.random() * 0.6 + 0.2
 };
 }
 
@@ -386,15 +388,15 @@ if(!running) return;
 if(ts - lastFrame < FRAME_INTERVAL) return;
 lastFrame = ts;
 
-windTime += 0.012;
-var wind = Math.sin(windTime) * 0.9 + Math.sin(windTime * 2.7 + 1.3) * 0.4;
+windTime += 0.02;
+var wind = Math.sin(windTime) * 1.7 + Math.sin(windTime * 2.7 + 1.3) * 0.8;
 
 ctx.clearRect(0,0,W,H);
 ctx.fillStyle = '#FFFFFF';
 grains.forEach(function(g){
 g.drift += g.driftSpeed;
-var windPull = wind * (1.6 - g.r);
-g.x += g.speedX + windPull + Math.sin(g.drift) * 0.15;
+var windPull = wind * (2.2 - g.r);
+g.x += g.speedX + windPull + Math.sin(g.drift) * 0.28;
 g.y += g.speedY;
 if(g.y > H + 4){ g.y = -4; g.x = Math.random() * W; }
 if(g.x > W + 4) g.x = -4;
