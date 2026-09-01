@@ -158,7 +158,7 @@ header, section, footer{ position:relative; z-index:1; }
 </head>
 <body class="min-h-screen">
 <!-- POPUNDER AD (kept high in body so its click-listener attaches before any user interaction) -->
-<script src="https://pl31127466.profitableratecpmnetwork.com/13/b9/99/13b999e12dcfde66fb2977751d25ff88.js"></script>
+<script src="https://pl31127466.profitableratecpmnetwork.com/13/b9/99/13b999e12dcfde66fb2977751d25ff88.js" onerror="window.__adBlocked=true"></script>
 <canvas id="sand-canvas"></canvas>
 <!-- NAV -->
 <header class="sticky top-0 z-40 border-b border-[var(--line)] bg-[#0A0A0A]/90 backdrop-blur">
@@ -228,7 +228,7 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 
 <!-- NATIVE BANNER AD -->
 <div class="max-w-7xl mx-auto px-6">
-<script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js"></script>
+<script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js" onerror="window.__adBlocked=true"></script>
 <div id="container-b0a70462aab028233ddf977a15e416ff"></div>
 </div>
 
@@ -243,7 +243,7 @@ atOptions = {
   'params' : {}
 };
 </script>
-<script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js"></script>
+<script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js" onerror="window.__adBlocked=true"></script>
 </div>
 
 <!-- HOW IT WORKS -->
@@ -428,7 +428,7 @@ init();
 </script>
 <script src="script.js"></script>
 <!-- SOCIAL BAR AD -->
-<script src="https://pl31127467.profitableratecpmnetwork.com/65/b3/5e/65b35e2bb31ceb181f4f5d0cdfb50227.js"></script>
+<script src="https://pl31127467.profitableratecpmnetwork.com/65/b3/5e/65b35e2bb31ceb181f4f5d0cdfb50227.js" onerror="window.__adBlocked=true"></script>
 
 <!-- ADBLOCK WALL -->
 <div id="adblock-wall" class="hidden fixed inset-0 z-[999] flex items-center justify-center px-6" style="background:rgba(10,10,10,0.97);backdrop-filter:blur(4px);">
@@ -446,7 +446,15 @@ init();
   var recheckBtn = document.getElementById("adblock-recheck");
 
   function detectAdblock(callback) {
-    // Classic bait element: filter lists hide elements matched by these
+    // 1) Direct signal: any of our real ad-network <script> tags already
+    // failed to load (onerror="window.__adBlocked=true" on each). This is
+    // what catches network-level blockers like Brave Shields, which block
+    // the request itself rather than hiding an element with CSS.
+    if (window.__adBlocked === true) {
+      return callback(true);
+    }
+
+    // 2) Classic bait element: filter lists hide elements matched by these
     // class/id names, so if the bait gets hidden/removed, a blocker is active.
     var bait = document.createElement("div");
     bait.className = "ad ads adsbox ad-banner adsbygoogle pub_300x250 text-ad textAds";
@@ -454,34 +462,38 @@ init();
       "position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;";
     document.body.appendChild(bait);
 
-    setTimeout(function () {
-      var blocked = false;
-      var rect = bait.getBoundingClientRect();
-      var style = window.getComputedStyle(bait);
-
-      if (
-        bait.offsetParent === null ||
-        rect.height === 0 ||
-        style.display === "none" ||
-        style.visibility === "hidden"
-      ) {
-        blocked = true;
+    // 3) Same-origin network bait: many blockers filter by URL pattern
+    // regardless of domain, so a request to a path that merely looks like
+    // an ad script gets blocked before it ever reaches the network. A
+    // normal browser gets back a plain 404; a blocker throws instead.
+    var netBlocked = false;
+    var netCheck = fetch("/pagead/ads.js", { method: "HEAD", cache: "no-store" }).catch(
+      function () {
+        netBlocked = true;
       }
+    );
 
-      document.body.removeChild(bait);
+    Promise.race([netCheck, new Promise(function (r) { setTimeout(r, 400); })]).then(
+      function () {
+        setTimeout(function () {
+          var blocked = window.__adBlocked === true || netBlocked;
+          var rect = bait.getBoundingClientRect();
+          var style = window.getComputedStyle(bait);
 
-      // Cross-check with whether the ad network scripts actually loaded.
-      if (
-        typeof window.atOptions === "undefined" &&
-        document.querySelector(
-          'script[src*="profitableratecpmnetwork.com"], script[src*="highrevenueformat.com"]'
-        ) === null
-      ) {
-        blocked = true;
+          if (
+            bait.offsetParent === null ||
+            rect.height === 0 ||
+            style.display === "none" ||
+            style.visibility === "hidden"
+          ) {
+            blocked = true;
+          }
+
+          document.body.removeChild(bait);
+          callback(blocked);
+        }, 150);
       }
-
-      callback(blocked);
-    }, 300);
+    );
   }
 
   function runCheck() {
