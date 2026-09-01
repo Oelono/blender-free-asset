@@ -1,8 +1,8 @@
 backend:
   name: github
-  repo: Oelono/blender-free-asset  # مثال: oelono/blender-free-asset
+  repo: Oelono/blender-free-asset
   branch: main
-  base_url: https://YOUR-OAUTH-WORKER.workers.dev   # من الـ Cloudflare Worker
+  base_url: https://oelono-cms-auth.beenbeen123455678.workers.dev
   auth_endpoint: auth
 
 media_folder: "assets/uploads"
