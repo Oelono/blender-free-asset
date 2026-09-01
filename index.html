@@ -208,20 +208,43 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 </div>
 </section>
 
-<!-- LIBRARY -->
+<!-- MAIN CONTENT LAYOUT (LIBRARY + SIDEBAR AD) -->
 <section id="library" class="max-w-7xl mx-auto px-6 py-16 md:py-20">
-<div class="flex items-end justify-between mb-8 flex-wrap gap-3">
-<div>
-<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading">The library</h2>
-<p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub">Every file is inspected before it's listed. New drops weekly.</p>
-</div>
-<div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
-</div>
-<div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-<div id="empty-state" class="hidden text-center py-20">
-<p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
-<p class="text-sm text-[var(--ink-dim)] mt-2" data-i18n="empty_sub">Try a different keyword or clear the category filter.</p>
-</div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    <!-- LEFT CONTENT: LIBRARY (9 COLUMNS) -->
+    <div class="lg:col-span-9">
+      <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
+        <div>
+          <h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading">The library</h2>
+          <p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub">Every file is inspected before it's listed. New drops weekly.</p>
+        </div>
+        <div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
+      </div>
+      <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      <div id="empty-state" class="hidden text-center py-20">
+        <p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
+        <p class="text-sm text-[var(--ink-dim)] mt-2" data-i18n="empty_sub">Try a different keyword or clear the category filter.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: 160x600 AD (3 COLUMNS) -->
+    <aside class="hidden lg:flex lg:col-span-3 justify-center">
+      <div class="sticky top-24">
+        <script type="text/javascript">
+        atOptions = {
+          'key' : '65eeb729b2e37d03a0903b13c2428823',
+          'format' : 'iframe',
+          'height' : 600,
+          'width' : 160,
+          'params' : {}
+        };
+        </script>
+        <script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js"></script>
+      </div>
+    </aside>
+
+  </div>
 </section>
 
 <!-- NATIVE BANNER AD -->
@@ -230,22 +253,8 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <div id="container-b0a70462aab028233ddf977a15e416ff"></div>
 </div>
 
-<!-- 160x600 SMART LINK BANNER -->
-<div class="max-w-7xl mx-auto px-6 flex justify-center py-4">
-<script type="text/javascript">
-atOptions = {
-  'key' : '65eeb729b2e37d03a0903b13c2428823',
-  'format' : 'iframe',
-  'height' : 600,
-  'width' : 160,
-  'params' : {}
-};
-</script>
-<script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js"></script>
-</div>
-
 <!-- HOW IT WORKS -->
-<section id="how-it-works" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40">
+<section id="how-it-works" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40 mt-12">
 <div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
 <h2 class="font-display text-2xl md:text-3xl font-semibold mb-10" data-i18n="how_heading">How a download works</h2>
 <div class="grid md:grid-cols-3 gap-8">
