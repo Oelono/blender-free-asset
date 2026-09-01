@@ -322,6 +322,7 @@ const unlockRingProgress = document.getElementById("unlock-ring-progress");
 const driveBtn = document.getElementById("drive-btn");
 const modalHint = document.getElementById("modal-hint");
 const modalClose = document.getElementById("modal-close");
+const stepIndicator = document.getElementById("step-indicator");
 
 const COUNTDOWN_SECONDS = 5;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 15.5; // matches r=15.5 in the SVG
@@ -343,11 +344,65 @@ function getSponsorLinks(product) {
 
 function stageHintText(n, total) {
   const hints = {
-    en: `Sponsor link ${n} of ${total} — opening in a new tab…`,
-    ar: `رابط الراعي ${n} من ${total} — يفتح في تبويب جديد…`,
-    ru: `Спонсорская ссылка ${n} из ${total} — открывается в новой вкладке…`,
+    en: `Step ${n} of ${total} — opening sponsor link in a new tab…`,
+    ar: `الخطوة ${n} من ${total} — بيفتح رابط الراعي في تبويب جديد…`,
+    ru: `Шаг ${n} из ${total} — открывается спонсорская ссылка в новой вкладке…`,
   };
   return hints[state.lang] || hints.en;
+}
+
+const stepReadyLabel = {
+  en: (n) => `Step ${n} complete`,
+  ar: (n) => `الخطوة ${n} خلصت`,
+  ru: (n) => `Шаг ${n} завершён`,
+};
+const driveStepLabel = {
+  en: "Drive file download",
+  ar: "تحميل ملف درايف",
+  ru: "Скачать файл с Drive",
+};
+
+// Renders a row of step pills: Step 1, Step 2, ... Step N, Drive download.
+// - completed steps: filled/checked
+// - the current step: highlighted
+// - future steps: dim
+// This is purely visual state driven by activeStage, which only ever
+// advances by exactly one stage per confirmed click (see unlockBtn handler
+// below) — so there is no way to reach a later step without the button
+// for every prior step actually being clicked and its countdown finished.
+function renderStepIndicator(totalSponsorStages, currentStage) {
+  if (!stepIndicator) return;
+  if (totalSponsorStages <= 0) {
+    stepIndicator.innerHTML = "";
+    return;
+  }
+  const pills = [];
+  for (let i = 1; i <= totalSponsorStages; i++) {
+    const done = i <= currentStage;
+    const isCurrent = i === currentStage + 1 && currentStage < totalSponsorStages;
+    pills.push(`
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
+        style="${done
+          ? "background:rgba(0,240,255,0.12); border-color:rgba(0,240,255,0.4); color:var(--ink);"
+          : isCurrent
+            ? "background:rgba(0,240,255,0.05); border-color:rgba(0,240,255,0.25); color:var(--ink);"
+            : "background:transparent; border-color:var(--line); color:var(--ink-dim);"}">
+        ${done ? "✓" : i}
+        <span>${state.lang === "ar" ? "خطوة" : "Step"} ${i}</span>
+      </div>
+    `);
+  }
+  const driveDone = currentStage >= totalSponsorStages;
+  pills.push(`
+    <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
+      style="${driveDone
+        ? "background:rgba(157,78,221,0.12); border-color:rgba(157,78,221,0.4); color:#C79BFF;"
+        : "background:transparent; border-color:var(--line); color:var(--ink-dim);"}">
+      ${driveDone ? "✓" : "🔒"}
+      <span>${driveStepLabel[state.lang] || driveStepLabel.en}</span>
+    </div>
+  `);
+  stepIndicator.innerHTML = pills.join("");
 }
 
 function openModal(product) {
@@ -373,6 +428,7 @@ function openModal(product) {
   modalHint.textContent = sponsorLinks.length
     ? stageHintText(1, sponsorLinks.length)
     : t("modal_hint_default");
+  renderStepIndicator(sponsorLinks.length, 0);
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
@@ -411,9 +467,13 @@ unlockBtn.addEventListener("click", () => {
   if (link) window.open(link, "_blank", "noopener");
 
   activeStage += 1;
+  renderStepIndicator(sponsorLinks.length, activeStage);
 
   if (activeStage < sponsorLinks.length) {
     // More sponsor links to go through — restart the countdown for the next one.
+    // activeStage only ever moves forward by 1 here, and the button stays
+    // disabled until a fresh countdown finishes, so repeatedly clicking the
+    // same opened tab/link cannot fast-forward past a step.
     unlockBtn.disabled = true;
     modalHint.textContent = stageHintText(activeStage + 1, sponsorLinks.length);
     startCountdown();
