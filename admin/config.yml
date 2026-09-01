@@ -40,10 +40,13 @@ collections:
                 options: ["Cycles", "Eevee", "Cycles / Eevee"]
               - { label: "File Size", name: "fileSize", widget: "string", hint: "e.g. 184 MB" }
               - { label: "License", name: "license", widget: "string", default: "CC0 — Free for personal & commercial use" }
-              - label: "Monetized Link"
-                name: "monetizedLink"
-                widget: "string"
-                hint: "Monetag / Adsterra direct link — opens first when a user clicks Download"
+              - label: "Sponsor Links"
+                name: "sponsorLinks"
+                widget: "list"
+                hint: "Links a visitor clicks through, in order, before the Google Drive link unlocks. Paste the same Adsterra link 4 times, or up to 4 different ones."
+                min: 1
+                max: 4
+                field: { label: "Link", name: "url", widget: "string" }
               - label: "Google Drive Link"
                 name: "driveLink"
                 widget: "string"
