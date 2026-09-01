@@ -249,7 +249,7 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--ink-dim)]">
 <span>© <span id="year"></span> Oelono <span data-i18n="footer_built">Built by Oelono.</span></span>
 <div class="flex gap-6">
-<a href="https://oelono.github.io/blender-free-asset/admin/#/collections/products/entries/products" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
+<a href="/admin/" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
 <a href="#top" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_top">Back to top</a>
 </div>
 </div>
@@ -297,10 +297,14 @@ var ctx = canvas.getContext('2d');
 var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var W, H, DPR;
 var grains = [];
-var GRAIN_COUNT = 140;
+var GRAIN_COUNT = 70;
+var running = true;
+var rafId = null;
+var lastFrame = 0;
+var FRAME_INTERVAL = 1000 / 30; // cap at ~30fps, plenty smooth for slow drifting grains
 
 function resize(){
-DPR = Math.min(window.devicePixelRatio || 1, 2);
+DPR = Math.min(window.devicePixelRatio || 1, 1.5);
 W = window.innerWidth;
 H = window.innerHeight;
 canvas.width = W * DPR;
@@ -327,7 +331,7 @@ function init(){
 resize();
 grains = [];
 for(var i=0;i<GRAIN_COUNT;i++){ grains.push(makeGrain()); }
-if(reduceMotion){ drawStatic(); } else { requestAnimationFrame(tick); }
+if(reduceMotion){ drawStatic(); } else { rafId = requestAnimationFrame(tick); }
 }
 
 function drawStatic(){
@@ -344,16 +348,19 @@ ctx.globalAlpha = 1;
 
 var windTime = 0;
 
-function tick(){
+function tick(ts){
+rafId = requestAnimationFrame(tick);
+if(!running) return;
+if(ts - lastFrame < FRAME_INTERVAL) return;
+lastFrame = ts;
+
 windTime += 0.0035;
-// slow base sway plus a slightly faster overlapping sway = a gentle, uneven breeze
 var wind = Math.sin(windTime) * 0.35 + Math.sin(windTime * 2.7 + 1.3) * 0.15;
 
 ctx.clearRect(0,0,W,H);
 ctx.fillStyle = '#FFFFFF';
 grains.forEach(function(g){
 g.drift += g.driftSpeed;
-// lighter grains (smaller r) catch the breeze a bit more, like real sand/dust
 var windPull = wind * (1.6 - g.r);
 g.x += g.speedX + windPull + Math.sin(g.drift) * 0.05;
 g.y += g.speedY;
@@ -366,8 +373,19 @@ ctx.arc(g.x, g.y, g.r, 0, Math.PI*2);
 ctx.fill();
 });
 ctx.globalAlpha = 1;
-requestAnimationFrame(tick);
 }
+
+// pause the ambient animation while the download modal is open or the tab
+// is hidden, so it never competes with the unlock/download flow
+var modalEl = document.getElementById('download-modal');
+function syncRunning(){
+var modalOpen = modalEl && !modalEl.classList.contains('hidden');
+running = !modalOpen && document.visibilityState === 'visible';
+}
+if(modalEl){
+new MutationObserver(syncRunning).observe(modalEl, { attributes:true, attributeFilter:['class'] });
+}
+document.addEventListener('visibilitychange', syncRunning);
 
 window.addEventListener('resize', function(){
 resize();
