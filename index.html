@@ -226,16 +226,17 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 </div>
 </section>
 
-<!-- NATIVE BANNER AD -->
-<div class="max-w-7xl mx-auto px-6">
+<!-- NATIVE BANNER AD + 160x600 SMART LINK BANNER, side by side in normal
+     page flow (not fixed) — they scroll with the page like any other
+     content and wrap to a stacked layout on narrow screens instead of
+     overlapping or disappearing. -->
+<div class="max-w-7xl mx-auto px-6 flex flex-wrap items-start gap-4">
+<div class="flex-1 min-w-0">
 <script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js" onerror="window.__adBlocked=true"></script>
 <div id="container-b0a70462aab028233ddf977a15e416ff"></div>
 </div>
 
-<!-- 160x600 SMART LINK BANNER (fixed skyscraper). Only shown once the viewport
-     has genuine spare room beside the max-w-7xl content column, so browser
-     zoom / narrower windows can't make it overlap the page text. -->
-<div id="sidebar-ad" class="hidden min-[1700px]:block fixed top-24 right-4 z-30" style="width:160px;height:600px;">
+<div id="sidebar-ad" class="flex-shrink-0 mx-auto" style="width:160px;height:600px;">
 <script type="text/javascript">
 atOptions = {
   'key' : '65eeb729b2e37d03a0903b13c2428823',
@@ -246,6 +247,7 @@ atOptions = {
 };
 </script>
 <script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js" onerror="window.__adBlocked=true"></script>
+</div>
 </div>
 
 <!-- HOW IT WORKS -->
