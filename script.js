@@ -323,8 +323,11 @@ const driveBtn = document.getElementById("drive-btn");
 const modalHint = document.getElementById("modal-hint");
 const modalClose = document.getElementById("modal-close");
 const stepIndicator = document.getElementById("step-indicator");
+const progressBar = document.getElementById("progress-bar");
+const progressLabel = document.getElementById("progress-label");
+const progressPercent = document.getElementById("progress-percent");
 
-const COUNTDOWN_SECONDS = 5;
+const COUNTDOWN_SECONDS = 10;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 15.5; // matches r=15.5 in the SVG
 let countdownTimer = null;
 let activeProduct = null;
@@ -403,6 +406,35 @@ function renderStepIndicator(totalSponsorStages, currentStage) {
     </div>
   `);
   stepIndicator.innerHTML = pills.join("");
+}
+
+const remainingStepsText = {
+  en: (n) => n === 1 ? "Almost done — 1 step left" : `${n} steps left`,
+  ar: (n) => n === 1 ? "قربت تخلص — خطوة واحدة باقية" : `متبقي ${n} خطوات`,
+  ru: (n) => n === 1 ? "Почти готово — остался 1 шаг" : `Осталось шагов: ${n}`,
+};
+const allDoneText = {
+  en: "All steps complete!",
+  ar: "خلصت كل الخطوات!",
+  ru: "Все шаги пройдены!",
+};
+
+// Overall progress across every step, including the final "in progress"
+// countdown fraction — so the bar creeps forward smoothly during each
+// wait too, not just in jumps when a step completes.
+function updateOverallProgress(totalSponsorStages, currentStage, countdownFraction) {
+  if (!progressBar) return;
+  const totalUnits = totalSponsorStages + 1; // +1 for the final drive unlock
+  const completedUnits = currentStage + (countdownFraction || 0);
+  const pct = totalUnits > 0 ? Math.min(100, Math.round((completedUnits / totalUnits) * 100)) : 0;
+
+  progressBar.style.width = `${pct}%`;
+  progressPercent.textContent = `${pct}%`;
+
+  const remaining = totalSponsorStages - currentStage;
+  progressLabel.textContent = remaining > 0
+    ? (remainingStepsText[state.lang] || remainingStepsText.en)(remaining)
+    : (allDoneText[state.lang] || allDoneText.en);
 }
 
 function openModal(product) {
