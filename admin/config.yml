@@ -1,54 +1,525 @@
-backend:
-  name: github
-  repo: Oelono/blender-free-asset
-  branch: main
-  base_url: https://oelono-cms-auth.beenbeen123455678.workers.dev
-  auth_endpoint: auth
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oelono — Free Blender Assets for 3D Artists</title>
+<link rel="icon" type="image/jpeg" href="we.png">
+<meta name="description" content="A free, community-fed library of high-quality Blender assets — characters, environments, shaders and animations, ready to drop into your scene.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#0A0A0A;
+--bg-raised:#141414;
+--line:#262626;
+--ink:#FFFFFF;
+--ink-dim:#8F8F8F;
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+background:var(--bg);
+color:var(--ink);
+font-family:'Inter',sans-serif;
+overflow-x:hidden;
+}
+.font-display{ font-family:'Space Grotesk',sans-serif; }
 
-media_folder: "assets/uploads"
-public_folder: "/assets/uploads"
+/* ---------- hero entrance: one orchestrated sequence ---------- */
+@keyframes rise{
+from{ opacity:0; transform:translateY(14px); }
+to{ opacity:1; transform:translateY(0); }
+}
+.reveal{ animation: rise .7s cubic-bezier(.22,.9,.3,1) both; }
+.reveal-1{ animation-delay:.05s; }
+.reveal-2{ animation-delay:.18s; }
+.reveal-3{ animation-delay:.31s; }
+.reveal-4{ animation-delay:.44s; }
 
-collections:
-  - name: "products"
-    label: "Products"
-    files:
-      - name: "products"
-        label: "Product Library"
-        file: "data/products.json"
-        format: "json"
-        fields:
-          - label: "Products"
-            name: "products"
-            widget: "list"
-            summary: "{{fields.title}} — {{fields.category}}"
-            fields:
-              - { label: "Title", name: "title", widget: "string" }
-              - { label: "Slug / ID", name: "id", widget: "string", hint: "Unique, no spaces, e.g. cyber-samurai-rig" }
-              - { label: "Description", name: "description", widget: "text" }
-              - label: "Category"
-                name: "category"
-                widget: "select"
-                options: ["Characters", "Environments", "Shaders", "Animations", "Assets"]
-              - label: "Thumbnail"
-                name: "thumbnail"
-                widget: "image"
-                hint: "Upload an image, or paste an external image URL"
-              - { label: "Blender Version", name: "blenderVersion", widget: "string", hint: "e.g. 4.2+" }
-              - label: "Render Engine"
-                name: "engine"
-                widget: "select"
-                options: ["Cycles", "Eevee", "Cycles / Eevee"]
-              - { label: "File Size", name: "fileSize", widget: "string", hint: "e.g. 184 MB" }
-              - { label: "License", name: "license", widget: "string", default: "CC0 — Free for personal & commercial use" }
-              - label: "Sponsor Links"
-                name: "sponsorLinks"
-                widget: "list"
-                hint: "Links a visitor clicks through, in order, before the Google Drive link unlocks. Paste the same Adsterra link 4 times, or up to 4 different ones."
-                min: 1
-                max: 4
-                field: { label: "Link", name: "url", widget: "string" }
-              - label: "Google Drive Link"
-                name: "driveLink"
-                widget: "string"
-                hint: "The real file — revealed after the sponsor link is unlocked"
-              - { label: "Featured", name: "featured", widget: "boolean", default: false, required: false }
+@keyframes drawline{
+from{ width:0; }
+to{ width:56px; }
+}
+.hero-rule{
+height:2px;
+background:var(--ink);
+animation: drawline .8s cubic-bezier(.22,.9,.3,1) .55s both;
+}
+
+.btn-primary{
+background: var(--ink);
+color:#0A0A0A;
+font-weight:600;
+transition: transform .16s cubic-bezier(.22,.9,.3,1), box-shadow .16s ease;
+}
+.btn-primary:hover{
+transform: translateY(-1px) scale(1.015);
+box-shadow: 0 10px 26px -12px rgba(255,255,255,0.25);
+}
+.btn-primary:active{ transform: translateY(0) scale(.99); }
+.btn-primary:disabled{
+opacity:.3;
+cursor:not-allowed;
+transform:none;
+box-shadow:none;
+}
+.card{
+background: var(--bg-raised);
+border:1px solid var(--line);
+transition: border-color .2s cubic-bezier(.22,.9,.3,1), transform .2s cubic-bezier(.22,.9,.3,1);
+}
+.card:hover{
+border-color: var(--ink);
+transform: translateY(-4px);
+}
+.chip{
+border:1px solid var(--line);
+color:var(--ink-dim);
+transition: all .16s ease;
+}
+.chip.active, .chip:hover{
+border-color: var(--ink);
+color: var(--ink);
+background: rgba(255,255,255,0.05);
+}
+.badge{
+font-family:'Space Grotesk',sans-serif;
+font-size:11px;
+border:1px solid var(--line);
+color:var(--ink-dim);
+}
+input[type="text"]::placeholder{ color:#565656; }
+#search-input{ transition: border-color .16s ease, box-shadow .16s ease; }
+#search-input:focus{ box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+#download-modal{
+background: rgba(0,0,0,0.82);
+}
+.modal-panel{
+background: var(--bg-raised);
+border:1px solid var(--line);
+animation: rise .3s cubic-bezier(.22,.9,.3,1) both;
+}
+.ring-progress{
+transition: stroke-dashoffset 1s linear;
+}
+::-webkit-scrollbar{ width:10px; }
+::-webkit-scrollbar-track{ background:var(--bg); }
+::-webkit-scrollbar-thumb{ background:#1F1F1F; border-radius:8px; }
+@media (prefers-reduced-motion: reduce){
+*{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+.skeleton{
+background: linear-gradient(90deg, #141414 25%, #1C1C1C 37%, #141414 63%);
+background-size: 400% 100%;
+animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer{
+0%{ background-position: 100% 0; }
+100%{ background-position: 0 0; }
+}
+/* ---------- language / RTL support ---------- */
+html[lang="ar"] body{ font-family:'Tajawal',sans-serif; }
+html[lang="ar"] .font-display,
+html[lang="ar"] .badge{ font-family:'Tajawal',sans-serif; font-weight:700; letter-spacing:0; }
+html[lang="ru"] .font-display,
+html[lang="ru"] .badge{ font-family:'Inter',sans-serif; font-weight:700; letter-spacing:0; }
+[dir="rtl"] #search-input{ padding-left:1rem; padding-right:2.75rem; }
+[dir="rtl"] #search-input + svg,
+[dir="rtl"] .search-icon{ left:auto; right:1rem; }
+[dir="rtl"] .card .absolute.top-3.left-3{ left:auto; right:0.75rem; }
+[dir="rtl"] .card .absolute.top-3.right-3{ right:auto; left:0.75rem; }
+[dir="rtl"] #modal-close{ right:auto; left:1rem; }
+[dir="rtl"] #modal-title{ padding-right:0; padding-left:1.5rem; }
+[dir="rtl"] .border-l{ border-left:none; }
+[dir="rtl"] .stat-divider{ border-left:none; border-right:1px solid var(--line); }
+[dir="rtl"] dd{ text-align:left; }
+[dir="rtl"] .hero-rule{ margin-left:auto; }
+/* lightweight switcher */
+.lang-switch button{
+color:var(--ink-dim);
+transition: color .16s ease;
+}
+.lang-switch button.active{ color:var(--ink); }
+
+/* ---------- drifting sand-grain particle layer ---------- */
+#sand-canvas{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+z-index:0;
+pointer-events:none;
+opacity:.55;
+}
+header, section, footer{ position:relative; z-index:1; }
+</style>
+</head>
+<body class="min-h-screen">
+<!-- POPUNDER AD (kept high in body so its click-listener attaches before any user interaction) -->
+<script src="https://pl31127466.profitableratecpmnetwork.com/13/b9/99/13b999e12dcfde66fb2977751d25ff88.js" onerror="window.__adBlocked=true"></script>
+<canvas id="sand-canvas"></canvas>
+<!-- NAV -->
+<header class="sticky top-0 z-40 border-b border-[var(--line)] bg-[#0A0A0A]/90 backdrop-blur">
+<div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<a href="#top" class="flex items-center gap-2.5">
+<img src="106993307.jpg" alt="Oelono" class="w-[26px] h-[26px] rounded-full object-cover">
+<span class="font-display text-lg font-semibold tracking-tight">Oelono</span>
+</a>
+<nav class="hidden md:flex items-center gap-8 text-sm text-[var(--ink-dim)]">
+<a href="#library" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_library">Library</a>
+<a href="#how-it-works" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_how">How it works</a>
+<a href="https://github.com/" target="_blank" rel="noopener" class="hover:text-[var(--ink)] transition-colors">GitHub</a>
+</nav>
+<div class="flex items-center gap-4">
+<div id="lang-switcher" class="lang-switch flex items-center gap-1 text-xs border border-[var(--line)] rounded-full px-1 py-1">
+<button data-lang="en" class="px-2 py-1 rounded-full">EN</button>
+<button data-lang="ar" class="px-2 py-1 rounded-full">AR</button>
+<button data-lang="ru" class="px-2 py-1 rounded-full">RU</button>
+</div>
+<a href="#library" class="btn-primary text-sm px-4 py-2 rounded-md" data-i18n="nav_browse">Browse assets</a>
+</div>
+</div>
+</header>
+
+<!-- HERO -->
+<section id="top" class="relative border-b border-[var(--line)]">
+<div class="relative max-w-7xl mx-auto px-6 pt-16 pb-16 md:pt-20 md:pb-20">
+<div class="max-w-3xl">
+<div class="hero-rule mb-5"></div>
+<h1 class="reveal reveal-1 font-display text-4xl md:text-5xl font-semibold tracking-tight mb-4 leading-[1.05]">Blender assets,<br>ready to drop in</h1>
+<p class="reveal reveal-2 text-[var(--ink-dim)] text-sm md:text-base mb-9 max-w-xl">A community-fed library of characters, environments, shaders and animations — every file checked before it's listed.</p>
+<!-- search -->
+<div class="reveal reveal-3 max-w-xl">
+<div class="relative">
+<svg class="search-icon absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-dim)]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+<input id="search-input" type="text" data-i18n-placeholder="search_placeholder" placeholder="Search assets — try “cyberpunk character”"
+class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-[var(--ink)]">
+</div>
+<div id="category-chips" class="flex flex-wrap gap-2 mt-4">
+<button data-cat="All" class="chip active px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_all">All</button>
+<button data-cat="Characters" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_characters">Characters</button>
+<button data-cat="Environments" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_environments">Environments</button>
+<button data-cat="Shaders" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_shaders">Shaders</button>
+<button data-cat="Animations" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_animations">Animations</button>
+<button data-cat="Assets" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_assets">Assets</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- LIBRARY -->
+<section id="library" class="max-w-7xl mx-auto px-6 pt-16 pb-4 md:pt-20 md:pb-6">
+<div class="flex items-end justify-between mb-8 flex-wrap gap-3">
+<div>
+<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading">The library</h2>
+<p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub">Every file is inspected before it's listed. New drops weekly.</p>
+</div>
+<div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
+</div>
+
+<!-- Grid + 160x600 sidebar ad side by side. The ad is `sticky`, not
+     `fixed`, so it travels with the library section as you scroll but
+     can never escape this row to overlap the header, footer, or other
+     sections — and on narrow screens it just stacks below the grid. -->
+<div class="flex flex-wrap items-start gap-6">
+<div class="flex-1 min-w-0">
+<div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+<div id="empty-state" class="hidden text-center py-20">
+<p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
+<p class="text-sm text-[var(--ink-dim)] mt-2" data-i18n="empty_sub">Try a different keyword or clear the category filter.</p>
+</div>
+</div>
+
+<div id="sidebar-ad" class="flex-shrink-0 mx-auto lg:sticky lg:top-24" style="width:160px;height:600px;">
+<script type="text/javascript">
+atOptions = {
+  'key' : '65eeb729b2e37d03a0903b13c2428823',
+  'format' : 'iframe',
+  'height' : 600,
+  'width' : 160,
+  'params' : {}
+};
+</script>
+<script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js" onerror="window.__adBlocked=true"></script>
+</div>
+</div>
+</section>
+
+<!-- NATIVE BANNER AD -->
+<div class="max-w-7xl mx-auto px-6">
+<script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js" onerror="window.__adBlocked=true"></script>
+<div id="container-b0a70462aab028233ddf977a15e416ff"></div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40">
+<div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
+<h2 class="font-display text-2xl md:text-3xl font-semibold mb-10" data-i18n="how_heading">How a download works</h2>
+<div class="grid md:grid-cols-3 gap-8">
+<div>
+<h3 class="font-semibold mb-1.5" data-i18n="how1_title">Pick your asset</h3>
+<p class="text-sm text-[var(--ink-dim)]" data-i18n="how1_desc">Browse or search the library, then open any asset's download panel to see its specs.</p>
+</div>
+<div>
+<h3 class="font-semibold mb-1.5" data-i18n="how2_title">Unlock the link</h3>
+<p class="text-sm text-[var(--ink-dim)]" data-i18n="how2_desc">A short sponsor page opens in a new tab — this is what keeps the library free to run.</p>
+</div>
+<div>
+<h3 class="font-semibold mb-1.5" data-i18n="how3_title">Grab the file</h3>
+<p class="text-sm text-[var(--ink-dim)]" data-i18n="how3_desc">Your Google Drive link unlocks right after — no login, no waiting rooms.</p>
+</div>
+</div>
+</div>
+</section>
+
+<footer class="border-t border-[var(--line)]">
+<div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--ink-dim)]">
+<span>© <span id="year"></span> Oelono <span data-i18n="footer_built">Built by Oelono.</span></span>
+<div class="flex gap-6">
+<a href="/admin/" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
+<a href="#top" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_top">Back to top</a>
+</div>
+</div>
+</footer>
+
+<!-- DOWNLOAD MODAL -->
+<div id="download-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+<div class="modal-panel relative w-full max-w-md rounded-xl p-6 md:p-7">
+<button id="modal-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+<span id="modal-badge" class="badge inline-block px-2.5 py-1 rounded mb-4"></span>
+<h3 id="modal-title" class="font-display text-xl font-semibold pr-6"></h3>
+<p id="modal-desc" class="text-sm text-[var(--ink-dim)] mt-2 leading-relaxed"></p>
+<dl class="grid grid-cols-2 gap-y-3 mt-5 text-sm border-t border-[var(--line)] pt-5">
+<dt class="text-[var(--ink-dim)]" data-i18n="modal_filesize_label">File size</dt>
+<dd id="modal-filesize" class="text-right"></dd>
+<dt class="text-[var(--ink-dim)]" data-i18n="modal_engine_label">Render engine</dt>
+<dd id="modal-engine" class="text-right"></dd>
+<dt class="text-[var(--ink-dim)]" data-i18n="modal_license_label">License</dt>
+<dd id="modal-license" class="text-right"></dd>
+</dl>
+<div class="mt-6">
+<div class="mb-3">
+<div class="flex items-center justify-between text-xs mb-1.5">
+<span id="progress-label" class="text-[var(--ink-dim)]"></span>
+<span id="progress-percent" class="text-[var(--ink-dim)] font-medium"></span>
+</div>
+<div class="w-full h-1.5 rounded-full overflow-hidden" style="background:var(--line);">
+<div id="progress-bar" class="h-full rounded-full transition-all duration-500" style="width:0%; background:linear-gradient(90deg, #00F0FF, #9D4EDD);"></div>
+</div>
+</div>
+<div id="step-indicator" class="flex items-center justify-center gap-2 mb-4"></div>
+<button id="unlock-btn" class="btn-primary w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2" disabled>
+<svg id="unlock-ring" width="18" height="18" viewBox="0 0 36 36" class="shrink-0">
+<circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(10,10,10,0.25)" stroke-width="3"/>
+<circle id="unlock-ring-progress" class="ring-progress" cx="18" cy="18" r="15.5" fill="none" stroke="#0A0A0A" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+</svg>
+<span id="unlock-label">Unlocking in 10s…</span>
+</button>
+<a id="drive-btn" target="_blank" rel="noopener"
+class="hidden btn-primary w-full py-3 rounded-lg text-sm items-center justify-center gap-2 mt-3">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14m0 0-5-5m5 5 5-5M5 21h14"/></svg>
+<span data-i18n="modal_drive_btn">Open Google Drive file</span>
+</a>
+<p id="modal-hint" class="text-xs text-[var(--ink-dim)] text-center mt-3">A sponsor page opens in a new tab to keep this library free.</p>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+var canvas = document.getElementById('sand-canvas');
+var ctx = canvas.getContext('2d');
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var W, H, DPR;
+var grains = [];
+var GRAIN_COUNT = 160;
+var running = true;
+var rafId = null;
+var lastFrame = 0;
+var FRAME_INTERVAL = 1000 / 30; // cap at ~30fps, plenty smooth for slow drifting grains
+
+function resize(){
+DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+W = window.innerWidth;
+H = window.innerHeight;
+canvas.width = W * DPR;
+canvas.height = H * DPR;
+canvas.style.width = W + 'px';
+canvas.style.height = H + 'px';
+ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+
+function makeGrain(){
+return {
+x: Math.random() * W,
+y: Math.random() * H,
+r: Math.random() * 1.3 + 0.35,
+speedX: (Math.random() - 0.5) * 0.9,
+speedY: Math.random() * 0.7 + 0.25,
+drift: Math.random() * Math.PI * 2,
+driftSpeed: (Math.random() * 0.03) + 0.01,
+alpha: Math.random() * 0.6 + 0.2
+};
+}
+
+function init(){
+resize();
+grains = [];
+for(var i=0;i<GRAIN_COUNT;i++){ grains.push(makeGrain()); }
+if(reduceMotion){ drawStatic(); } else { rafId = requestAnimationFrame(tick); }
+}
+
+function drawStatic(){
+ctx.clearRect(0,0,W,H);
+ctx.fillStyle = '#FFFFFF';
+grains.forEach(function(g){
+ctx.globalAlpha = g.alpha * 0.6;
+ctx.beginPath();
+ctx.arc(g.x, g.y, g.r, 0, Math.PI*2);
+ctx.fill();
+});
+ctx.globalAlpha = 1;
+}
+
+var windTime = 0;
+
+function tick(ts){
+rafId = requestAnimationFrame(tick);
+if(!running) return;
+if(ts - lastFrame < FRAME_INTERVAL) return;
+lastFrame = ts;
+
+windTime += 0.02;
+var wind = Math.sin(windTime) * 1.7 + Math.sin(windTime * 2.7 + 1.3) * 0.8;
+
+ctx.clearRect(0,0,W,H);
+ctx.fillStyle = '#FFFFFF';
+grains.forEach(function(g){
+g.drift += g.driftSpeed;
+var windPull = wind * (2.2 - g.r);
+g.x += g.speedX + windPull + Math.sin(g.drift) * 0.28;
+g.y += g.speedY;
+if(g.y > H + 4){ g.y = -4; g.x = Math.random() * W; }
+if(g.x > W + 4) g.x = -4;
+if(g.x < -4) g.x = W + 4;
+ctx.globalAlpha = g.alpha;
+ctx.beginPath();
+ctx.arc(g.x, g.y, g.r, 0, Math.PI*2);
+ctx.fill();
+});
+ctx.globalAlpha = 1;
+}
+
+// pause the ambient animation while the download modal is open or the tab
+// is hidden, so it never competes with the unlock/download flow
+var modalEl = document.getElementById('download-modal');
+function syncRunning(){
+var modalOpen = modalEl && !modalEl.classList.contains('hidden');
+running = !modalOpen && document.visibilityState === 'visible';
+}
+if(modalEl){
+new MutationObserver(syncRunning).observe(modalEl, { attributes:true, attributeFilter:['class'] });
+}
+document.addEventListener('visibilitychange', syncRunning);
+
+window.addEventListener('resize', function(){
+resize();
+});
+
+init();
+})();
+</script>
+<script src="script.js"></script>
+<!-- SOCIAL BAR AD -->
+<script src="https://pl31127467.profitableratecpmnetwork.com/65/b3/5e/65b35e2bb31ceb181f4f5d0cdfb50227.js" onerror="window.__adBlocked=true"></script>
+
+<!-- ADBLOCK WALL -->
+<div id="adblock-wall" class="hidden fixed inset-0 z-[999] flex items-center justify-center px-6" style="background:rgba(10,10,10,0.97);backdrop-filter:blur(4px);">
+<div class="max-w-md w-full text-center rounded-2xl p-8" style="background:var(--bg-raised);border:1px solid var(--line);">
+<div class="text-4xl mb-4">🛑</div>
+<h2 class="font-display text-xl mb-3" style="color:var(--ink);">لازم توقف مانع الإعلانات (AdBlock)</h2>
+<p class="text-sm mb-6" style="color:var(--ink-dim);">الموقع ده مجاني وبيتمول بالإعلانات فقط. من فضلك عطّل الـ AdBlock / uBlock من إعدادات المتصفح لهذا الموقع، بعدين اضغط "أعد المحاولة".</p>
+<button id="adblock-recheck" class="w-full py-3 rounded-lg font-semibold" style="background:var(--ink);color:var(--bg);">أعد المحاولة</button>
+</div>
+</div>
+
+<script>
+(function () {
+  var wall = document.getElementById("adblock-wall");
+  var recheckBtn = document.getElementById("adblock-recheck");
+
+  function detectAdblock(callback) {
+    // 1) Direct signal: any of our real ad-network <script> tags already
+    // failed to load (onerror="window.__adBlocked=true" on each). This is
+    // what catches network-level blockers like Brave Shields, which block
+    // the request itself rather than hiding an element with CSS.
+    if (window.__adBlocked === true) {
+      return callback(true);
+    }
+
+    // 2) Classic bait element: filter lists hide elements matched by these
+    // class/id names, so if the bait gets hidden/removed, a blocker is active.
+    var bait = document.createElement("div");
+    bait.className = "ad ads adsbox ad-banner adsbygoogle pub_300x250 text-ad textAds";
+    bait.style.cssText =
+      "position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;";
+    document.body.appendChild(bait);
+
+    // 3) Same-origin network bait: many blockers filter by URL pattern
+    // regardless of domain, so a request to a path that merely looks like
+    // an ad script gets blocked before it ever reaches the network. A
+    // normal browser gets back a plain 404; a blocker throws instead.
+    var netBlocked = false;
+    var netCheck = fetch("/pagead/ads.js", { method: "HEAD", cache: "no-store" }).catch(
+      function () {
+        netBlocked = true;
+      }
+    );
+
+    Promise.race([netCheck, new Promise(function (r) { setTimeout(r, 400); })]).then(
+      function () {
+        setTimeout(function () {
+          var blocked = window.__adBlocked === true || netBlocked;
+          var rect = bait.getBoundingClientRect();
+          var style = window.getComputedStyle(bait);
+
+          if (
+            bait.offsetParent === null ||
+            rect.height === 0 ||
+            style.display === "none" ||
+            style.visibility === "hidden"
+          ) {
+            blocked = true;
+          }
+
+          document.body.removeChild(bait);
+          callback(blocked);
+        }, 150);
+      }
+    );
+  }
+
+  function runCheck() {
+    detectAdblock(function (blocked) {
+      wall.classList.toggle("hidden", !blocked);
+      document.documentElement.style.overflow = blocked ? "hidden" : "";
+    });
+  }
+
+  if (recheckBtn) {
+    recheckBtn.addEventListener("click", runCheck);
+  }
+
+  window.addEventListener("load", function () {
+    setTimeout(runCheck, 500);
+  });
+})();
+</script>
+
+</body>
+</html>
