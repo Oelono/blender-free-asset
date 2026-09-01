@@ -8,17 +8,14 @@
 <meta name="description" content="A free, community-fed library of high-quality Blender assets — characters, environments, shaders and animations, ready to drop into your scene.">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
---bg:#0B0C10;
---bg-raised:#101319;
---line:#1E2430;
---cyan:#00F0FF;
---purple:#9D4EDD;
---magenta:#FF3D9A;
---ink:#E8ECF1;
---ink-dim:#8A93A6;
+--bg:#0A0A0A;
+--bg-raised:#141414;
+--line:#262626;
+--ink:#FFFFFF;
+--ink-dim:#8F8F8F;
 }
 *{ box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
@@ -28,85 +25,93 @@ color:var(--ink);
 font-family:'Inter',sans-serif;
 overflow-x:hidden;
 }
-.font-display{ font-family:'Chakra Petch',sans-serif; }
-/* faint circuit / grid backdrop */
-.grid-veil{
-position:absolute; inset:0;
-background-image:
-linear-gradient(rgba(0,240,255,0.05) 1px, transparent 1px),
-linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px);
-background-size: 44px 44px;
-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+.font-display{ font-family:'Space Grotesk',sans-serif; }
+
+/* ---------- hero entrance: one orchestrated sequence ---------- */
+@keyframes rise{
+from{ opacity:0; transform:translateY(14px); }
+to{ opacity:1; transform:translateY(0); }
 }
-.glow-text{
-text-shadow: 0 0 24px rgba(0,240,255,0.35);
+.reveal{ animation: rise .7s cubic-bezier(.22,.9,.3,1) both; }
+.reveal-1{ animation-delay:.05s; }
+.reveal-2{ animation-delay:.18s; }
+.reveal-3{ animation-delay:.31s; }
+.reveal-4{ animation-delay:.44s; }
+
+@keyframes drawline{
+from{ width:0; }
+to{ width:56px; }
 }
+.hero-rule{
+height:2px;
+background:var(--ink);
+animation: drawline .8s cubic-bezier(.22,.9,.3,1) .55s both;
+}
+
 .btn-primary{
-background: linear-gradient(135deg, var(--cyan), var(--purple));
-color:#03060A;
-font-weight:700;
-transition: transform .18s ease, box-shadow .18s ease;
-box-shadow: 0 0 0 rgba(0,240,255,0);
+background: var(--ink);
+color:#0A0A0A;
+font-weight:600;
+transition: transform .16s cubic-bezier(.22,.9,.3,1), box-shadow .16s ease;
 }
 .btn-primary:hover{
-transform: translateY(-1px);
-box-shadow: 0 8px 30px -8px rgba(0,240,255,0.55);
+transform: translateY(-1px) scale(1.015);
+box-shadow: 0 10px 26px -12px rgba(255,255,255,0.25);
 }
+.btn-primary:active{ transform: translateY(0) scale(.99); }
 .btn-primary:disabled{
-opacity:.45;
+opacity:.3;
 cursor:not-allowed;
 transform:none;
 box-shadow:none;
 }
 .card{
-background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+background: var(--bg-raised);
 border:1px solid var(--line);
-backdrop-filter: blur(6px);
-transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+transition: border-color .2s cubic-bezier(.22,.9,.3,1), transform .2s cubic-bezier(.22,.9,.3,1);
 }
 .card:hover{
-border-color: rgba(0,240,255,0.45);
+border-color: var(--ink);
 transform: translateY(-4px);
-box-shadow: 0 20px 50px -20px rgba(157,78,221,0.35), 0 0 0 1px rgba(0,240,255,0.08) inset;
 }
 .chip{
 border:1px solid var(--line);
 color:var(--ink-dim);
-transition: all .2s ease;
+transition: all .16s ease;
 }
 .chip.active, .chip:hover{
-border-color: var(--cyan);
-color: var(--cyan);
-background: rgba(0,240,255,0.06);
+border-color: var(--ink);
+color: var(--ink);
+background: rgba(255,255,255,0.05);
 }
 .badge{
-font-family:'Chakra Petch',sans-serif;
-letter-spacing:.02em;
+font-family:'Space Grotesk',sans-serif;
 font-size:11px;
-border:1px solid rgba(0,240,255,0.35);
-color:var(--cyan);
-background:rgba(0,240,255,0.06);
+border:1px solid var(--line);
+color:var(--ink-dim);
 }
-input[type="text"]::placeholder{ color:#5C6579; }
+input[type="text"]::placeholder{ color:#565656; }
+#search-input{ transition: border-color .16s ease, box-shadow .16s ease; }
+#search-input:focus{ box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
 #download-modal{
-background: rgba(4,5,8,0.78);
-backdrop-filter: blur(6px);
+background: rgba(0,0,0,0.82);
 }
 .modal-panel{
-background: linear-gradient(180deg, var(--bg-raised), #0B0C10);
+background: var(--bg-raised);
 border:1px solid var(--line);
+animation: rise .3s cubic-bezier(.22,.9,.3,1) both;
 }
 .ring-progress{
 transition: stroke-dashoffset 1s linear;
 }
 ::-webkit-scrollbar{ width:10px; }
 ::-webkit-scrollbar-track{ background:var(--bg); }
-::-webkit-scrollbar-thumb{ background:#232838; border-radius:8px; }
+::-webkit-scrollbar-thumb{ background:#1F1F1F; border-radius:8px; }
 @media (prefers-reduced-motion: reduce){
 *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
 }
 .skeleton{
-background: linear-gradient(90deg, #12151C 25%, #171B25 37%, #12151C 63%);
+background: linear-gradient(90deg, #141414 25%, #1C1C1C 37%, #141414 63%);
 background-size: 400% 100%;
 animation: shimmer 1.4s ease infinite;
 }
@@ -119,8 +124,7 @@ html[lang="ar"] body{ font-family:'Tajawal',sans-serif; }
 html[lang="ar"] .font-display,
 html[lang="ar"] .badge{ font-family:'Tajawal',sans-serif; font-weight:700; letter-spacing:0; }
 html[lang="ru"] .font-display,
-html[lang="ru"] .badge{ font-family:'Inter',sans-serif; font-weight:800; letter-spacing:0; }
-[dir="rtl"] .grid-veil{ mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%); }
+html[lang="ru"] .badge{ font-family:'Inter',sans-serif; font-weight:700; letter-spacing:0; }
 [dir="rtl"] #search-input{ padding-left:1rem; padding-right:2.75rem; }
 [dir="rtl"] #search-input + svg,
 [dir="rtl"] .search-icon{ left:auto; right:1rem; }
@@ -131,26 +135,40 @@ html[lang="ru"] .badge{ font-family:'Inter',sans-serif; font-weight:800; letter-
 [dir="rtl"] .border-l{ border-left:none; }
 [dir="rtl"] .stat-divider{ border-left:none; border-right:1px solid var(--line); }
 [dir="rtl"] dd{ text-align:left; }
+[dir="rtl"] .hero-rule{ margin-left:auto; }
 /* lightweight switcher */
 .lang-switch button{
 color:var(--ink-dim);
-transition: color .2s ease;
+transition: color .16s ease;
 }
-.lang-switch button.active{ color:var(--cyan); }
+.lang-switch button.active{ color:var(--ink); }
+
+/* ---------- drifting sand-grain particle layer ---------- */
+#sand-canvas{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+z-index:0;
+pointer-events:none;
+opacity:.55;
+}
+header, section, footer, #download-modal{ position:relative; z-index:1; }
 </style>
 </head>
 <body class="min-h-screen">
+<canvas id="sand-canvas"></canvas>
 <!-- NAV -->
-<header class="sticky top-0 z-40 border-b border-[var(--line)] bg-[#0B0C10]/85 backdrop-blur">
+<header class="sticky top-0 z-40 border-b border-[var(--line)] bg-[#0A0A0A]/90 backdrop-blur">
 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 <a href="#top" class="flex items-center gap-2.5">
 <img src="106993307.jpg" alt="Oelono" class="w-[26px] h-[26px] rounded-full object-cover">
-<span class="font-display text-lg font-bold tracking-tight">Oelono</span>
+<span class="font-display text-lg font-semibold tracking-tight">Oelono</span>
 </a>
 <nav class="hidden md:flex items-center gap-8 text-sm text-[var(--ink-dim)]">
-<a href="#library" class="hover:text-[var(--cyan)] transition-colors" data-i18n="nav_library">Library</a>
-<a href="#how-it-works" class="hover:text-[var(--cyan)] transition-colors" data-i18n="nav_how">How it works</a>
-<a href="https://github.com/" target="_blank" rel="noopener" class="hover:text-[var(--cyan)] transition-colors">GitHub</a>
+<a href="#library" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_library">Library</a>
+<a href="#how-it-works" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_how">How it works</a>
+<a href="https://github.com/" target="_blank" rel="noopener" class="hover:text-[var(--ink)] transition-colors">GitHub</a>
 </nav>
 <div class="flex items-center gap-4">
 <div id="lang-switcher" class="lang-switch flex items-center gap-1 text-xs border border-[var(--line)] rounded-full px-1 py-1">
@@ -165,15 +183,17 @@ transition: color .2s ease;
 
 <!-- HERO -->
 <section id="top" class="relative border-b border-[var(--line)]">
-<div class="grid-veil"></div>
-<div class="relative max-w-7xl mx-auto px-6 pt-14 pb-14 md:pt-16 md:pb-16">
+<div class="relative max-w-7xl mx-auto px-6 pt-16 pb-16 md:pt-20 md:pb-20">
 <div class="max-w-3xl">
+<div class="hero-rule mb-5"></div>
+<h1 class="reveal reveal-1 font-display text-4xl md:text-5xl font-semibold tracking-tight mb-4 leading-[1.05]">Blender assets,<br>ready to drop in</h1>
+<p class="reveal reveal-2 text-[var(--ink-dim)] text-sm md:text-base mb-9 max-w-xl">A community-fed library of characters, environments, shaders and animations — every file checked before it's listed.</p>
 <!-- search -->
-<div class="max-w-xl">
+<div class="reveal reveal-3 max-w-xl">
 <div class="relative">
 <svg class="search-icon absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-dim)]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
 <input id="search-input" type="text" data-i18n-placeholder="search_placeholder" placeholder="Search assets — try “cyberpunk character”"
-class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-[var(--cyan)] focus:ring-1 focus:ring-[var(--cyan)]/40 transition-colors">
+class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-[var(--ink)]">
 </div>
 <div id="category-chips" class="flex flex-wrap gap-2 mt-4">
 <button data-cat="All" class="chip active px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_all">All</button>
@@ -192,7 +212,7 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <section id="library" class="max-w-7xl mx-auto px-6 py-16 md:py-20">
 <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
 <div>
-<h2 class="font-display text-2xl md:text-3xl font-bold" data-i18n="library_heading">The library</h2>
+<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading">The library</h2>
 <p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub">Every file is inspected before it's listed. New drops weekly.</p>
 </div>
 <div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
@@ -207,20 +227,17 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <!-- HOW IT WORKS -->
 <section id="how-it-works" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40">
 <div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
-<h2 class="font-display text-2xl md:text-3xl font-bold mb-10" data-i18n="how_heading">How a download works</h2>
+<h2 class="font-display text-2xl md:text-3xl font-semibold mb-10" data-i18n="how_heading">How a download works</h2>
 <div class="grid md:grid-cols-3 gap-8">
 <div>
-<div class="font-display text-[var(--cyan)] text-sm mb-2">01</div>
 <h3 class="font-semibold mb-1.5" data-i18n="how1_title">Pick your asset</h3>
 <p class="text-sm text-[var(--ink-dim)]" data-i18n="how1_desc">Browse or search the library, then open any asset's download panel to see its specs.</p>
 </div>
 <div>
-<div class="font-display text-[var(--purple)] text-sm mb-2">02</div>
 <h3 class="font-semibold mb-1.5" data-i18n="how2_title">Unlock the link</h3>
 <p class="text-sm text-[var(--ink-dim)]" data-i18n="how2_desc">A short sponsor page opens in a new tab — this is what keeps the library free to run.</p>
 </div>
 <div>
-<div class="font-display text-[var(--magenta)] text-sm mb-2">03</div>
 <h3 class="font-semibold mb-1.5" data-i18n="how3_title">Grab the file</h3>
 <p class="text-sm text-[var(--ink-dim)]" data-i18n="how3_desc">Your Google Drive link unlocks right after — no login, no waiting rooms.</p>
 </div>
@@ -232,8 +249,8 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--ink-dim)]">
 <span>© <span id="year"></span> Oelono <span data-i18n="footer_built">Built by Oelono.</span></span>
 <div class="flex gap-6">
-<a href="/admin/" class="hover:text-[var(--cyan)] transition-colors" data-i18n="footer_admin">Admin</a>
-<a href="#top" class="hover:text-[var(--cyan)] transition-colors" data-i18n="footer_top">Back to top</a>
+<a href="/admin/" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
+<a href="#top" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_top">Back to top</a>
 </div>
 </div>
 </footer>
@@ -245,7 +262,7 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
 </button>
 <span id="modal-badge" class="badge inline-block px-2.5 py-1 rounded mb-4"></span>
-<h3 id="modal-title" class="font-display text-xl font-bold pr-6"></h3>
+<h3 id="modal-title" class="font-display text-xl font-semibold pr-6"></h3>
 <p id="modal-desc" class="text-sm text-[var(--ink-dim)] mt-2 leading-relaxed"></p>
 <dl class="grid grid-cols-2 gap-y-3 mt-5 text-sm border-t border-[var(--line)] pt-5">
 <dt class="text-[var(--ink-dim)]" data-i18n="modal_filesize_label">File size</dt>
@@ -258,8 +275,8 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <div class="mt-6">
 <button id="unlock-btn" class="btn-primary w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2" disabled>
 <svg id="unlock-ring" width="18" height="18" viewBox="0 0 36 36" class="shrink-0">
-<circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(3,6,10,0.25)" stroke-width="3"/>
-<circle id="unlock-ring-progress" class="ring-progress" cx="18" cy="18" r="15.5" fill="none" stroke="#03060A" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+<circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(10,10,10,0.25)" stroke-width="3"/>
+<circle id="unlock-ring-progress" class="ring-progress" cx="18" cy="18" r="15.5" fill="none" stroke="#0A0A0A" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 18 18)"/>
 </svg>
 <span id="unlock-label">Unlocking in 5s…</span>
 </button>
@@ -273,6 +290,92 @@ class="hidden btn-primary w-full py-3 rounded-lg text-sm items-center justify-ce
 </div>
 </div>
 
+<script>
+(function(){
+var canvas = document.getElementById('sand-canvas');
+var ctx = canvas.getContext('2d');
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var W, H, DPR;
+var grains = [];
+var GRAIN_COUNT = 140;
+
+function resize(){
+DPR = Math.min(window.devicePixelRatio || 1, 2);
+W = window.innerWidth;
+H = window.innerHeight;
+canvas.width = W * DPR;
+canvas.height = H * DPR;
+canvas.style.width = W + 'px';
+canvas.style.height = H + 'px';
+ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+
+function makeGrain(){
+return {
+x: Math.random() * W,
+y: Math.random() * H,
+r: Math.random() * 1.1 + 0.3,
+speedX: (Math.random() - 0.5) * 0.12,
+speedY: Math.random() * 0.10 + 0.03,
+drift: Math.random() * Math.PI * 2,
+driftSpeed: (Math.random() * 0.006) + 0.002,
+alpha: Math.random() * 0.5 + 0.15
+};
+}
+
+function init(){
+resize();
+grains = [];
+for(var i=0;i<GRAIN_COUNT;i++){ grains.push(makeGrain()); }
+if(reduceMotion){ drawStatic(); } else { requestAnimationFrame(tick); }
+}
+
+function drawStatic(){
+ctx.clearRect(0,0,W,H);
+ctx.fillStyle = '#FFFFFF';
+grains.forEach(function(g){
+ctx.globalAlpha = g.alpha * 0.6;
+ctx.beginPath();
+ctx.arc(g.x, g.y, g.r, 0, Math.PI*2);
+ctx.fill();
+});
+ctx.globalAlpha = 1;
+}
+
+var windTime = 0;
+
+function tick(){
+windTime += 0.0035;
+// slow base sway plus a slightly faster overlapping sway = a gentle, uneven breeze
+var wind = Math.sin(windTime) * 0.35 + Math.sin(windTime * 2.7 + 1.3) * 0.15;
+
+ctx.clearRect(0,0,W,H);
+ctx.fillStyle = '#FFFFFF';
+grains.forEach(function(g){
+g.drift += g.driftSpeed;
+// lighter grains (smaller r) catch the breeze a bit more, like real sand/dust
+var windPull = wind * (1.6 - g.r);
+g.x += g.speedX + windPull + Math.sin(g.drift) * 0.05;
+g.y += g.speedY;
+if(g.y > H + 4){ g.y = -4; g.x = Math.random() * W; }
+if(g.x > W + 4) g.x = -4;
+if(g.x < -4) g.x = W + 4;
+ctx.globalAlpha = g.alpha;
+ctx.beginPath();
+ctx.arc(g.x, g.y, g.r, 0, Math.PI*2);
+ctx.fill();
+});
+ctx.globalAlpha = 1;
+requestAnimationFrame(tick);
+}
+
+window.addEventListener('resize', function(){
+resize();
+});
+
+init();
+})();
+</script>
 <script src="script.js"></script>
 </body>
 </html>
