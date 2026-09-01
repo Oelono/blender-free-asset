@@ -332,6 +332,26 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * 15.5; // matches r=15.5 in the SVG
 let countdownTimer = null;
 let activeProduct = null;
 let activeStage = 0;
+// Reference to the sponsor tab opened for the stage currently being timed.
+// Polled every tick so a tab closed before COUNTDOWN_SECONDS elapses
+// cancels credit for that stage instead of silently letting it pass.
+let sponsorWindow = null;
+
+const closedEarlyHint = {
+  en: "That sponsor tab was closed too early — reopen it and keep it open for the full countdown.",
+  ar: "قفلت صفحة الراعي بدري — افتحها تاني وسيبها لحد ما العداد يخلص.",
+  ru: "Спонсорская вкладка была закрыта слишком рано — откройте её снова и дождитесь окончания отсчёта.",
+};
+const reopenLabel = {
+  en: "Reopen sponsor link",
+  ar: "افتح رابط الراعي تاني",
+  ru: "Открыть спонсорскую ссылку снова",
+};
+const popupBlockedHint = {
+  en: "Your browser blocked that tab from opening — allow pop-ups for this site, then try again.",
+  ar: "المتصفح منع فتح الصفحة — لازم تسمح بالنوافذ المنبثقة (pop-ups) لهذا الموقع وتجرب تاني.",
+  ru: "Браузер заблокировал открытие вкладки — разрешите всплывающие окна для этого сайта и попробуйте снова.",
+};
 
 // Returns the ordered list of sponsor links for a product.
 // Supports the new "sponsorLinks" list field, and falls back to the
@@ -469,24 +489,72 @@ function openModal(product) {
   startCountdown();
 }
 
-function startCountdown() {
+// windowRef is the tab opened for the stage we're timing (or null if this
+// stage has no sponsor link). The interval checks windowRef.closed on every
+// tick — if the visitor closes that tab before the countdown finishes, the
+// stage is cancelled instead of quietly being granted anyway.
+function startCountdown(windowRef) {
+  sponsorWindow = windowRef || null;
   let remaining = COUNTDOWN_SECONDS;
   unlockLabel.textContent = t("unlock_unlocking")(remaining);
 
   clearInterval(countdownTimer);
   countdownTimer = setInterval(() => {
+    if (sponsorWindow && sponsorWindow.closed) {
+      clearInterval(countdownTimer);
+      handleClosedEarly();
+      return;
+    }
+
     remaining -= 1;
     const progress = 1 - remaining / COUNTDOWN_SECONDS;
     unlockRingProgress.style.strokeDashoffset = `${RING_CIRCUMFERENCE * progress}`;
 
     if (remaining <= 0) {
       clearInterval(countdownTimer);
-      unlockBtn.disabled = false;
-      unlockLabel.textContent = t("unlock_ready");
+      sponsorWindow = null;
+      onCountdownVerified();
     } else {
       unlockLabel.textContent = t("unlock_unlocking")(remaining);
     }
   }, 1000);
+}
+
+// Runs once a stage's countdown finishes without its tab closing early.
+// If every sponsor stage now has a verified full countdown behind it,
+// reveal the Drive link; otherwise just re-enable the button so the
+// visitor can move on to the next stage.
+function onCountdownVerified() {
+  const sponsorLinks = getSponsorLinks(activeProduct);
+  if (activeStage >= sponsorLinks.length) {
+    driveBtn.href = (activeProduct && activeProduct.driveLink) || "#";
+    unlockBtn.classList.add("hidden");
+    driveBtn.classList.remove("hidden");
+    driveBtn.classList.add("flex");
+    modalHint.textContent = t("modal_hint_ready");
+    updateOverallProgress(sponsorLinks.length, activeStage, 0);
+  } else {
+    unlockBtn.disabled = false;
+    unlockLabel.textContent = t("unlock_ready");
+  }
+}
+
+// Called when the sponsor tab for the stage being timed closes before the
+// countdown completes. Rolls that stage's "done" credit back so the click
+// handler re-opens the same link (not the next one) on the next click.
+function handleClosedEarly() {
+  sponsorWindow = null;
+  if (!activeProduct) return;
+  const sponsorLinks = getSponsorLinks(activeProduct);
+
+  activeStage = Math.max(0, activeStage - 1);
+  renderStepIndicator(sponsorLinks.length, activeStage);
+  updateOverallProgress(sponsorLinks.length, activeStage, 0);
+
+  unlockRingProgress.style.strokeDashoffset = "0";
+  unlockBtn.disabled = false;
+  unlockLabel.textContent = reopenLabel[state.lang] || reopenLabel.en;
+  modalHint.textContent = closedEarlyHint[state.lang] || closedEarlyHint.en;
 }
 
 unlockBtn.addEventListener("click", () => {
@@ -494,9 +562,21 @@ unlockBtn.addEventListener("click", () => {
 
   const sponsorLinks = getSponsorLinks(activeProduct);
 
-  // Open this stage's sponsor link in a new tab.
+  // Open this stage's sponsor link in a new tab. window.open returns null
+  // when the browser's pop-up blocker prevents the tab from opening at
+  // all — noopener means we can't detect that as "closed", so we check
+  // for null explicitly instead of pretending the tab exists.
   const link = sponsorLinks[activeStage];
-  if (link) window.open(link, "_blank", "noopener");
+  let openedWindow = null;
+  if (link) {
+    openedWindow = window.open(link, "_blank");
+    if (!openedWindow) {
+      unlockLabel.textContent = t("unlock_ready");
+      modalHint.textContent = popupBlockedHint[state.lang] || popupBlockedHint.en;
+      unlockBtn.disabled = false;
+      return; // stage not credited — nothing to time, nothing advances
+    }
+  }
 
   activeStage += 1;
   renderStepIndicator(sponsorLinks.length, activeStage);
@@ -504,20 +584,20 @@ unlockBtn.addEventListener("click", () => {
   if (activeStage < sponsorLinks.length) {
     // More sponsor links to go through — restart the countdown for the next one.
     // activeStage only ever moves forward by 1 here, and the button stays
-    // disabled until a fresh countdown finishes, so repeatedly clicking the
-    // same opened tab/link cannot fast-forward past a step.
+    // disabled until a fresh countdown finishes without the tab being closed
+    // early, so repeatedly clicking / closing early cannot fast-forward
+    // past a step.
     unlockBtn.disabled = true;
     modalHint.textContent = stageHintText(activeStage + 1, sponsorLinks.length);
-    startCountdown();
+    startCountdown(openedWindow);
     return;
   }
 
-  // All sponsor stages done — reveal the real Google Drive link.
-  driveBtn.href = activeProduct.driveLink || "#";
-  unlockBtn.classList.add("hidden");
-  driveBtn.classList.remove("hidden");
-  driveBtn.classList.add("flex");
-  modalHint.textContent = t("modal_hint_ready");
+  // Last sponsor stage — still needs its own full, un-interrupted
+  // countdown before the Drive link is revealed.
+  unlockBtn.disabled = true;
+  modalHint.textContent = t("modal_hint_default");
+  startCountdown(openedWindow);
 });
 
 function closeModal() {
