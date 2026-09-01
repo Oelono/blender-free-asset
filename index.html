@@ -219,24 +219,21 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 </div>
 <div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
 </div>
+
+<!-- Grid + 160x600 sidebar ad side by side. The ad is `sticky`, not
+     `fixed`, so it travels with the library section as you scroll but
+     can never escape this row to overlap the header, footer, or other
+     sections — and on narrow screens it just stacks below the grid. -->
+<div class="flex flex-wrap items-start gap-6">
+<div class="flex-1 min-w-0">
 <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 <div id="empty-state" class="hidden text-center py-20">
 <p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
 <p class="text-sm text-[var(--ink-dim)] mt-2" data-i18n="empty_sub">Try a different keyword or clear the category filter.</p>
 </div>
-</section>
-
-<!-- NATIVE BANNER AD + 160x600 SMART LINK BANNER, side by side in normal
-     page flow (not fixed) — they scroll with the page like any other
-     content and wrap to a stacked layout on narrow screens instead of
-     overlapping or disappearing. -->
-<div class="max-w-7xl mx-auto px-6 flex flex-wrap items-start gap-4">
-<div class="flex-1 min-w-0">
-<script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js" onerror="window.__adBlocked=true"></script>
-<div id="container-b0a70462aab028233ddf977a15e416ff"></div>
 </div>
 
-<div id="sidebar-ad" class="flex-shrink-0 mx-auto" style="width:160px;height:600px;">
+<div id="sidebar-ad" class="flex-shrink-0 mx-auto lg:sticky lg:top-24" style="width:160px;height:600px;">
 <script type="text/javascript">
 atOptions = {
   'key' : '65eeb729b2e37d03a0903b13c2428823',
@@ -248,6 +245,13 @@ atOptions = {
 </script>
 <script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js" onerror="window.__adBlocked=true"></script>
 </div>
+</div>
+</section>
+
+<!-- NATIVE BANNER AD -->
+<div class="max-w-7xl mx-auto px-6">
+<script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js" onerror="window.__adBlocked=true"></script>
+<div id="container-b0a70462aab028233ddf977a15e416ff"></div>
 </div>
 
 <!-- HOW IT WORKS -->
