@@ -21,86 +21,39 @@ collections:
             name: "products"
             widget: "list"
             summary: "{{fields.title}} — {{fields.category}}"
-
             fields:
-              - label: "Title"
-                name: "title"
-                widget: "string"
-
-              - label: "Slug / ID"
-                name: "id"
-                widget: "string"
-                hint: "Unique, no spaces, e.g. cyber-samurai-rig"
-
-              - label: "Description"
-                name: "description"
-                widget: "text"
-
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Slug / ID", name: "id", widget: "string", hint: "Unique, no spaces, e.g. cyber-samurai-rig" }
+              - { label: "Description", name: "description", widget: "text" }
               - label: "Category"
                 name: "category"
                 widget: "select"
-                options:
-                  - "Characters"
-                  - "Environments"
-                  - "Shaders"
-                  - "Animations"
-                  - "Assets"
-
+                options: ["Characters", "Environments", "Shaders", "Animations", "Assets"]
               - label: "Thumbnail"
                 name: "thumbnail"
                 widget: "image"
                 hint: "Upload an image, or paste an external image URL"
-
-              # ==================================================
-              # 3D MODEL
-              # ==================================================
               - label: "3D Model (GLB / GLTF)"
                 name: "modelUrl"
                 widget: "file"
                 required: false
                 hint: "Upload a .glb or .gltf file. GLB is recommended because it can bundle textures and meshes into one file."
-
-              - label: "Blender Version"
-                name: "blenderVersion"
-                widget: "string"
-                hint: "e.g. 4.2+"
-
+              - { label: "Blender Version", name: "blenderVersion", widget: "string", hint: "e.g. 4.2+" }
               - label: "Render Engine"
                 name: "engine"
                 widget: "select"
-                options:
-                  - "Cycles"
-                  - "Eevee"
-                  - "Cycles / Eevee"
-
-              - label: "File Size"
-                name: "fileSize"
-                widget: "string"
-                hint: "e.g. 184 MB"
-
-              - label: "License"
-                name: "license"
-                widget: "string"
-                default: "CC0 — Free for personal & commercial use"
-
+                options: ["Cycles", "Eevee", "Cycles / Eevee"]
+              - { label: "File Size", name: "fileSize", widget: "string", hint: "e.g. 184 MB" }
+              - { label: "License", name: "license", widget: "string", default: "CC0 — Free for personal & commercial use" }
               - label: "Sponsor Links"
                 name: "sponsorLinks"
                 widget: "list"
                 hint: "Links a visitor clicks through, in order, before the Google Drive link unlocks. Paste the same Adsterra link 4 times, or up to 4 different ones."
                 min: 1
                 max: 4
-                field:
-                  label: "Link"
-                  name: "url"
-                  widget: "string"
-
+                field: { label: "Link", name: "url", widget: "string" }
               - label: "Google Drive Link"
                 name: "driveLink"
                 widget: "string"
                 hint: "The real file — revealed after the sponsor link is unlocked"
-
-              - label: "Featured"
-                name: "featured"
-                widget: "boolean"
-                default: false
-                required: false
+              - { label: "Featured", name: "featured", widget: "boolean", default: false, required: false }
