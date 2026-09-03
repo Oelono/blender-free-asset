@@ -52,6 +52,34 @@ const translations = {
     unlock_ready: "Unlock download link",
     card_download: "Download",
     results_count: (n) => `${n} asset${n === 1 ? "" : "s"}`,
+    nav_request_label: "Request a model",
+    card_preview3d: "3D preview",
+    card_report: "Report broken link",
+    viewer_title: "3D preview",
+    viewer_hint: "Drag to rotate · scroll to zoom. This is a lightweight preview — the downloaded .blend file may include extra materials, rigs and lighting.",
+    viewer_unavailable: "No 3D preview is available for this asset yet.",
+    report_title: "Report a broken link",
+    report_reason_label: "What's wrong?",
+    report_reason_dead: "Download link doesn't work",
+    report_reason_wrong: "File doesn't match the description",
+    report_reason_corrupt: "File is corrupted / won't open",
+    report_reason_other: "Something else",
+    report_note_label: "Details (optional)",
+    report_note_placeholder: "Anything that helps us fix it faster…",
+    report_submit: "Send report",
+    report_success: "Thanks — we'll take a look at this asset.",
+    request_title: "Request a model",
+    request_sub: "Tell us what you need — if it fits the library, we'll add it to the queue.",
+    request_desc_label: "What model do you need?",
+    request_desc_placeholder: "e.g. a low-poly medieval blacksmith shop with modular walls",
+    request_category_label: "Category",
+    request_contact_label: "Email (optional)",
+    request_contact_placeholder: "you@example.com",
+    request_ref_label: "Reference link (optional)",
+    request_ref_placeholder: "Artstation / Pinterest / image URL…",
+    request_submit: "Send request",
+    request_success: "Thanks — your request has been sent.",
+    request_error: "Please describe the model you need.",
   },
   ar: {
     nav_library: "المكتبة",
@@ -88,6 +116,34 @@ const translations = {
     unlock_ready: "افتح رابط التحميل",
     card_download: "تحميل",
     results_count: (n) => `${n} أصل`,
+    nav_request_label: "طلب موديل جديد",
+    card_preview3d: "معاينة 3D",
+    card_report: "إبلاغ عن رابط مكسور",
+    viewer_title: "معاينة ثلاثية الأبعاد",
+    viewer_hint: "اسحب للتدوير · مرّر للتكبير. هذه معاينة مبسطة — ملف .blend الأصلي قد يحتوي على خامات وريغ وإضاءة إضافية.",
+    viewer_unavailable: "لا تتوفر معاينة 3D لهذا الأصل حاليًا.",
+    report_title: "إبلاغ عن رابط مكسور",
+    report_reason_label: "ما هي المشكلة؟",
+    report_reason_dead: "رابط التحميل لا يعمل",
+    report_reason_wrong: "الملف لا يطابق الوصف",
+    report_reason_corrupt: "الملف تالف / لا يفتح",
+    report_reason_other: "شيء آخر",
+    report_note_label: "تفاصيل (اختياري)",
+    report_note_placeholder: "أي شيء يساعدنا على الإصلاح بشكل أسرع…",
+    report_submit: "إرسال البلاغ",
+    report_success: "شكرًا — سنراجع هذا الأصل قريبًا.",
+    request_title: "طلب موديل جديد",
+    request_sub: "أخبرنا بما تحتاجه — إذا كان يناسب المكتبة، سنضيفه لقائمة الانتظار.",
+    request_desc_label: "ما هو الموديل الذي تحتاجه؟",
+    request_desc_placeholder: "مثال: محل حداد من العصور الوسطى بجدران متعددة منخفضة التفاصيل",
+    request_category_label: "الفئة",
+    request_contact_label: "البريد الإلكتروني (اختياري)",
+    request_contact_placeholder: "you@example.com",
+    request_ref_label: "رابط مرجعي (اختياري)",
+    request_ref_placeholder: "آرت ستيشن / بينترست / رابط صورة…",
+    request_submit: "إرسال الطلب",
+    request_success: "شكرًا — تم إرسال طلبك.",
+    request_error: "من فضلك اكتب وصف الموديل المطلوب.",
   },
   ru: {
     nav_library: "Библиотека",
@@ -124,6 +180,34 @@ const translations = {
     unlock_ready: "Открыть ссылку на файл",
     card_download: "Скачать",
     results_count: (n) => `${n} ассет(ов)`,
+    nav_request_label: "Запросить модель",
+    card_preview3d: "3D просмотр",
+    card_report: "Сообщить о неработающей ссылке",
+    viewer_title: "3D просмотр",
+    viewer_hint: "Перетащите, чтобы вращать · прокрутите для масштаба. Это упрощённый предпросмотр — файл .blend может содержать больше материалов, риг и освещения.",
+    viewer_unavailable: "Для этого ассета пока нет 3D-предпросмотра.",
+    report_title: "Сообщить о неработающей ссылке",
+    report_reason_label: "Что не так?",
+    report_reason_dead: "Ссылка на скачивание не работает",
+    report_reason_wrong: "Файл не соответствует описанию",
+    report_reason_corrupt: "Файл повреждён / не открывается",
+    report_reason_other: "Другое",
+    report_note_label: "Подробности (необязательно)",
+    report_note_placeholder: "Всё, что поможет нам быстрее это исправить…",
+    report_submit: "Отправить сообщение",
+    report_success: "Спасибо — мы проверим этот ассет.",
+    request_title: "Запросить модель",
+    request_sub: "Расскажите, что вам нужно — если это подходит библиотеке, мы добавим её в очередь.",
+    request_desc_label: "Какая модель вам нужна?",
+    request_desc_placeholder: "например: низкополигональная кузница в средневековом стиле с модульными стенами",
+    request_category_label: "Категория",
+    request_contact_label: "Email (необязательно)",
+    request_contact_placeholder: "you@example.com",
+    request_ref_label: "Ссылка-референс (необязательно)",
+    request_ref_placeholder: "Artstation / Pinterest / ссылка на изображение…",
+    request_submit: "Отправить запрос",
+    request_success: "Спасибо — ваш запрос отправлен.",
+    request_error: "Пожалуйста, опишите нужную модель.",
   },
 };
 
@@ -250,15 +334,31 @@ function render() {
       if (product) openModal(product);
     });
   });
+
+  grid.querySelectorAll("[data-viewer-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const product = state.products.find(p => p.id === btn.dataset.viewerId);
+      if (product) openViewerModal(product);
+    });
+  });
+
+  grid.querySelectorAll("[data-report-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const product = state.products.find(p => p.id === btn.dataset.reportId);
+      if (product) openReportModal(product);
+    });
+  });
 }
 
 function cardTemplate(p) {
   const thumb = p.thumbnail || "https://placehold.co/600x400/0B0C10/00F0FF?text=Vaultframe";
+  const preview = p.previewImage || p.previewGif || ""; // optional hover preview (image or GIF)
+  const hasModel = !!p.modelUrl; // optional GLB/GLTF for the 3D viewer
   return `
     <article class="card rounded-xl overflow-hidden group">
-      <div class="relative h-44 overflow-hidden bg-[var(--bg-raised)]">
-        <img src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      <div class="card-media relative h-44">
+        <img class="card-thumb" src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy">
+        ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true">` : ""}
         <div class="absolute top-3 left-3 flex gap-1.5">
           <span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || "")}</span>
         </div>
@@ -273,6 +373,18 @@ function cardTemplate(p) {
         <div class="flex items-center justify-between">
           <span class="text-xs text-[var(--ink-dim)]">${escapeHtml(p.fileSize || "")}</span>
           <button data-download-id="${escapeAttr(p.id)}" class="btn-primary text-xs px-4 py-2 rounded-md">${escapeHtml(t("card_download"))}</button>
+        </div>
+        <div class="card-actions-row">
+          ${hasModel
+            ? `<button data-viewer-id="${escapeAttr(p.id)}" class="btn-3d">
+                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
+                 ${escapeHtml(t("card_preview3d"))}
+               </button>`
+            : `<span></span>`}
+          <button data-report-id="${escapeAttr(p.id)}" class="btn-ghost-sm report-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+            ${escapeHtml(t("card_report"))}
+          </button>
         </div>
       </div>
     </article>
@@ -614,6 +726,173 @@ modal.addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+});
+
+/* =========================================================
+   NEW: contact target for the report / request forms below.
+   Frontend-only delivery via mailto — replace CONTACT_EMAIL
+   with a real inbox, or swap the two window.location.href
+   lines for a fetch() call to Formspree / Getform / your own
+   worker if you'd rather submit silently with no mail client.
+   ========================================================= */
+const CONTACT_EMAIL = "requests@oelono.dev"; // TODO: replace with your real inbox
+
+const toastEl = document.getElementById("toast");
+let toastTimer = null;
+function showToast(message) {
+  if (!toastEl || !message) return;
+  toastEl.textContent = message;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3200);
+}
+
+/* ---------------------------------------------------------
+   3D VIEWER MODAL — <model-viewer> loads the asset's GLB/GLTF
+   (product field: modelUrl) so visitors can rotate/zoom it
+   before downloading.
+   --------------------------------------------------------- */
+const viewerModal = document.getElementById("viewer-modal");
+const viewerClose = document.getElementById("viewer-close");
+const viewerTitleEl = document.getElementById("viewer-title");
+const modelViewerEl = document.getElementById("model-viewer-el");
+
+function openViewerModal(product) {
+  if (!product.modelUrl) {
+    showToast(t("viewer_unavailable"));
+    return;
+  }
+  viewerTitleEl.textContent = product.title || t("viewer_title");
+  modelViewerEl.setAttribute("alt", product.title || "3D preview");
+  if (product.posterImage || product.thumbnail) {
+    modelViewerEl.setAttribute("poster", product.posterImage || product.thumbnail);
+  } else {
+    modelViewerEl.removeAttribute("poster");
+  }
+  modelViewerEl.setAttribute("src", product.modelUrl);
+  viewerModal.classList.remove("hidden");
+  viewerModal.classList.add("flex");
+  document.body.style.overflow = "hidden";
+}
+
+function closeViewerModal() {
+  viewerModal.classList.add("hidden");
+  viewerModal.classList.remove("flex");
+  document.body.style.overflow = "";
+  modelViewerEl.removeAttribute("src"); // stop rendering once hidden
+}
+
+viewerClose.addEventListener("click", closeViewerModal);
+viewerModal.addEventListener("click", (e) => { if (e.target === viewerModal) closeViewerModal(); });
+
+/* ---------------------------------------------------------
+   REPORT BROKEN LINK MODAL
+   --------------------------------------------------------- */
+const reportModal = document.getElementById("report-modal");
+const reportClose = document.getElementById("report-close");
+const reportForm = document.getElementById("report-form");
+const reportAssetName = document.getElementById("report-asset-name");
+const reportReasonSelect = document.getElementById("report-reason");
+const reportNote = document.getElementById("report-note");
+let reportProduct = null;
+
+function openReportModal(product) {
+  reportProduct = product;
+  reportAssetName.textContent = product.title || "";
+  reportForm.reset();
+  reportModal.classList.remove("hidden");
+  reportModal.classList.add("flex");
+  document.body.style.overflow = "hidden";
+}
+
+function closeReportModal() {
+  reportModal.classList.add("hidden");
+  reportModal.classList.remove("flex");
+  document.body.style.overflow = "";
+  reportProduct = null;
+}
+
+reportClose.addEventListener("click", closeReportModal);
+reportModal.addEventListener("click", (e) => { if (e.target === reportModal) closeReportModal(); });
+
+reportForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!reportProduct) return;
+
+  const reasonLabel = reportReasonSelect.options[reportReasonSelect.selectedIndex].text;
+  const subject = `Broken link report: ${reportProduct.title}`;
+  const body =
+    `Asset: ${reportProduct.title} (${reportProduct.id})\n` +
+    `Reason: ${reasonLabel}\n` +
+    `Details: ${reportNote.value.trim() || "—"}\n` +
+    `Page: ${window.location.href}`;
+
+  window.location.href =
+    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  showToast(t("report_success"));
+  closeReportModal();
+});
+
+/* ---------------------------------------------------------
+   REQUEST A MODEL MODAL
+   --------------------------------------------------------- */
+const requestModal = document.getElementById("request-modal");
+const requestClose = document.getElementById("request-close");
+const requestForm = document.getElementById("request-form");
+const requestDesc = document.getElementById("request-desc");
+const requestCategory = document.getElementById("request-category");
+const requestContact = document.getElementById("request-contact");
+const requestRef = document.getElementById("request-ref");
+
+function openRequestModal() {
+  requestForm.reset();
+  requestModal.classList.remove("hidden");
+  requestModal.classList.add("flex");
+  document.body.style.overflow = "hidden";
+}
+
+function closeRequestModal() {
+  requestModal.classList.add("hidden");
+  requestModal.classList.remove("flex");
+  document.body.style.overflow = "";
+}
+
+const requestModalNavBtn = document.getElementById("open-request-modal");
+if (requestModalNavBtn) requestModalNavBtn.addEventListener("click", openRequestModal);
+const requestModalFooterBtn = document.getElementById("open-request-modal-footer");
+if (requestModalFooterBtn) requestModalFooterBtn.addEventListener("click", openRequestModal);
+
+requestClose.addEventListener("click", closeRequestModal);
+requestModal.addEventListener("click", (e) => { if (e.target === requestModal) closeRequestModal(); });
+
+requestForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!requestDesc.value.trim()) {
+    showToast(t("request_error"));
+    return;
+  }
+
+  const subject = `Model request: ${requestCategory.value}`;
+  const body =
+    `Category: ${requestCategory.value}\n` +
+    `Description: ${requestDesc.value.trim()}\n` +
+    `Reference: ${requestRef.value.trim() || "—"}\n` +
+    `Contact: ${requestContact.value.trim() || "—"}`;
+
+  window.location.href =
+    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  showToast(t("request_success"));
+  closeRequestModal();
+});
+
+// Escape closes whichever of the three new overlays is open
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!viewerModal.classList.contains("hidden")) closeViewerModal();
+  if (!reportModal.classList.contains("hidden")) closeReportModal();
+  if (!requestModal.classList.contains("hidden")) closeRequestModal();
 });
 
 initLanguage();
