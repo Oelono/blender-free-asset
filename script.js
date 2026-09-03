@@ -342,6 +342,28 @@ function render() {
     });
   });
 
+  // Inline 3D preview: load the GLB/GLTF only when the card is hovered.
+  grid.querySelectorAll(".card-media").forEach(media => {
+    const viewer = media.querySelector(".card-3d-viewer");
+    if (!viewer) return;
+
+    const loadViewer = () => {
+      if (!viewer.dataset.loaded) {
+        const src = viewer.dataset.modelSrc;
+        if (src) {
+          viewer.setAttribute("src", src);
+          viewer.dataset.loaded = "1";
+        }
+      }
+      media.classList.add("show-3d");
+    };
+
+    const hideViewer = () => media.classList.remove("show-3d");
+
+    media.addEventListener("pointerenter", loadViewer);
+    media.addEventListener("pointerleave", hideViewer);
+  });
+
   grid.querySelectorAll("[data-report-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const product = state.products.find(p => p.id === btn.dataset.reportId);
@@ -356,9 +378,10 @@ function cardTemplate(p) {
   const hasModel = !!p.modelUrl; // optional GLB/GLTF for the 3D viewer
   return `
     <article class="card rounded-xl overflow-hidden group">
-      <div class="card-media relative h-44">
+      <div class="card-media relative h-44${hasModel ? " has-3d" : ""}">
         <img class="card-thumb" src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy">
         ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true">` : ""}
+        ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer>` : ""}
         <div class="absolute top-3 left-3 flex gap-1.5">
           <span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || "")}</span>
         </div>
