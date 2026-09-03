@@ -343,23 +343,77 @@ function render() {
   });
 
   // Inline 3D preview: load the GLB/GLTF only when the card is hovered.
+  // We keep the thumbnail visible UNTIL the model has actually finished
+  // loading (so the card is never blank while the 14MB GLB streams in),
+  // and we delay hiding slightly so quick pointer jitter doesn't flicker.
   grid.querySelectorAll(".card-media").forEach(media => {
     const viewer = media.querySelector(".card-3d-viewer");
     if (!viewer) return;
 
+    let hideTimer = null;
+    const HIDE_DELAY = 120; // ms — tolerate small pointer jitter before un-showing
+
+    const showNow = () => {
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+      media.classList.add("show-3d");
+    };
+
     const loadViewer = () => {
+      showNow();
       if (!viewer.dataset.loaded) {
         const src = viewer.dataset.modelSrc;
         if (src) {
           viewer.setAttribute("src", src);
           viewer.dataset.loaded = "1";
+
+          // Loading spinner appears instantly over the thumbnail while the
+          // GLB streams in, so the user gets immediate feedback on hover.
+          media.classList.add("model-loading");
+
+          // <model-viewer> fires "load" once the asset is ready to render.
+          const onReady = () => {
+            media.classList.remove("model-loading");
+            media.classList.add("model-ready");
+            cleanup();
+          };
+          // Safety net: if "load" never fires (e.g. broken file), drop the
+          // spinner after 15s so the card isn't stuck spinning forever.
+          const safety = setTimeout(() => {
+            media.classList.remove("model-loading");
+            cleanup();
+          }, 15000);
+          const cleanup = () => {
+            viewer.removeEventListener("load", onReady);
+            clearTimeout(safety);
+          };
+          viewer.addEventListener("load", onReady);
+
+          // Also fall back to the "poster" / thumbnail if the model fails.
+          viewer.addEventListener("error", () => {
+            media.classList.remove("model-loading", "show-3d");
+          }, { once: true });
+        }
+      } else {
+        // Already loaded before — it's ready, so mark it ready immediately.
+        if (!media.classList.contains("model-ready")) {
+          media.classList.add("model-ready");
         }
       }
-      media.classList.add("show-3d");
     };
 
-    const hideViewer = () => media.classList.remove("show-3d");
+    const hideViewer = () => {
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        media.classList.remove("show-3d");
+        hideTimer = null;
+      }, HIDE_DELAY);
+    };
 
+    // mouseenter/leave are more predictable than pointer events for hover
+    // intents (they don't fire on touch taps / small sub-pixel moves).
+    media.addEventListener("mouseenter", loadViewer);
+    media.addEventListener("mouseleave", hideViewer);
+    // Keep pointer events too for touch devices that emulate hover.
     media.addEventListener("pointerenter", loadViewer);
     media.addEventListener("pointerleave", hideViewer);
   });
@@ -381,7 +435,7 @@ function cardTemplate(p) {
       <div class="card-media relative h-44${hasModel ? " has-3d" : ""}">
         <img class="card-thumb" src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy">
         ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true">` : ""}
-        ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer>` : ""}
+        ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer><div class="card-3d-loading"><div class="spinner"></div></div>` : ""}
         <div class="absolute top-3 left-3 flex gap-1.5">
           <span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || "")}</span>
         </div>
