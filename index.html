@@ -172,7 +172,9 @@ transition: opacity .45s cubic-bezier(.22,.9,.3,1), transform .5s cubic-bezier(.
 /* =========================================================
    NEW: inline 3D hover viewer (model-viewer over the card)
    - hidden by default, revealed when JS adds .show-3d on hover
-   - sits on top of the thumbnail, fills the whole card media
+   - the THUMBNAIL stays visible while the GLB loads (.model-loading)
+     and is only faded out once the model is ready (.model-ready),
+     so the card is never blank while the big GLB streams in
    ========================================================= */
 .card-3d-viewer{
 position:absolute !important;
@@ -190,13 +192,39 @@ transition:opacity .35s ease;
 opacity:1;
 pointer-events:auto;
 }
-/* while the 3D viewer is shown, hide the static images underneath */
-.card-media.show-3d .card-thumb,
-.card-media.show-3d .card-preview{ opacity:0 !important; }
+/* While loading: keep the thumbnail visible (don't hide it yet) and
+   dim the model-viewer slightly behind a spinner. */
+.card-media.model-loading .card-thumb{ opacity:1 !important; transform:none !important; }
+.card-media.model-loading .card-preview{ opacity:0 !important; }
+/* Only once the model is actually ready do we fade the thumbnail out. */
+.card-media.model-ready.show-3d .card-thumb,
+.card-media.model-ready.show-3d .card-preview{ opacity:0 !important; }
+
+/* Loading spinner overlay shown while .model-loading */
+.card-3d-loading{
+position:absolute;
+inset:0;
+display:none;
+align-items:center;
+justify-content:center;
+z-index:6;
+background:rgba(10,10,10,0.45);
+pointer-events:none;
+}
+.card-media.model-loading .card-3d-loading{ display:flex; }
+.card-3d-loading .spinner{
+width:26px; height:26px;
+border:2.5px solid rgba(255,255,255,0.18);
+border-top-color:#FFFFFF;
+border-radius:50%;
+animation: card-spin .8s linear infinite;
+}
+@keyframes card-spin{ to{ transform:rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce){
 .card-media img{ transition:none !important; transform:none !important; }
 .card-3d-viewer{ transition:none !important; }
+.card-3d-loading .spinner{ animation:none !important; }
 }
 
 /* =========================================================
