@@ -168,8 +168,35 @@ transition: opacity .45s cubic-bezier(.22,.9,.3,1), transform .5s cubic-bezier(.
 .card-media .card-preview{ opacity:0; }
 .card:hover .card-media .card-thumb{ opacity:0; transform:scale(1.04); }
 .card:hover .card-media .card-preview{ opacity:1; transform:scale(1.04); }
+
+/* =========================================================
+   NEW: inline 3D hover viewer (model-viewer over the card)
+   - hidden by default, revealed when JS adds .show-3d on hover
+   - sits on top of the thumbnail, fills the whole card media
+   ========================================================= */
+.card-3d-viewer{
+position:absolute !important;
+inset:0;
+width:100%;
+height:100%;
+background:#0A0A0A;
+opacity:0;
+z-index:5;
+pointer-events:none;
+transition:opacity .35s ease;
+--poster-color:transparent;
+}
+.card-media.show-3d .card-3d-viewer{
+opacity:1;
+pointer-events:auto;
+}
+/* while the 3D viewer is shown, hide the static images underneath */
+.card-media.show-3d .card-thumb,
+.card-media.show-3d .card-preview{ opacity:0 !important; }
+
 @media (prefers-reduced-motion: reduce){
 .card-media img{ transition:none !important; transform:none !important; }
+.card-3d-viewer{ transition:none !important; }
 }
 
 /* =========================================================
