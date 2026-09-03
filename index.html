@@ -7,6 +7,7 @@
 <link rel="icon" type="image/jpeg" href="we.png">
 <meta name="description" content="A free, community-fed library of high-quality Blender assets — characters, environments, shaders and animations, ready to drop into your scene.">
 <script src="https://cdn.tailwindcss.com"></script>
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -154,6 +155,88 @@ pointer-events:none;
 opacity:.55;
 }
 header, section, footer{ position:relative; z-index:1; }
+
+/* =========================================================
+   NEW: card media crossfade (thumbnail <-> preview/gif)
+   ========================================================= */
+.card-media{ position:relative; overflow:hidden; background:var(--bg-raised); }
+.card-media img{
+position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+transition: opacity .45s cubic-bezier(.22,.9,.3,1), transform .5s cubic-bezier(.22,.9,.3,1);
+}
+.card-media .card-thumb{ position:relative; opacity:1; }
+.card-media .card-preview{ opacity:0; }
+.card:hover .card-media .card-thumb{ opacity:0; transform:scale(1.04); }
+.card:hover .card-media .card-preview{ opacity:1; transform:scale(1.04); }
+@media (prefers-reduced-motion: reduce){
+.card-media img{ transition:none !important; transform:none !important; }
+}
+
+/* =========================================================
+   NEW: card action row (3D preview + report link)
+   ========================================================= */
+.card-actions-row{
+display:flex; align-items:center; justify-content:space-between;
+margin-top:.6rem; padding-top:.6rem; border-top:1px solid var(--line);
+}
+.btn-ghost-sm{
+display:inline-flex; align-items:center; gap:5px;
+font-size:11.5px; color:var(--ink-dim);
+background:transparent; border:none; padding:2px 0; cursor:pointer;
+transition: color .16s ease;
+}
+.btn-ghost-sm:hover{ color:var(--ink); }
+.btn-ghost-sm.report-link:hover{ color:#FF6B6B; }
+.btn-3d{
+display:inline-flex; align-items:center; gap:5px;
+font-size:11.5px; font-weight:600; color:var(--ink);
+background:rgba(255,255,255,0.06); border:1px solid var(--line);
+padding:5px 10px; border-radius:999px; cursor:pointer;
+transition: all .16s ease;
+}
+.btn-3d:hover{ border-color:var(--ink); background:rgba(255,255,255,0.1); }
+
+/* =========================================================
+   NEW: generic overlay modal (3D viewer / report / request)
+   ========================================================= */
+.overlay-modal{ background:rgba(0,0,0,0.82); }
+.overlay-panel{
+background: var(--bg-raised); border:1px solid var(--line);
+animation: rise .3s cubic-bezier(.22,.9,.3,1) both;
+}
+#viewer-stage{
+width:100%; height:min(60vh, 460px);
+background:
+radial-gradient(circle at 50% 30%, #1b1b1b 0%, #0A0A0A 70%);
+border:1px solid var(--line); border-radius:.75rem; overflow:hidden;
+}
+model-viewer{ width:100%; height:100%; --poster-color:transparent; }
+.form-field label{ display:block; font-size:12px; color:var(--ink-dim); margin-bottom:6px; }
+.form-field input,
+.form-field select,
+.form-field textarea{
+width:100%; background:var(--bg); border:1px solid var(--line); border-radius:.5rem;
+padding:.65rem .8rem; font-size:13.5px; color:var(--ink);
+transition: border-color .16s ease, box-shadow .16s ease;
+}
+.form-field input::placeholder,
+.form-field textarea::placeholder{ color:#565656; }
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus{ outline:none; border-color:var(--ink); box-shadow:0 0 0 3px rgba(255,255,255,0.06); }
+.form-field textarea{ resize:vertical; min-height:90px; }
+
+/* toast confirmation */
+#toast{
+position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+background:var(--ink); color:#0A0A0A; font-weight:600; font-size:13px;
+padding:.7rem 1.2rem; border-radius:.6rem; z-index:70;
+opacity:0; pointer-events:none; transition: opacity .25s ease, transform .25s ease;
+box-shadow:0 12px 30px -10px rgba(0,0,0,0.5);
+}
+#toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+[dir="rtl"] #toast{ transform:translateX(50%) translateY(20px); }
+[dir="rtl"] #toast.show{ transform:translateX(50%) translateY(0); }
 </style>
 </head>
 <body class="min-h-screen">
@@ -179,6 +262,10 @@ header, section, footer{ position:relative; z-index:1; }
 <button data-lang="ru" class="px-2 py-1 rounded-full">RU</button>
 </div>
 <a href="#library" class="btn-primary text-sm px-4 py-2 rounded-md" data-i18n="nav_browse">Browse assets</a>
+<button id="open-request-modal" class="chip text-sm px-4 py-2 rounded-md hidden sm:inline-flex items-center gap-1.5">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+<span data-i18n="nav_request_label">Request a model</span>
+</button>
 </div>
 </div>
 </header>
@@ -279,6 +366,7 @@ atOptions = {
 <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--ink-dim)]">
 <span>© <span id="year"></span> Oelono <span data-i18n="footer_built">Built by Oelono.</span></span>
 <div class="flex gap-6">
+<button id="open-request-modal-footer" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_request_label">Request a model</button>
 <a href="/admin/" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
 <a href="#top" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_top">Back to top</a>
 </div>
@@ -329,6 +417,91 @@ class="hidden btn-primary w-full py-3 rounded-lg text-sm items-center justify-ce
 </div>
 </div>
 </div>
+
+<!-- 3D VIEWER MODAL -->
+<div id="viewer-modal" class="overlay-modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+<div class="overlay-panel relative w-full max-w-2xl rounded-xl p-5 md:p-6">
+<button id="viewer-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+<h3 id="viewer-title" class="font-display text-lg font-semibold pr-6 mb-3" data-i18n="viewer_title">3D preview</h3>
+<div id="viewer-stage">
+<model-viewer id="model-viewer-el" camera-controls auto-rotate rotation-per-second="18deg"
+shadow-intensity="0.9" exposure="0.95" environment-image="neutral" interaction-prompt="none">
+<div slot="progress-bar"></div>
+</model-viewer>
+</div>
+<p class="text-xs text-[var(--ink-dim)] text-center mt-3" data-i18n="viewer_hint">Drag to rotate · scroll to zoom. This is a lightweight preview — the downloaded .blend file may include extra materials, rigs and lighting.</p>
+</div>
+</div>
+
+<!-- REPORT BROKEN LINK MODAL -->
+<div id="report-modal" class="overlay-modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+<div class="overlay-panel relative w-full max-w-sm rounded-xl p-6">
+<button id="report-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+<h3 class="font-display text-lg font-semibold pr-6 mb-1" data-i18n="report_title">Report a broken link</h3>
+<p id="report-asset-name" class="text-sm text-[var(--ink-dim)] mb-4"></p>
+<form id="report-form" class="space-y-4">
+<div class="form-field">
+<label for="report-reason" data-i18n="report_reason_label">What's wrong?</label>
+<select id="report-reason">
+<option value="dead-link" data-i18n="report_reason_dead">Download link doesn't work</option>
+<option value="wrong-file" data-i18n="report_reason_wrong">File doesn't match the description</option>
+<option value="corrupted" data-i18n="report_reason_corrupt">File is corrupted / won't open</option>
+<option value="other" data-i18n="report_reason_other">Something else</option>
+</select>
+</div>
+<div class="form-field">
+<label for="report-note" data-i18n="report_note_label">Details (optional)</label>
+<textarea id="report-note" rows="3" data-i18n-placeholder="report_note_placeholder" placeholder="Anything that helps us fix it faster…"></textarea>
+</div>
+<button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="report_submit">Send report</button>
+</form>
+</div>
+</div>
+
+<!-- REQUEST A MODEL MODAL -->
+<div id="request-modal" class="overlay-modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+<div class="overlay-panel relative w-full max-w-md rounded-xl p-6">
+<button id="request-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+<h3 class="font-display text-lg font-semibold pr-6 mb-1" data-i18n="request_title">Request a model</h3>
+<p class="text-sm text-[var(--ink-dim)] mb-5" data-i18n="request_sub">Tell us what you need — if it fits the library, we'll add it to the queue.</p>
+<form id="request-form" class="space-y-4">
+<div class="form-field">
+<label for="request-desc" data-i18n="request_desc_label">What model do you need?</label>
+<textarea id="request-desc" rows="3" required data-i18n-placeholder="request_desc_placeholder" placeholder="e.g. a low-poly medieval blacksmith shop with modular walls"></textarea>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="form-field">
+<label for="request-category" data-i18n="request_category_label">Category</label>
+<select id="request-category">
+<option value="Characters" data-i18n="chip_characters">Characters</option>
+<option value="Environments" data-i18n="chip_environments">Environments</option>
+<option value="Shaders" data-i18n="chip_shaders">Shaders</option>
+<option value="Animations" data-i18n="chip_animations">Animations</option>
+<option value="Assets" data-i18n="chip_assets">Assets</option>
+</select>
+</div>
+<div class="form-field">
+<label for="request-contact" data-i18n="request_contact_label">Email (optional)</label>
+<input id="request-contact" type="email" data-i18n-placeholder="request_contact_placeholder" placeholder="you@example.com">
+</div>
+</div>
+<div class="form-field">
+<label for="request-ref" data-i18n="request_ref_label">Reference link (optional)</label>
+<input id="request-ref" type="text" data-i18n-placeholder="request_ref_placeholder" placeholder="Artstation / Pinterest / image URL…">
+</div>
+<button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="request_submit">Send request</button>
+</form>
+</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
