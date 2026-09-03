@@ -1,1 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الآدمن - البلاغات والطلبات</title>
+    <style>
+        * { direction: rtl; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #1a1a2e; color: #eee; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .login-container, .dashboard { background: #16213e; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        input, button { padding: 12px 20px; border: none; border-radius: 8px; font-size: 16px; margin: 8px 0; }
+        input { background: #0f3460; color: #fff; width: 300px; }
+        button { background: #e94560; color: #fff; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #c73652; transform: scale(1.02); }
+        .table-container { overflow-x: auto; margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; background: #1a1a40; }
+        th { background: #0f3460; padding: 12px; text-align: right; }
+        td { padding: 12px; border-bottom: 1px solid #2a2a5e; }
+        .delete-btn { background: #dc3545; padding: 6px 16px; font-size: 14px; }
+        .delete-btn:hover { background: #a71d2a; }
+        .hidden { display: none; }
+        .error { color: #ff6b6b; }
+        h2 { color: #4fc3f7; border-bottom: 2px solid #4fc3f7; padding-bottom: 8px; }
+        .badge { background: #e94560; padding: 4px 12px; border-radius: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div id="loginSection" class="login-container">
+        <h1>🔐 دخول الآدمن</h1>
+        <p>أدخل كلمة السر للوصول إلى لوحة البلاغات والطلبات</p>
+        <input type="password" id="adminPassword" placeholder="كلمة السر">
+        <button onclick="login()">تسجيل الدخول</button>
+        <div id="loginError" class="error"></div>
+    </div>
 
+    <div id="dashboardSection" class="dashboard hidden">
+        <h1>📋 لوحة البلاغات والطلبات</h1>
+        <button onclick="logout()" style="background:#666; float: left;">تسجيل الخروج</button>
+        <div style="clear:both;"></div>
+        
+        <div class="table-container">
+            <h2>🚨 بلاغات الروابط المكسورة <span class="badge" id="brokenCount">0</span></h2>
+            <table>
+                <thead><tr><th>الموديل</th><th>التفاصيل</th><th>تاريخ البلاغ</th><th>الإجراء</th></tr></thead>
+                <tbody id="brokenTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h2>📥 طلبات الموديلات الجديدة <span class="badge" id="requestCount">0</span></h2>
+            <table>
+                <thead><tr><th>اسم الموديل</th><th>الوصف</th><th>تاريخ الطلب</th><th>الإجراء</th></tr></thead>
+                <tbody id="requestTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // المتغيرات العامة
+        let token = localStorage.getItem('adminToken');
+        const API_BASE = 'https://your-render-server.onrender.com/api'; // غيّر هذا لاحقاً
+
+        // دالة تسجيل الدخول
+        async function login() {
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!password) {
+                errorDiv.textContent = 'الرجاء إدخال كلمة السر';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.token) {
+                    token = data.token;
+                    localStorage.setItem('adminToken', token);
+                    errorDiv.textContent = '';
+                    showDashboard();
+                } else {
+                    errorDiv.textContent = '❌ كلمة السر غير صحيحة';
+                }
+            } catch (error) {
+                errorDiv.textContent = '❌ خطأ في الاتصال بالسيرفر';
+                console.error(error);
+            }
+        }
+
+        // دالة عرض لوحة التحكم
+        async function showDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            await loadData();
+        }
+
+        // دالة تحميل البيانات
+        async function loadData() {
+            try {
+                const [brokenRes, requestsRes] = await Promise.all([
+                    fetch(`${API_BASE}/reports/broken-links`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_BASE}/reports/model-requests`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                if (!brokenRes.ok || !requestsRes.ok) {
+                    if (brokenRes.status === 401 || requestsRes.status === 401) {
+                        logout();
+                        return;
+                    }
+                    throw new Error('فشل في تحميل البيانات');
+                }
+
+                const brokenLinks = await brokenRes.json();
+                const modelRequests = await requestsRes.json();
+
+                // عرض بلاغات الروابط المكسورة
+                const brokenTable = document.getElementById('brokenTableBody');
+                brokenTable.innerHTML = brokenLinks.map(item => `
+                    <tr>
+                        <td>${item.modelName || 'غير محدد'}</td>
+                        <td>${item.details || 'لا توجد تفاصيل'}</td>
+                        <td>${new Date(item.createdAt).toLocaleDateString('ar-EG')}</td>
+                        <td><button class="delete-btn" onclick="deleteItem('broken-links', '${item._id}')">حذف</button></td>
+                    </tr>
+                `).join('');
+                document.getElementById('brokenCount').textContent = brokenLinks.length;
+
+                // عرض طلبات الموديلات
+                const requestTable = document.getElementById('requestTableBody');
+                requestTable.innerHTML = modelRequests.map(item => `
+                    <tr>
+                        <td>${item.modelName || 'غير محدد'}</td>
+                        <td>${item.description || 'لا توجد تفاصيل'}</td>
+                        <td>${new Date(item.createdAt).toLocaleDateString('ar-EG')}</td>
+                        <td><button class="delete-btn" onclick="deleteItem('model-requests', '${item._id}')">حذف</button></td>
+                    </tr>
+                `).join('');
+                document.getElementById('requestCount').textContent = modelRequests.length;
+
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                alert('حدث خطأ في تحميل البيانات');
+            }
+        }
+
+        // دالة حذف عنصر
+        async function deleteItem(type, id) {
+            if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/reports/${type}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    await loadData(); // إعادة تحميل البيانات
+                } else if (response.status === 401) {
+                    logout();
+                } else {
+                    alert('فشل في حذف العنصر');
+                }
+            } catch (error) {
+                console.error('خطأ في الحذف:', error);
+                alert('حدث خطأ في الاتصال');
+            }
+        }
+
+        // دالة تسجيل الخروج
+        function logout() {
+            localStorage.removeItem('adminToken');
+            token = null;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+        }
+
+        // التحقق من وجود جلسة عند التحميل
+        if (token) {
+            showDashboard();
+        }
+    </script>
+</body>
+</html>
