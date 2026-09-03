@@ -897,3 +897,64 @@ document.addEventListener("keydown", (e) => {
 
 initLanguage();
 loadProducts();
+// ===== إضافة وظائف البلاغات والطلبات =====
+// تأكد من وجود API_BASE الصحيح
+const API_BASE = 'https://your-render-server.onrender.com/api';
+
+// دالة إرسال بلاغ عن رابط مكسور
+window.reportBrokenLink = async function(modelName, details = '') {
+    try {
+        const response = await fetch(`${API_BASE}/reports/broken-links`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                modelName: modelName || 'غير محدد',
+                details: details || 'تم الإبلاغ عن رابط مكسور'
+            })
+        });
+
+        if (response.ok) {
+            alert('✅ تم إرسال بلاغك بنجاح، شكراً لك!');
+        } else {
+            alert('❌ حدث خطأ في إرسال البلاغ، حاول مرة أخرى');
+        }
+    } catch (error) {
+        console.error('خطأ في إرسال البلاغ:', error);
+        alert('❌ حدث خطأ في الاتصال بالسيرفر');
+    }
+};
+
+// دالة طلب موديل جديد
+window.requestModel = async function(modelName, description = '') {
+    if (!modelName || modelName.trim() === '') {
+        alert('الرجاء إدخال اسم الموديل المطلوب');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/reports/model-requests`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                modelName: modelName.trim(),
+                description: description.trim() || 'لا يوجد وصف'
+            })
+        });
+
+        if (response.ok) {
+            alert('✅ تم إرسال طلبك بنجاح، سنعمل على توفيره قريباً!');
+        } else {
+            alert('❌ حدث خطأ في إرسال الطلب، حاول مرة أخرى');
+        }
+    } catch (error) {
+        console.error('خطأ في إرسال الطلب:', error);
+        alert('❌ حدث خطأ في الاتصال بالسيرفر');
+    }
+};
+
+// مثال لاستخدام الأزرار في واجهة الموقع
+// يمكن إضافة أزرار في index.html كالتالي:
+/*
+<button onclick="reportBrokenLink('اسم الموديل')">إبلاغ عن رابط مكسور</button>
+<button onclick="requestModel(prompt('أدخل اسم الموديل المطلوب'))">طلب موديل جديد</button>
+*/
