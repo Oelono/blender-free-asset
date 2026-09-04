@@ -910,54 +910,36 @@ document.addEventListener("keydown", (e) => {
 const CONTACT_EMAIL = "requests@oelono.dev"; // TODO: replace with your real inbox
 
 /* =========================================================
-   DISCORD WEBHOOK INTEGRATION
+   DISCORD INTEGRATION (via Cloudflare Worker)
    --------------------------------------------------------
-   Reports, model requests AND comments are pushed to a
-   Discord channel via a webhook. This keeps everything in
-   one place without needing a backend server.
+   Reports, model requests AND comments are pushed to Discord
+   through the "discord-bot" Cloudflare Worker instead of
+   calling a Discord webhook directly from the browser. This
+   keeps the webhook URLs secret (they live only as Worker
+   secrets), and lets the Worker validate/rate-limit input.
 
-   HOW TO GET A WEBHOOK URL:
-   1. Open your Discord server -> channel settings -> Integrations
-   2. "Create Webhook" -> copy the URL (ends in /XXXXXXXX/XXXXXXXX)
-   3. Paste it below.
+   SETUP:
+   1. Deploy the Worker (discord-bot-worker.js) to Cloudflare.
+   2. Replace WORKER_URL below with your Worker's URL, e.g.
+      "https://discord-bot.YOUR-SUBDOMAIN.workers.dev/submit"
    ========================================================= */
-const DISCORD_WEBHOOKS = {
-  reports:   "https://discord.com/api/webhooks/REPLACE_ME_REPORTS",
-  requests:  "https://discord.com/api/webhooks/REPLACE_ME_REQUESTS",
-  comments:  "https://discord.com/api/webhooks/REPLACE_ME_COMMENTS",
-};
-const USE_SINGLE_WEBHOOK = false;
-const SINGLE_WEBHOOK_URL = "https://discord.com/api/webhooks/REPLACE_ME";
-
-function getWebhook(type) {
-  if (USE_SINGLE_WEBHOOK) return SINGLE_WEBHOOK_URL;
-  return DISCORD_WEBHOOKS[type] || DISCORD_WEBHOOKS.reports;
-}
-
-const EMBED_COLORS = {
-  report:   0xFF6B6B,
-  request:  0x00F0FF,
-  comment:  0x9D4EDD,
-};
+const WORKER_URL = "https://discord-bot.YOUR-SUBDOMAIN.workers.dev/submit"; // TODO: replace with your real Worker URL
 
 async function sendToDiscord(type, { title, description, fields = [], footer = "" }) {
-  const url = getWebhook(type);
-  if (!url || url.includes("REPLACE_ME")) {
-    console.warn(`[Discord] No webhook configured for "${type}". Set DISCORD_WEBHOOKS.${type} in script.js.`);
+  if (!WORKER_URL || WORKER_URL.includes("YOUR-SUBDOMAIN")) {
+    console.warn("[Discord] WORKER_URL not configured yet in script.js.");
     return false;
   }
   const payload = {
-    embeds: [{
-      title: title || "",
-      description: description || "",
-      color: EMBED_COLORS[type] || 0x8F8F8F,
-      fields: fields.filter(f => f && f.name && f.value),
-      footer: footer ? { text: footer } : undefined,
-      timestamp: new Date().toISOString(),
-    }],
+    type, // "report" | "request" | "comment"
+    title: title || "",
+    description: description || "",
+    fields: fields.filter(f => f && f.name && f.value),
+    footer: footer || "",
+    honeypot: "", // فاضي دايمًا للمستخدم الحقيقي؛ لو اتملى الـ Worker بيتجاهل الطلب
   };
   try {
-    const res = await fetch(url, {
+    const res = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
