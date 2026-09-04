@@ -167,8 +167,12 @@ transition: opacity .45s cubic-bezier(.22,.9,.3,1), transform .5s cubic-bezier(.
 .card-media .card-thumb{ position:relative; opacity:1; }
 .card-media .card-preview{ opacity:0; }
 .card:hover .card-media.has-3d .card-thumb{ opacity:1; }
-.card:hover .card-media:not(.has-3d) .card-thumb{ opacity:0; transform:scale(1.04); }
-.card:hover .card-media:not(.has-3d) .card-preview{ opacity:1; transform:scale(1.04); }
+/* FIX: only crossfade to a preview when a preview image actually exists.
+   Before, the thumbnail faded out even when there was no (working) preview,
+   leaving the card completely blank/black on hover. */
+.card:hover .card-media.has-preview .card-thumb{ opacity:0; transform:scale(1.04); }
+.card:hover .card-media.has-preview .card-preview{ opacity:1; transform:scale(1.04); }
+.card:hover .card-media:not(.has-preview) .card-thumb{ opacity:1; transform:scale(1.03); }
 /* =========================================================
    INLINE 3D HOVER VIEWER (GLB/GLTF on the card image)
    ========================================================= */
@@ -247,6 +251,19 @@ transition: opacity .45s cubic-bezier(.22,.9,.3,1), transform .5s cubic-bezier(.
 @media (prefers-reduced-motion: reduce){
 .card-media img{ transition:none !important; transform:none !important; }
 }
+
+/* =========================================================
+   NEW: community wall (site-wide guestbook) — matches card style
+   ========================================================= */
+.wall-panel{
+background: var(--bg-raised);
+border:1px solid var(--line);
+transition: border-color .2s cubic-bezier(.22,.9,.3,1);
+}
+.wall-panel:hover{ border-color:#3A3A3A; }
+#guestbook-list{ max-height:420px; overflow-y:auto; }
+#guestbook-list .comment-item{ border-top:1px solid var(--line); padding:12px 0; }
+#guestbook-list .comment-item:first-child{ border-top:none; padding-top:4px; }
 
 /* =========================================================
    NEW: card action row (3D preview + report link)
@@ -434,6 +451,69 @@ atOptions = {
 <h3 class="font-semibold mb-1.5" data-i18n="how3_title">Grab the file</h3>
 <p class="text-sm text-[var(--ink-dim)]" data-i18n="how3_desc">Your Google Drive link unlocks right after — no login, no waiting rooms.</p>
 </div>
+</div>
+</div>
+</section>
+
+<!-- SITE COMMUNITY WALL (guestbook) -->
+<section id="community-wall" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40">
+<div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
+<div class="flex items-center gap-3 mb-2">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="wall_heading">Community wall</h2>
+</div>
+<p class="text-sm text-[var(--ink-dim)] mb-10" data-i18n="wall_subheading">Leave a public message for the whole site — feedback, ideas, or just say hi. No login needed.</p>
+<div class="grid md:grid-cols-2 gap-8 items-start">
+
+<!-- form panel -->
+<div class="wall-panel rounded-xl p-6">
+<h3 class="font-display text-lg font-semibold mb-4" data-i18n="wall_form_title">Post a message</h3>
+<form id="guestbook-form" class="space-y-4">
+<div class="form-field">
+<label for="gb-name" data-i18n="comment_name_label">Your name</label>
+<input id="gb-name" type="text" maxlength="40" required data-i18n-placeholder="comment_name_placeholder" placeholder="Anonymous">
+</div>
+<div class="form-field">
+<label data-i18n="comment_rating_label">Your rating</label>
+<div class="star-rating" id="gb-star-rating">
+<input type="radio" id="gb-star5" name="gb-rating" value="5"><label for="gb-star5">&#9733;</label>
+<input type="radio" id="gb-star4" name="gb-rating" value="4"><label for="gb-star4">&#9733;</label>
+<input type="radio" id="gb-star3" name="gb-rating" value="3"><label for="gb-star3">&#9733;</label>
+<input type="radio" id="gb-star2" name="gb-rating" value="2"><label for="gb-star2">&#9733;</label>
+<input type="radio" id="gb-star1" name="gb-rating" value="1"><label for="gb-star1">&#9733;</label>
+</div>
+</div>
+<div class="form-field">
+<label for="gb-text" data-i18n="comment_text_label">Your comment</label>
+<textarea id="gb-text" rows="3" maxlength="600" required data-i18n-placeholder="wall_text_placeholder" placeholder="Say something to the community…"></textarea>
+</div>
+<div class="form-field">
+<label data-i18n="comment_captcha_label">Anti-bot check</label>
+<div class="captcha-box">
+<span class="cap-q" id="gb-captcha-question">2 + 3 = ?</span>
+<button type="button" class="cap-refresh" id="gb-captcha-refresh" title="New question">&#8635;</button>
+</div>
+<input id="gb-captcha-answer" type="text" inputmode="numeric" maxlength="3" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="margin-top:8px;">
+</div>
+<button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="wall_submit">Post message</button>
+</form>
+</div>
+
+<!-- list panel -->
+<div class="wall-panel rounded-xl p-6">
+<div class="flex items-center justify-between gap-3 mb-1">
+<div class="flex items-center gap-2.5">
+<h3 class="font-display text-lg font-semibold" data-i18n="wall_list_title">Latest messages</h3>
+<span class="badge px-2 py-0.5 rounded" style="font-size:11px;" id="gb-count">0</span>
+</div>
+<span class="comment-avg" id="gb-avg-wrap" style="display:none;">
+<span class="avg-stars" id="gb-avg-stars"></span>
+<span id="gb-avg-text"></span>
+</span>
+</div>
+<div id="guestbook-list"></div>
+</div>
+
 </div>
 </div>
 </section>
