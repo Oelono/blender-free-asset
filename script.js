@@ -80,6 +80,22 @@ const translations = {
     request_submit: "Send request",
     request_success: "Thanks — your request has been sent.",
     request_error: "Please describe the model you need.",
+    comments_title: "Comments",
+    comment_name_label: "Your name",
+    comment_name_placeholder: "Anonymous",
+    comment_rating_label: "Your rating",
+    comment_text_label: "Your comment",
+    comment_text_placeholder: "Share your thoughts about this asset...",
+    comment_captcha_label: "Anti-bot check",
+    comment_captcha_placeholder: "Your answer",
+    comment_submit: "Post comment",
+    comment_success: "Thanks for your comment!",
+    comment_error_name: "Please enter your name.",
+    comment_error_text: "Please write a comment.",
+    comment_error_captcha: "Wrong answer to the anti-bot check.",
+    comment_error_profanity: "Please keep your comment respectful.",
+    comment_empty: "No comments yet. Be the first!",
+    comment_avg_text: (n) => `Average: ${n.toFixed(1)} / 5`,
   },
   ar: {
     nav_library: "المكتبة",
@@ -144,6 +160,22 @@ const translations = {
     request_submit: "إرسال الطلب",
     request_success: "شكرًا — تم إرسال طلبك.",
     request_error: "من فضلك اكتب وصف الموديل المطلوب.",
+    comments_title: "التعليقات",
+    comment_name_label: "اسمك",
+    comment_name_placeholder: "مجهول",
+    comment_rating_label: "تقييمك",
+    comment_text_label: "تعليقك",
+    comment_text_placeholder: "شارك رأيك حول هذا الأصل...",
+    comment_captcha_label: "اختبار منع الروبوتات",
+    comment_captcha_placeholder: "إجابتك",
+    comment_submit: "نشر التعليق",
+    comment_success: "شكراً لتعليقك!",
+    comment_error_name: "الرجاء إدخال اسمك.",
+    comment_error_text: "الرجاء كتابة تعليق.",
+    comment_error_captcha: "إجابة خاطئة لاختبار منع الروبوتات.",
+    comment_error_profanity: "الرجاء الحفاظ على احترام التعليق.",
+    comment_empty: "لا توجد تعليقات بعد. كن أول من يعلّق!",
+    comment_avg_text: (n) => `المتوسط: ${n.toFixed(1)} / 5`,
   },
   ru: {
     nav_library: "Библиотека",
@@ -208,6 +240,22 @@ const translations = {
     request_submit: "Отправить запрос",
     request_success: "Спасибо — ваш запрос отправлен.",
     request_error: "Пожалуйста, опишите нужную модель.",
+    comments_title: "Комментарии",
+    comment_name_label: "Ваше имя",
+    comment_name_placeholder: "Аноним",
+    comment_rating_label: "Ваша оценка",
+    comment_text_label: "Ваш комментарий",
+    comment_text_placeholder: "Поделитесь мыслями об этом ассете...",
+    comment_captcha_label: "Проверка от ботов",
+    comment_captcha_placeholder: "Ваш ответ",
+    comment_submit: "Опубликовать",
+    comment_success: "Спасибо за комментарий!",
+    comment_error_name: "Пожалуйста, введите имя.",
+    comment_error_text: "Пожалуйста, напишите комментарий.",
+    comment_error_captcha: "Неверный ответ на проверку.",
+    comment_error_profanity: "Пожалуйста, будьте вежливы в комментарии.",
+    comment_empty: "Пока нет комментариев. Будьте первым!",
+    comment_avg_text: (n) => `Средняя: ${n.toFixed(1)} / 5`,
   },
 };
 
@@ -343,77 +391,56 @@ function render() {
   });
 
   // Inline 3D preview: load the GLB/GLTF only when the card is hovered.
-  // We keep the thumbnail visible UNTIL the model has actually finished
-  // loading (so the card is never blank while the 14MB GLB streams in),
-  // and we delay hiding slightly so quick pointer jitter doesn't flicker.
+  // Debounced so quick pointer passes don't flash a blank card; the thumbnail
+  // stays visible until the model has actually finished loading.
   grid.querySelectorAll(".card-media").forEach(media => {
     const viewer = media.querySelector(".card-3d-viewer");
     if (!viewer) return;
 
-    let hideTimer = null;
-    const HIDE_DELAY = 120; // ms — tolerate small pointer jitter before un-showing
-
-    const showNow = () => {
-      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
-      media.classList.add("show-3d");
-    };
+    let enterTimer = null;
+    let leaveTimer = null;
+    let safetyTimer = null;
 
     const loadViewer = () => {
-      showNow();
-      if (!viewer.dataset.loaded) {
-        const src = viewer.dataset.modelSrc;
-        if (src) {
-          viewer.setAttribute("src", src);
-          viewer.dataset.loaded = "1";
-
-          // Loading spinner appears instantly over the thumbnail while the
-          // GLB streams in, so the user gets immediate feedback on hover.
-          media.classList.add("model-loading");
-
-          // <model-viewer> fires "load" once the asset is ready to render.
-          const onReady = () => {
-            media.classList.remove("model-loading");
+      if (leaveTimer) { clearTimeout(leaveTimer); leaveTimer = null; }
+      enterTimer = setTimeout(() => {
+        enterTimer = null;
+        if (!viewer.dataset.loaded) {
+          const src = viewer.dataset.modelSrc;
+          if (src) {
+            viewer.setAttribute("src", src);
+            viewer.dataset.loaded = "1";
+            media.classList.add("model-loading");
+            // When the model has finished streaming, mark ready + show it.
+            viewer.addEventListener("load", () => {
+              media.classList.remove("model-loading");
+              media.classList.add("model-ready");
+            }, { once: true });
+            viewer.addEventListener("error", () => {
+              media.classList.remove("model-loading");
+            }, { once: true });
+            // Safety: if the model hasn't loaded in 15s, drop the spinner
+            // so the card doesn't look frozen.
+            safetyTimer = setTimeout(() => {
+              media.classList.remove("model-loading");
+            }, 15000);
+          } else {
             media.classList.add("model-ready");
-            cleanup();
-          };
-          // Safety net: if "load" never fires (e.g. broken file), drop the
-          // spinner after 15s so the card isn't stuck spinning forever.
-          const safety = setTimeout(() => {
-            media.classList.remove("model-loading");
-            cleanup();
-          }, 15000);
-          const cleanup = () => {
-            viewer.removeEventListener("load", onReady);
-            clearTimeout(safety);
-          };
-          viewer.addEventListener("load", onReady);
-
-          // Also fall back to the "poster" / thumbnail if the model fails.
-          viewer.addEventListener("error", () => {
-            media.classList.remove("model-loading", "show-3d");
-          }, { once: true });
+          }
         }
-      } else {
-        // Already loaded before — it's ready, so mark it ready immediately.
-        if (!media.classList.contains("model-ready")) {
-          media.classList.add("model-ready");
-        }
-      }
+        media.classList.add("show-3d");
+      }, 120);
     };
 
     const hideViewer = () => {
-      if (hideTimer) clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => {
+      if (enterTimer) { clearTimeout(enterTimer); enterTimer = null; }
+      if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
+      leaveTimer = setTimeout(() => {
+        leaveTimer = null;
         media.classList.remove("show-3d");
-        hideTimer = null;
-      }, HIDE_DELAY);
+      }, 120);
     };
 
-    // mouseenter/leave are more predictable than pointer events for hover
-    // intents (they don't fire on touch taps / small sub-pixel moves).
-    media.addEventListener("mouseenter", loadViewer);
-    media.addEventListener("mouseleave", hideViewer);
-    // Keep pointer events too for touch devices that emulate hover.
     media.addEventListener("pointerenter", loadViewer);
     media.addEventListener("pointerleave", hideViewer);
   });
@@ -424,6 +451,16 @@ function render() {
       if (product) openReportModal(product);
     });
   });
+
+  // Comments button on each card
+  grid.querySelectorAll("[data-comments-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const product = state.products.find(p => p.id === btn.dataset.commentsId);
+      if (product) openCommentsModal(product);
+    });
+  });
+  // Refresh visible comment counts
+  refreshCommentCounts();
 }
 
 function cardTemplate(p) {
@@ -435,7 +472,7 @@ function cardTemplate(p) {
       <div class="card-media relative h-44${hasModel ? " has-3d" : ""}">
         <img class="card-thumb" src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy">
         ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true">` : ""}
-        ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer><div class="card-3d-loading"><div class="spinner"></div></div>` : ""}
+        ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer>` : ""}
         <div class="absolute top-3 left-3 flex gap-1.5">
           <span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || "")}</span>
         </div>
@@ -452,12 +489,18 @@ function cardTemplate(p) {
           <button data-download-id="${escapeAttr(p.id)}" class="btn-primary text-xs px-4 py-2 rounded-md">${escapeHtml(t("card_download"))}</button>
         </div>
         <div class="card-actions-row">
-          ${hasModel
-            ? `<button data-viewer-id="${escapeAttr(p.id)}" class="btn-3d">
-                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
-                 ${escapeHtml(t("card_preview3d"))}
-               </button>`
-            : `<span></span>`}
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${hasModel
+              ? `<button data-viewer-id="${escapeAttr(p.id)}" class="btn-3d">
+                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
+                   ${escapeHtml(t("card_preview3d"))}
+                 </button>`
+              : `<span></span>`}
+            <button data-comments-id="${escapeAttr(p.id)}" class="comment-count-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="cmt-count" data-cmt-for="${escapeAttr(p.id)}">0</span>
+            </button>
+          </div>
           <button data-report-id="${escapeAttr(p.id)}" class="btn-ghost-sm report-link">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
             ${escapeHtml(t("card_report"))}
@@ -517,6 +560,9 @@ const progressLabel = document.getElementById("progress-label");
 const progressPercent = document.getElementById("progress-percent");
 
 const COUNTDOWN_SECONDS = 10;
+// The first sponsor step is shorter \u2014 it's the entry point, so a long
+// wait there feels especially punishing. Subsequent steps keep 10s.
+const FIRST_STEP_SECONDS = 3;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 15.5; // matches r=15.5 in the SVG
 let countdownTimer = null;
 let activeProduct = null;
@@ -684,7 +730,10 @@ function openModal(product) {
 // stage is cancelled instead of quietly being granted anyway.
 function startCountdown(windowRef) {
   sponsorWindow = windowRef || null;
-  let remaining = COUNTDOWN_SECONDS;
+  // Stage 1 (activeStage === 1 when this is called for the first step)
+  // uses the shorter FIRST_STEP_SECONDS; later stages use COUNTDOWN_SECONDS.
+  const total = (activeStage === 1) ? FIRST_STEP_SECONDS : COUNTDOWN_SECONDS;
+  let remaining = total;
   unlockLabel.textContent = t("unlock_unlocking")(remaining);
 
   clearInterval(countdownTimer);
@@ -696,7 +745,7 @@ function startCountdown(windowRef) {
     }
 
     remaining -= 1;
-    const progress = 1 - remaining / COUNTDOWN_SECONDS;
+    const progress = 1 - remaining / total;
     unlockRingProgress.style.strokeDashoffset = `${RING_CIRCUMFERENCE * progress}`;
 
     if (remaining <= 0) {
@@ -814,6 +863,67 @@ document.addEventListener("keydown", (e) => {
    ========================================================= */
 const CONTACT_EMAIL = "requests@oelono.dev"; // TODO: replace with your real inbox
 
+/* =========================================================
+   DISCORD WEBHOOK INTEGRATION
+   --------------------------------------------------------
+   Reports, model requests AND comments are pushed to a
+   Discord channel via a webhook. This keeps everything in
+   one place without needing a backend server.
+
+   HOW TO GET A WEBHOOK URL:
+   1. Open your Discord server -> channel settings -> Integrations
+   2. "Create Webhook" -> copy the URL (ends in /XXXXXXXX/XXXXXXXX)
+   3. Paste it below.
+   ========================================================= */
+const DISCORD_WEBHOOKS = {
+  reports:   "https://discord.com/api/webhooks/REPLACE_ME_REPORTS",
+  requests:  "https://discord.com/api/webhooks/REPLACE_ME_REQUESTS",
+  comments:  "https://discord.com/api/webhooks/REPLACE_ME_COMMENTS",
+};
+const USE_SINGLE_WEBHOOK = false;
+const SINGLE_WEBHOOK_URL = "https://discord.com/api/webhooks/REPLACE_ME";
+
+function getWebhook(type) {
+  if (USE_SINGLE_WEBHOOK) return SINGLE_WEBHOOK_URL;
+  return DISCORD_WEBHOOKS[type] || DISCORD_WEBHOOKS.reports;
+}
+
+const EMBED_COLORS = {
+  report:   0xFF6B6B,
+  request:  0x00F0FF,
+  comment:  0x9D4EDD,
+};
+
+async function sendToDiscord(type, { title, description, fields = [], footer = "" }) {
+  const url = getWebhook(type);
+  if (!url || url.includes("REPLACE_ME")) {
+    console.warn(`[Discord] No webhook configured for "${type}". Set DISCORD_WEBHOOKS.${type} in script.js.`);
+    return false;
+  }
+  const payload = {
+    embeds: [{
+      title: title || "",
+      description: description || "",
+      color: EMBED_COLORS[type] || 0x8F8F8F,
+      fields: fields.filter(f => f && f.name && f.value),
+      footer: footer ? { text: footer } : undefined,
+      timestamp: new Date().toISOString(),
+    }],
+  };
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("[Discord] send failed:", err);
+    return false;
+  }
+}
+
+
 const toastEl = document.getElementById("toast");
 let toastTimer = null;
 function showToast(message) {
@@ -892,23 +1002,36 @@ function closeReportModal() {
 reportClose.addEventListener("click", closeReportModal);
 reportModal.addEventListener("click", (e) => { if (e.target === reportModal) closeReportModal(); });
 
-reportForm.addEventListener("submit", (e) => {
+reportForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!reportProduct) return;
 
   const reasonLabel = reportReasonSelect.options[reportReasonSelect.selectedIndex].text;
-  const subject = `Broken link report: ${reportProduct.title}`;
-  const body =
-    `Asset: ${reportProduct.title} (${reportProduct.id})\n` +
-    `Reason: ${reasonLabel}\n` +
-    `Details: ${reportNote.value.trim() || "—"}\n` +
-    `Page: ${window.location.href}`;
 
-  window.location.href =
-    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const ok = await sendToDiscord("report", {
+    title: "🚩 Broken Link Report",
+    description: `**Asset:** ${reportProduct.title} (\`${reportProduct.id}\`)`,
+    fields: [
+      { name: "Reason", value: reasonLabel, inline: true },
+      { name: "Details", value: reportNote.value.trim() || "—", inline: false },
+      { name: "Page", value: window.location.href, inline: false },
+    ],
+    footer: "Vaultframe report",
+  });
 
   showToast(t("report_success"));
   closeReportModal();
+
+  if (!ok) {
+    const subject = `Broken link report: ${reportProduct.title}`;
+    const body =
+      `Asset: ${reportProduct.title} (${reportProduct.id})\n` +
+      `Reason: ${reasonLabel}\n` +
+      `Details: ${reportNote.value.trim() || "—"}\n` +
+      `Page: ${window.location.href}`;
+    window.location.href =
+      `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
 });
 
 /* ---------------------------------------------------------
@@ -943,95 +1066,276 @@ if (requestModalFooterBtn) requestModalFooterBtn.addEventListener("click", openR
 requestClose.addEventListener("click", closeRequestModal);
 requestModal.addEventListener("click", (e) => { if (e.target === requestModal) closeRequestModal(); });
 
-requestForm.addEventListener("submit", (e) => {
+requestForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!requestDesc.value.trim()) {
     showToast(t("request_error"));
     return;
   }
 
-  const subject = `Model request: ${requestCategory.value}`;
-  const body =
-    `Category: ${requestCategory.value}\n` +
-    `Description: ${requestDesc.value.trim()}\n` +
-    `Reference: ${requestRef.value.trim() || "—"}\n` +
-    `Contact: ${requestContact.value.trim() || "—"}`;
-
-  window.location.href =
-    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const ok = await sendToDiscord("request", {
+    title: "💡 Model Request",
+    description: `**Category:** ${requestCategory.value}`,
+    fields: [
+      { name: "Description", value: requestDesc.value.trim(), inline: false },
+      { name: "Reference", value: requestRef.value.trim() || "—", inline: false },
+      { name: "Contact", value: requestContact.value.trim() || "—", inline: true },
+    ],
+    footer: "Vaultframe request",
+  });
 
   showToast(t("request_success"));
   closeRequestModal();
+
+  if (!ok) {
+    const subject = `Model request: ${requestCategory.value}`;
+    const body =
+      `Category: ${requestCategory.value}\n` +
+      `Description: ${requestDesc.value.trim()}\n` +
+      `Reference: ${requestRef.value.trim() || "—"}\n` +
+      `Contact: ${requestContact.value.trim() || "—"}`;
+    window.location.href =
+      `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
 });
 
-// Escape closes whichever of the three new overlays is open
+/* =========================================================
+   COMMENTS SYSTEM
+   - No login required (name + comment + 1-5 star rating)
+   - Simple math captcha (anti-bot)
+   - Profanity filter (blocklist)
+   - Stored in localStorage + pushed to Discord webhook
+   ========================================================= */
+
+// --- Profanity blocklist (English + Arabic + Russian common offenders) ---
+const PROFANITY_LIST = [
+  // English
+  "fuck", "shit", "bitch", "asshole", "bastard", "dick", "piss", "cunt",
+  "whore", "slut", "nigger", "nigga", "retard", "faggot", "douche",
+  "motherfucker", "cock", "pussy", "wanker", "twat", "prick", "bollocks",
+  // Arabic (transliterated + script)
+  "khsara", "kos", "kuss", "omak", "abak", "khol", "sharmoota", "sharmuta",
+  "kes emmak", "ibn", "kalb", "hmar", "gayid", "nagis", "khara", "khara2",
+  // Russian (transliterated)
+  "blyad", "blyat", "suka", "pizdec", "pizdets", "hui", "davalka", "ebal",
+];
+
+function containsProfanity(text) {
+  const lower = text.toLowerCase();
+  // Normalize: collapse repeated spaces and strip diacritics lightly
+  const normalized = lower.replace(/\s+/g, " ").trim();
+  for (const word of PROFANITY_LIST) {
+    // word boundary match so "ass" won't flag "class"
+    const re = new RegExp("(?:^|[^a-z\u0600-\u06ff\u0400-\u04ff])" +
+      word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+      "(?:[^a-z\u0600-\u06ff\u0400-\u04ff]|$)", "i");
+    if (re.test(normalized)) return true;
+  }
+  return false;
+}
+
+// --- localStorage helpers ---
+const COMMENTS_KEY = "vaultframe_comments_v1";
+function getAllComments() {
+  try {
+    return JSON.parse(localStorage.getItem(COMMENTS_KEY) || "{}");
+  } catch (e) { return {}; }
+}
+function saveAllComments(all) {
+  try { localStorage.setItem(COMMENTS_KEY, JSON.stringify(all)); } catch (e) {}
+}
+function getCommentsFor(productId) {
+  const all = getAllComments();
+  return Array.isArray(all[productId]) ? all[productId] : [];
+}
+function addCommentToStore(productId, comment) {
+  const all = getAllComments();
+  if (!Array.isArray(all[productId])) all[productId] = [];
+  all[productId].push(comment);
+  saveAllComments(all);
+}
+
+// --- Refresh the visible comment count badges on cards ---
+function refreshCommentCounts() {
+  const all = getAllComments();
+  document.querySelectorAll("[data-cmt-for]").forEach(span => {
+    const id = span.getAttribute("data-cmt-for");
+    const list = Array.isArray(all[id]) ? all[id] : [];
+    span.textContent = String(list.length);
+  });
+}
+
+// --- Captcha (simple math question) ---
+let captchaSolution = 0;
+function generateCaptcha() {
+  const a = Math.floor(Math.random() * 8) + 1;   // 1-8
+  const b = Math.floor(Math.random() * 8) + 1;   // 1-8
+  const ops = ["+", "-"];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let q, ans;
+  if (op === "+") { q = a + " + " + b; ans = a + b; }
+  else {
+    // keep subtraction non-negative
+    const big = Math.max(a, b), small = Math.min(a, b);
+    q = big + " - " + small; ans = big - small;
+  }
+  captchaSolution = ans;
+  const qEl = document.getElementById("captcha-question");
+  if (qEl) qEl.textContent = q + " = ?";
+}
+
+// --- Comments modal ---
+const commentsModal = document.getElementById("comments-modal");
+const commentsClose = document.getElementById("comments-close");
+const commentsAssetName = document.getElementById("comments-asset-name");
+const commentList = document.getElementById("comment-list");
+const commentAvgWrap = document.getElementById("comment-avg-wrap");
+const commentAvgStars = document.getElementById("comment-avg-stars");
+const commentAvgText = document.getElementById("comment-avg-text");
+const commentForm = document.getElementById("comment-form");
+const commentNameInput = document.getElementById("comment-name");
+const commentTextInput = document.getElementById("comment-text");
+const captchaAnswerInput = document.getElementById("captcha-answer");
+const captchaRefreshBtn = document.getElementById("captcha-refresh");
+let activeCommentProduct = null;
+
+function starsString(n) {
+  let s = "";
+  for (let i = 0; i < 5; i++) s += (i < n) ? "\u2605" : "\u2606";
+  return s;
+}
+
+function renderComments(productId) {
+  const list = getCommentsFor(productId);
+  if (!list.length) {
+    commentList.innerHTML = '<div class="comment-empty">' + escapeHtml(t("comment_empty")) + '</div>';
+    commentAvgWrap.style.display = "none";
+    return;
+  }
+  // average
+  const avg = list.reduce((s, c) => s + (c.rating || 0), 0) / list.length;
+  commentAvgStars.textContent = starsString(Math.round(avg));
+  commentAvgText.textContent = t("comment_avg_text")(avg);
+  commentAvgWrap.style.display = "inline-flex";
+
+  commentList.innerHTML = list.slice().reverse().map(c => {
+    const d = new Date(c.ts || Date.now());
+    const dateStr = d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    return '<div class="comment-item">' +
+      '<div class="c-head">' +
+        '<span class="c-name">' + escapeHtml(c.name || "Anonymous") + '</span>' +
+        '<span class="c-date">' + escapeHtml(dateStr) + '</span>' +
+      '</div>' +
+      '<div class="c-stars">' + starsString(c.rating || 0) + '</div>' +
+      '<div class="c-body">' + escapeHtml(c.text || "") + '</div>' +
+    '</div>';
+  }).join("");
+}
+
+function openCommentsModal(product) {
+  activeCommentProduct = product;
+  commentsAssetName.textContent = product.title || "";
+  renderComments(product.id);
+  generateCaptcha();
+  commentForm.reset();
+  commentsModal.classList.remove("hidden");
+  commentsModal.classList.add("flex");
+  document.body.style.overflow = "hidden";
+}
+
+function closeCommentsModal() {
+  commentsModal.classList.add("hidden");
+  commentsModal.classList.remove("flex");
+  document.body.style.overflow = "";
+  activeCommentProduct = null;
+}
+
+commentsClose.addEventListener("click", closeCommentsModal);
+commentsModal.addEventListener("click", (e) => {
+  if (e.target === commentsModal) closeCommentsModal();
+});
+if (captchaRefreshBtn) captchaRefreshBtn.addEventListener("click", generateCaptcha);
+
+commentForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = commentNameInput.value.trim();
+  const text = commentTextInput.value.trim();
+  const ratingInput = commentForm.querySelector('input[name="rating"]:checked');
+  const rating = ratingInput ? parseInt(ratingInput.value, 10) : 0;
+  const capAns = (captchaAnswerInput.value || "").trim();
+
+  if (!name) { showToast(t("comment_error_name")); return; }
+  if (!text) { showToast(t("comment_error_text")); return; }
+  if (parseInt(capAns, 10) !== captchaSolution) { showToast(t("comment_error_captcha")); return; }
+  if (containsProfanity(name + " " + text)) { showToast(t("comment_error_profanity")); return; }
+
+  const comment = {
+    name: name,
+    text: text,
+    rating: rating,
+    ts: Date.now(),
+  };
+
+  // 1) Save locally so it shows immediately
+  addCommentToStore(activeCommentProduct.id, comment);
+  renderComments(activeCommentProduct.id);
+  refreshCommentCounts();
+  commentForm.reset();
+  generateCaptcha();
+  showToast(t("comment_success"));
+
+  // 2) Push to Discord (best-effort)
+  sendToDiscord("comment", {
+    title: "\u{1F4AC} New Comment",
+    description: "**Asset:** " + (activeCommentProduct.title || "Unknown"),
+    fields: [
+      { name: "Name", value: name, inline: true },
+      { name: "Rating", value: rating + " / 5 " + starsString(rating), inline: true },
+      { name: "Comment", value: text, inline: false },
+    ],
+    footer: "Vaultframe comments",
+  }).then(() => {}).catch(() => {});
+});
+
+// Periodically refresh counts (in case comments added from another tab)
+window.addEventListener("storage", refreshCommentCounts);
+
+// Escape closes whichever overlay is open
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   if (!viewerModal.classList.contains("hidden")) closeViewerModal();
   if (!reportModal.classList.contains("hidden")) closeReportModal();
   if (!requestModal.classList.contains("hidden")) closeRequestModal();
+  if (!commentsModal.classList.contains("hidden")) closeCommentsModal();
 });
 
 initLanguage();
 loadProducts();
-// ===== إضافة وظائف البلاغات والطلبات =====
-// تأكد من وجود API_BASE الصحيح
-const API_BASE = 'https://your-render-server.onrender.com/api';
+// ===== البلاغات والطلبات عبر Discord =====
+// (تم نقل المنطق إلى sendToDiscord أعلاه — هذه دوال مساعدة للأزرار الديناميكية)
 
-// دالة إرسال بلاغ عن رابط مكسور
+// دالة إرسال بلاغ عن رابط مكسور (تستخدم Discord webhook)
 window.reportBrokenLink = async function(modelName, details = '') {
-    try {
-        const response = await fetch(`${API_BASE}/reports/broken-links`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                modelName: modelName || 'غير محدد',
-                details: details || 'تم الإبلاغ عن رابط مكسور'
-            })
-        });
-
-        if (response.ok) {
-            alert('✅ تم إرسال بلاغك بنجاح، شكراً لك!');
-        } else {
-            alert('❌ حدث خطأ في إرسال البلاغ، حاول مرة أخرى');
-        }
-    } catch (error) {
-        console.error('خطأ في إرسال البلاغ:', error);
-        alert('❌ حدث خطأ في الاتصال بالسيرفر');
-    }
+    const ok = await sendToDiscord("report", {
+        title: "🚩 Broken Link Report",
+        description: `**Model:** ${modelName || 'غير محدد'}`,
+        fields: [{ name: "Details", value: details || 'تم الإبلاغ عن رابط مكسور', inline: false }],
+        footer: "Vaultframe report",
+    });
+    alert(ok ? '✅ تم إرسال بلاغك بنجاح، شكراً لك!' : '⚠️ تعذّر الإرسال لـ Discord — تأكد من إعداد الـ webhook.');
 };
 
-// دالة طلب موديل جديد
+// دالة طلب موديل جديد (تستخدم Discord webhook)
 window.requestModel = async function(modelName, description = '') {
     if (!modelName || modelName.trim() === '') {
         alert('الرجاء إدخال اسم الموديل المطلوب');
         return;
     }
-
-    try {
-        const response = await fetch(`${API_BASE}/reports/model-requests`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                modelName: modelName.trim(),
-                description: description.trim() || 'لا يوجد وصف'
-            })
-        });
-
-        if (response.ok) {
-            alert('✅ تم إرسال طلبك بنجاح، سنعمل على توفيره قريباً!');
-        } else {
-            alert('❌ حدث خطأ في إرسال الطلب، حاول مرة أخرى');
-        }
-    } catch (error) {
-        console.error('خطأ في إرسال الطلب:', error);
-        alert('❌ حدث خطأ في الاتصال بالسيرفر');
-    }
+    const ok = await sendToDiscord("request", {
+        title: "💡 Model Request",
+        description: `**Model:** ${modelName.trim()}`,
+        fields: [{ name: "Description", value: description.trim() || 'لا توجد وصف', inline: false }],
+        footer: "Vaultframe request",
+    });
+    alert(ok ? '✅ تم إرسال طلبك بنجاح، سنعمل على توفيره قريباً!' : '⚠️ تعذّر الإرسال لـ Discord — تأكد من إعداد الـ webhook.');
 };
-
-// مثال لاستخدام الأزرار في واجهة الموقع
-// يمكن إضافة أزرار في index.html كالتالي:
-/*
-<button onclick="reportBrokenLink('اسم الموديل')">إبلاغ عن رابط مكسور</button>
-<button onclick="requestModel(prompt('أدخل اسم الموديل المطلوب'))">طلب موديل جديد</button>
-*/
