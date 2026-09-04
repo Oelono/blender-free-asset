@@ -6,7 +6,9 @@ backend:
   auth_endpoint: auth
 
 media_folder: "assets/uploads"
-public_folder: "/blender-free-asset/assets/uploads"
+# Relative (NOT "/blender-free-asset/assets/uploads") so saved image paths
+# like "assets/uploads/pic.png" work on GitHub Pages AND any custom domain.
+public_folder: "assets/uploads"
 
 collections:
   - name: "products"
@@ -32,7 +34,12 @@ collections:
               - label: "Thumbnail"
                 name: "thumbnail"
                 widget: "image"
-                hint: "Upload an image, or paste an external image URL"
+                hint: "Upload an image, or paste an external image URL. This is the main card image."
+              - label: "Hover Preview Image (optional)"
+                name: "previewImage"
+                widget: "image"
+                required: false
+                hint: "Optional second image shown when the visitor hovers the card. Leave EMPTY unless you really have one — if left empty, the thumbnail simply stays visible on hover."
               - label: "3D Model (GLB / GLTF)"
                 name: "modelUrl"
                 widget: "file"
