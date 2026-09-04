@@ -923,7 +923,7 @@ const CONTACT_EMAIL = "requests@oelono.dev"; // TODO: replace with your real inb
    2. Replace WORKER_URL below with your Worker's URL, e.g.
       "https://discord-bot.YOUR-SUBDOMAIN.workers.dev/submit"
    ========================================================= */
-const WORKER_URL = "https://discord-bot.YOUR-SUBDOMAIN.workers.dev/submit"; // TODO: replace with your real Worker URL
+const WORKER_URL = "https://discord-bot.beenbeen123455678.workers.dev/submit";
 
 async function sendToDiscord(type, { title, description, fields = [], footer = "" }) {
   if (!WORKER_URL || WORKER_URL.includes("YOUR-SUBDOMAIN")) {
