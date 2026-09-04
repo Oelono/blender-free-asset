@@ -436,8 +436,8 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
      `fixed`, so it travels with the library section as you scroll but
      can never escape this row to overlap the header, footer, or other
      sections — and on narrow screens it just stacks below the grid. -->
-<div class="flex flex-wrap items-start gap-6">
-<div class="flex-1 min-w-0">
+<div class="flex flex-col lg:flex-row items-start gap-6">
+<div class="flex-1 min-w-0 w-full">
 <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 <div id="empty-state" class="hidden text-center py-20">
 <p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
