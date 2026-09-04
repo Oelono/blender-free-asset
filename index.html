@@ -168,63 +168,158 @@ transition: opacity .45s cubic-bezier(.22,.9,.3,1), transform .5s cubic-bezier(.
 .card-media .card-preview{ opacity:0; }
 .card:hover .card-media .card-thumb{ opacity:0; transform:scale(1.04); }
 .card:hover .card-media .card-preview{ opacity:1; transform:scale(1.04); }
-
 /* =========================================================
-   NEW: inline 3D hover viewer (model-viewer over the card)
-   - hidden by default, revealed when JS adds .show-3d on hover
-   - the THUMBNAIL stays visible while the GLB loads (.model-loading)
-     and is only faded out once the model is ready (.model-ready),
-     so the card is never blank while the big GLB streams in
+   INLINE 3D HOVER VIEWER (GLB/GLTF on the card image)
    ========================================================= */
 .card-3d-viewer{
-position:absolute !important;
-inset:0;
-width:100%;
-height:100%;
-background:#0A0A0A;
-opacity:0;
-z-index:5;
-pointer-events:none;
-transition:opacity .35s ease;
---poster-color:transparent;
+  position:absolute !important; inset:0; width:100%; height:100%;
+  background:#0A0A0A; opacity:0; z-index:5; pointer-events:none;
+  transition:opacity .35s ease; --poster-color:transparent;
 }
-.card-media.show-3d .card-3d-viewer{
-opacity:1;
-pointer-events:auto;
-}
-/* While loading: keep the thumbnail visible (don't hide it yet) and
-   dim the model-viewer slightly behind a spinner. */
+.card-media.show-3d .card-3d-viewer{ opacity:1; pointer-events:auto; }
+/* Keep the thumbnail visible WHILE the model is still streaming,
+   so the card never shows a blank area during the 14MB load. */
 .card-media.model-loading .card-thumb{ opacity:1 !important; transform:none !important; }
 .card-media.model-loading .card-preview{ opacity:0 !important; }
-/* Only once the model is actually ready do we fade the thumbnail out. */
 .card-media.model-ready.show-3d .card-thumb,
 .card-media.model-ready.show-3d .card-preview{ opacity:0 !important; }
-
-/* Loading spinner overlay shown while .model-loading */
 .card-3d-loading{
-position:absolute;
-inset:0;
-display:none;
-align-items:center;
-justify-content:center;
-z-index:6;
-background:rgba(10,10,10,0.45);
-pointer-events:none;
+  position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+  z-index:6; background:rgba(10,10,10,0.45); pointer-events:none;
 }
 .card-media.model-loading .card-3d-loading{ display:flex; }
 .card-3d-loading .spinner{
-width:26px; height:26px;
-border:2.5px solid rgba(255,255,255,0.18);
-border-top-color:#FFFFFF;
-border-radius:50%;
-animation: card-spin .8s linear infinite;
+  width:26px; height:26px;
+  border:2.5px solid rgba(255,255,255,0.18);
+  border-top-color:#FFFFFF; border-radius:50%;
+  animation:card-spin .8s linear infinite;
 }
 @keyframes card-spin{ to{ transform:rotate(360deg); } }
 
+/* =========================================================
+   COMMENTS SYSTEM (modal + star rating + captcha)
+   ========================================================= */
+.star-rating{ display:inline-flex; flex-direction:row-reverse; gap:2px; justify-content:flex-end; }
+.star-rating input{ display:none; }
+.star-rating label{
+  font-size:26px; line-height:1; color:#444; cursor:pointer;
+  transition:color .12s ease;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label{ color:#FFD24C; }
+#comment-list{ max-height:260px; overflow-y:auto; margin-top:10px; }
+.comment-item{
+  border-top:1px solid var(--line); padding:10px 0;
+}
+.comment-item:first-child{ border-top:none; }
+.comment-item .c-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.comment-item .c-name{ font-weight:600; font-size:13px; color:var(--ink); }
+.comment-item .c-stars{ color:#FFD24C; font-size:12px; letter-spacing:1px; }
+.comment-item .c-date{ font-size:11px; color:var(--ink-dim); }
+.comment-item .c-body{ font-size:13px; color:var(--ink); line-height:1.5; word-wrap:break-word; }
+.comment-empty{ font-size:13px; color:var(--ink-dim); text-align:center; padding:18px 0; }
+.captcha-box{
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--bg); border:1px solid var(--line); border-radius:.5rem;
+  padding:.5rem .8rem; font-size:14px; user-select:none;
+}
+.captcha-box .cap-q{ font-weight:700; font-size:16px; color:var(--ink); letter-spacing:1px; }
+.captcha-box .cap-refresh{
+  background:transparent; border:none; color:var(--ink-dim); cursor:pointer;
+  font-size:15px; padding:0 2px; transition:color .12s ease;
+}
+.captcha-box .cap-refresh:hover{ color:var(--ink); }
+.comment-avg{
+  display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-dim);
+}
+.comment-avg .avg-stars{ color:#FFD24C; letter-spacing:1px; }
+.comment-count-btn{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11.5px; font-weight:600; color:var(--ink);
+  background:rgba(157,78,221,0.08); border:1px solid rgba(157,78,221,0.3);
+  padding:5px 10px; border-radius:999px; cursor:pointer;
+  transition:all .16s ease;
+}
+.comment-count-btn:hover{ border-color:#C79BFF; background:rgba(157,78,221,0.18); }
+
+/* =========================================================
+   INLINE 3D HOVER VIEWER (GLB/GLTF on the card image)
+   ========================================================= */
+.card-3d-viewer{
+  position:absolute !important; inset:0; width:100%; height:100%;
+  background:#0A0A0A; opacity:0; z-index:5; pointer-events:none;
+  transition:opacity .35s ease; --poster-color:transparent;
+}
+.card-media.show-3d .card-3d-viewer{ opacity:1; pointer-events:auto; }
+/* Keep the thumbnail visible WHILE the model is still streaming,
+   so the card never shows a blank area during the 14MB load. */
+.card-media.model-loading .card-thumb{ opacity:1 !important; transform:none !important; }
+.card-media.model-loading .card-preview{ opacity:0 !important; }
+.card-media.model-ready.show-3d .card-thumb,
+.card-media.model-ready.show-3d .card-preview{ opacity:0 !important; }
+.card-3d-loading{
+  position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+  z-index:6; background:rgba(10,10,10,0.45); pointer-events:none;
+}
+.card-media.model-loading .card-3d-loading{ display:flex; }
+.card-3d-loading .spinner{
+  width:26px; height:26px;
+  border:2.5px solid rgba(255,255,255,0.18);
+  border-top-color:#FFFFFF; border-radius:50%;
+  animation:card-spin .8s linear infinite;
+}
+@keyframes card-spin{ to{ transform:rotate(360deg); } }
+
+/* =========================================================
+   COMMENTS SYSTEM (modal + star rating + captcha)
+   ========================================================= */
+.star-rating{ display:inline-flex; flex-direction:row-reverse; gap:2px; justify-content:flex-end; }
+.star-rating input{ display:none; }
+.star-rating label{
+  font-size:26px; line-height:1; color:#444; cursor:pointer;
+  transition:color .12s ease;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label{ color:#FFD24C; }
+#comment-list{ max-height:260px; overflow-y:auto; margin-top:10px; }
+.comment-item{
+  border-top:1px solid var(--line); padding:10px 0;
+}
+.comment-item:first-child{ border-top:none; }
+.comment-item .c-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.comment-item .c-name{ font-weight:600; font-size:13px; color:var(--ink); }
+.comment-item .c-stars{ color:#FFD24C; font-size:12px; letter-spacing:1px; }
+.comment-item .c-date{ font-size:11px; color:var(--ink-dim); }
+.comment-item .c-body{ font-size:13px; color:var(--ink); line-height:1.5; word-wrap:break-word; }
+.comment-empty{ font-size:13px; color:var(--ink-dim); text-align:center; padding:18px 0; }
+.captcha-box{
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--bg); border:1px solid var(--line); border-radius:.5rem;
+  padding:.5rem .8rem; font-size:14px; user-select:none;
+}
+.captcha-box .cap-q{ font-weight:700; font-size:16px; color:var(--ink); letter-spacing:1px; }
+.captcha-box .cap-refresh{
+  background:transparent; border:none; color:var(--ink-dim); cursor:pointer;
+  font-size:15px; padding:0 2px; transition:color .12s ease;
+}
+.captcha-box .cap-refresh:hover{ color:var(--ink); }
+.comment-avg{
+  display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-dim);
+}
+.comment-avg .avg-stars{ color:#FFD24C; letter-spacing:1px; }
+.comment-count-btn{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11.5px; font-weight:600; color:var(--ink);
+  background:rgba(157,78,221,0.08); border:1px solid rgba(157,78,221,0.3);
+  padding:5px 10px; border-radius:999px; cursor:pointer;
+  transition:all .16s ease;
+}
+.comment-count-btn:hover{ border-color:#C79BFF; background:rgba(157,78,221,0.18); }
+
 @media (prefers-reduced-motion: reduce){
 .card-media img{ transition:none !important; transform:none !important; }
-.card-3d-viewer{ transition:none !important; }
-.card-3d-loading .spinner{ animation:none !important; }
 }
 
 /* =========================================================
@@ -551,6 +646,98 @@ shadow-intensity="0.9" exposure="0.95" environment-image="neutral" interaction-p
 <input id="request-ref" type="text" data-i18n-placeholder="request_ref_placeholder" placeholder="Artstation / Pinterest / image URL…">
 </div>
 <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="request_submit">Send request</button>
+</form>
+</div>
+</div>
+
+
+<!-- COMMENTS MODAL -->
+<div id="comments-modal" class="overlay-modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+<div class="overlay-panel relative w-full max-w-md rounded-xl p-6" style="max-height:88vh;overflow-y:auto;">
+<button id="comments-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+<h3 class="font-display text-lg font-semibold pr-6 mb-1" data-i18n="comments_title">Comments</h3>
+<p id="comments-asset-name" class="text-sm text-[var(--ink-dim)] mb-3"></p>
+<div id="comment-avg-wrap" class="mb-3" style="display:none;">
+  <span class="comment-avg"><span class="avg-stars" id="comment-avg-stars"></span><span id="comment-avg-text"></span></span>
+</div>
+<div id="comment-list"></div>
+<hr style="border-color:var(--line);margin:14px 0;">
+<form id="comment-form" class="space-y-4">
+<div class="form-field">
+<label for="comment-name" data-i18n="comment_name_label">Your name</label>
+<input id="comment-name" type="text" maxlength="40" required data-i18n-placeholder="comment_name_placeholder" placeholder="Anonymous">
+</div>
+<div class="form-field">
+<label data-i18n="comment_rating_label">Your rating</label>
+<div class="star-rating" id="star-rating">
+<input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
+<input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
+<input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
+<input type="radio" id="star2" name="rating" value="2"><label for="star2">&#9733;</label>
+<input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
+</div>
+</div>
+<div class="form-field">
+<label for="comment-text" data-i18n="comment_text_label">Your comment</label>
+<textarea id="comment-text" rows="3" maxlength="600" required data-i18n-placeholder="comment_text_placeholder" placeholder="Share your thoughts about this asset..."></textarea>
+</div>
+<div class="form-field">
+<label data-i18n="comment_captcha_label">Anti-bot check</label>
+<div class="captcha-box">
+<span class="cap-q" id="captcha-question">2 + 3 = ?</span>
+<button type="button" class="cap-refresh" id="captcha-refresh" title="New question">&#8635;</button>
+</div>
+<input id="captcha-answer" type="text" inputmode="numeric" maxlength="3" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="margin-top:8px;">
+</div>
+<button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="comment_submit">Post comment</button>
+</form>
+</div>
+</div>
+
+
+<!-- COMMENTS MODAL -->
+<div id="comments-modal" class="overlay-modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+<div class="overlay-panel relative w-full max-w-md rounded-xl p-6" style="max-height:88vh;overflow-y:auto;">
+<button id="comments-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+<h3 class="font-display text-lg font-semibold pr-6 mb-1" data-i18n="comments_title">Comments</h3>
+<p id="comments-asset-name" class="text-sm text-[var(--ink-dim)] mb-3"></p>
+<div id="comment-avg-wrap" class="mb-3" style="display:none;">
+  <span class="comment-avg"><span class="avg-stars" id="comment-avg-stars"></span><span id="comment-avg-text"></span></span>
+</div>
+<div id="comment-list"></div>
+<hr style="border-color:var(--line);margin:14px 0;">
+<form id="comment-form" class="space-y-4">
+<div class="form-field">
+<label for="comment-name" data-i18n="comment_name_label">Your name</label>
+<input id="comment-name" type="text" maxlength="40" required data-i18n-placeholder="comment_name_placeholder" placeholder="Anonymous">
+</div>
+<div class="form-field">
+<label data-i18n="comment_rating_label">Your rating</label>
+<div class="star-rating" id="star-rating">
+<input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
+<input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
+<input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
+<input type="radio" id="star2" name="rating" value="2"><label for="star2">&#9733;</label>
+<input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
+</div>
+</div>
+<div class="form-field">
+<label for="comment-text" data-i18n="comment_text_label">Your comment</label>
+<textarea id="comment-text" rows="3" maxlength="600" required data-i18n-placeholder="comment_text_placeholder" placeholder="Share your thoughts about this asset..."></textarea>
+</div>
+<div class="form-field">
+<label data-i18n="comment_captcha_label">Anti-bot check</label>
+<div class="captcha-box">
+<span class="cap-q" id="captcha-question">2 + 3 = ?</span>
+<button type="button" class="cap-refresh" id="captcha-refresh" title="New question">&#8635;</button>
+</div>
+<input id="captcha-answer" type="text" inputmode="numeric" maxlength="3" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="margin-top:8px;">
+</div>
+<button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="comment_submit">Post comment</button>
 </form>
 </div>
 </div>
