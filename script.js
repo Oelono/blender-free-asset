@@ -96,6 +96,15 @@ const translations = {
     comment_error_profanity: "Please keep your comment respectful.",
     comment_empty: "No comments yet. Be the first!",
     comment_avg_text: (n) => `Average: ${n.toFixed(1)} / 5`,
+    wall_heading: "Community wall",
+    wall_subheading: "Leave a public message for the whole site — feedback, ideas, or just say hi. No login needed.",
+    wall_form_title: "Post a message",
+    wall_list_title: "Latest messages",
+    wall_text_placeholder: "Say something to the community…",
+    wall_submit: "Post message",
+    wall_empty: "No messages yet. Be the first to write on the wall!",
+    wall_success: "Your message is on the wall — thanks!",
+    wall_count_label: (n) => `${n} ${n === 1 ? "message" : "messages"}`,
   },
   ar: {
     nav_library: "المكتبة",
@@ -176,6 +185,15 @@ const translations = {
     comment_error_profanity: "الرجاء الحفاظ على احترام التعليق.",
     comment_empty: "لا توجد تعليقات بعد. كن أول من يعلّق!",
     comment_avg_text: (n) => `المتوسط: ${n.toFixed(1)} / 5`,
+    wall_heading: "حائط المجتمع",
+    wall_subheading: "سيبي رسالة عامة للموقع كله — ملاحظات، أفكار، أو حتى سلام. مش محتاجة تسجيل دخول.",
+    wall_form_title: "اكتبي رسالة",
+    wall_list_title: "أحدث الرسائل",
+    wall_text_placeholder: "قولي حاجة للمجتمع…",
+    wall_submit: "نشر الرسالة",
+    wall_empty: "لا توجد رسائل بعد. كوني أول من يكتب على الحائط!",
+    wall_success: "رسالتك على الحائط — شكراً!",
+    wall_count_label: (n) => `${n} ${n === 1 ? "رسالة" : "رسائل"}`,
   },
   ru: {
     nav_library: "Библиотека",
@@ -256,6 +274,15 @@ const translations = {
     comment_error_profanity: "Пожалуйста, будьте вежливы в комментарии.",
     comment_empty: "Пока нет комментариев. Будьте первым!",
     comment_avg_text: (n) => `Средняя: ${n.toFixed(1)} / 5`,
+    wall_heading: "Стена сообщества",
+    wall_subheading: "Оставьте публичное сообщение для всего сайта — отзывы, идеи или просто поздоровайтесь. Без регистрации.",
+    wall_form_title: "Написать сообщение",
+    wall_list_title: "Последние сообщения",
+    wall_text_placeholder: "Скажите что-нибудь сообществу…",
+    wall_submit: "Опубликовать",
+    wall_empty: "Пока нет сообщений. Будьте первым на стене!",
+    wall_success: "Ваше сообщение на стене — спасибо!",
+    wall_count_label: (n) => `${n} ${n === 1 ? "сообщение" : "сообщений"}`,
   },
 };
 
@@ -304,6 +331,7 @@ function setLanguage(lang) {
   try { localStorage.setItem("vaultframe-lang", lang); } catch (e) { /* ignore */ }
   applyStaticTranslations();
   render(); // re-render products so card labels / category names / counts refresh
+  if (typeof renderGuestbook === "function") renderGuestbook(); // refresh wall labels/counts
 }
 
 langSwitcher.addEventListener("click", (e) => {
@@ -331,6 +359,13 @@ async function loadProducts() {
     if (!res.ok) throw new Error("Failed to load products.json");
     const json = await res.json();
     state.products = (json.products || []).filter(p => p && p.title);
+    // Normalize CMS paths ("/blender-free-asset/assets/..." -> "assets/...")
+    // so thumbnails/preview images always resolve, wherever the site is hosted.
+    state.products.forEach(p => {
+      ["thumbnail", "previewImage", "previewGif", "modelUrl", "posterImage"].forEach(k => {
+        if (p[k]) p[k] = normalizeAssetPath(p[k]);
+      });
+    });
   } catch (err) {
     console.error(err);
     state.products = [];
@@ -469,9 +504,9 @@ function cardTemplate(p) {
   const hasModel = !!p.modelUrl; // optional GLB/GLTF for the 3D viewer
   return `
     <article class="card rounded-xl overflow-hidden group">
-      <div class="card-media relative h-44${hasModel ? " has-3d" : ""}">
-        <img class="card-thumb" src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy">
-        ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true">` : ""}
+      <div class="card-media relative h-44${hasModel ? " has-3d" : ""}${preview ? " has-preview" : ""}">
+        <img class="card-thumb" src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/600x400/0B0C10/00F0FF?text=Vaultframe'">
+        ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true" onerror="this.closest('.card-media').classList.remove('has-preview'); this.remove()">` : ""}
         ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer>` : ""}
         <div class="absolute top-3 left-3 flex gap-1.5">
           <span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || "")}</span>
@@ -513,6 +548,17 @@ function cardTemplate(p) {
 
 function translateCategory(cat) {
   return (categoryLabels[state.lang] && categoryLabels[state.lang][cat]) || cat || "";
+}
+
+/* Normalize image/file paths coming from the CMS.
+   The Decap CMS saves uploads as "/blender-free-asset/assets/uploads/x.png"
+   (absolute, repo-based). That only works when the site is served from the
+   same URL. Convert it to a relative "assets/uploads/x.png" so thumbnails
+   work everywhere (GitHub Pages, custom domain, local preview). */
+function normalizeAssetPath(p = "") {
+  if (!p) return "";
+  if (/^(https?:|data:|blob:)/i.test(p)) return p;          // external / inline
+  return p.replace(/^\/?blender-free-asset\//i, "").replace(/^\//, "");
 }
 
 function escapeHtml(str = "") {
@@ -1299,6 +1345,135 @@ commentForm.addEventListener("submit", async (e) => {
 
 // Periodically refresh counts (in case comments added from another tab)
 window.addEventListener("storage", refreshCommentCounts);
+
+/* =========================================================
+   SITE-WIDE COMMUNITY WALL (guestbook)
+   - Same engine as the asset comments: math captcha,
+     profanity filter, 1-5 star rating, Discord push.
+   - Stored per-browser in localStorage (site-wide, not per-asset).
+   ========================================================= */
+const GUESTBOOK_KEY = "vaultframe_guestbook_v1";
+const gbForm = document.getElementById("guestbook-form");
+const gbList = document.getElementById("guestbook-list");
+const gbCount = document.getElementById("gb-count");
+const gbAvgWrap = document.getElementById("gb-avg-wrap");
+const gbAvgStars = document.getElementById("gb-avg-stars");
+const gbAvgText = document.getElementById("gb-avg-text");
+const gbCaptchaQ = document.getElementById("gb-captcha-question");
+const gbCaptchaRefresh = document.getElementById("gb-captcha-refresh");
+const gbNameInput = document.getElementById("gb-name");
+const gbTextInput = document.getElementById("gb-text");
+const gbCaptchaAnswer = document.getElementById("gb-captcha-answer");
+
+// --- storage ---
+function getGuestbook() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(GUESTBOOK_KEY) || "[]");
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function saveGuestbook(arr) {
+  try { localStorage.setItem(GUESTBOOK_KEY, JSON.stringify(arr)); } catch (e) {}
+}
+
+// --- wall captcha (kept separate from the asset-comments captcha) ---
+let gbCaptchaSolution = 0;
+function generateGbCaptcha() {
+  const a = Math.floor(Math.random() * 8) + 1;
+  const b = Math.floor(Math.random() * 8) + 1;
+  const ops = ["+", "-"];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let q, ans;
+  if (op === "+") { q = a + " + " + b; ans = a + b; }
+  else {
+    const big = Math.max(a, b), small = Math.min(a, b);
+    q = big + " - " + small; ans = big - small;
+  }
+  gbCaptchaSolution = ans;
+  if (gbCaptchaQ) gbCaptchaQ.textContent = q + " = ?";
+}
+
+// --- render ---
+function renderGuestbook() {
+  const list = getGuestbook().slice().reverse();
+  if (gbCount) {
+    const n = list.length;
+    gbCount.textContent = t("wall_count_label")(n);
+  }
+  if (!list.length) {
+    if (gbList) gbList.innerHTML = '<div class="comment-empty">' + escapeHtml(t("wall_empty")) + '</div>';
+    if (gbAvgWrap) gbAvgWrap.style.display = "none";
+    return;
+  }
+  const rated = list.filter(c => c.rating > 0);
+  if (rated.length && gbAvgWrap) {
+    const avg = rated.reduce((s, c) => s + c.rating, 0) / rated.length;
+    gbAvgStars.textContent = starsString(Math.round(avg));
+    gbAvgText.textContent = t("comment_avg_text")(avg);
+    gbAvgWrap.style.display = "inline-flex";
+  } else if (gbAvgWrap) {
+    gbAvgWrap.style.display = "none";
+  }
+  if (gbList) {
+    gbList.innerHTML = list.map(c => {
+      const d = new Date(c.ts || Date.now());
+      const dateStr = d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+      return '<div class="comment-item">' +
+        '<div class="c-head">' +
+          '<span class="c-name">' + escapeHtml(c.name || "Anonymous") + '</span>' +
+          '<span class="c-date">' + escapeHtml(dateStr) + '</span>' +
+        '</div>' +
+        (c.rating ? '<div class="c-stars">' + starsString(c.rating) + '</div>' : '') +
+        '<div class="c-body">' + escapeHtml(c.text || "") + '</div>' +
+      '</div>';
+    }).join("");
+  }
+}
+
+// --- form ---
+if (gbForm) {
+  gbCaptchaRefresh.addEventListener("click", generateGbCaptcha);
+  gbForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = gbNameInput.value.trim();
+    const text = gbTextInput.value.trim();
+    const ratingInput = gbForm.querySelector('input[name="gb-rating"]:checked');
+    const rating = ratingInput ? parseInt(ratingInput.value, 10) : 0;
+    const capAns = (gbCaptchaAnswer.value || "").trim();
+
+    if (!name) { showToast(t("comment_error_name")); return; }
+    if (!text) { showToast(t("comment_error_text")); return; }
+    if (parseInt(capAns, 10) !== gbCaptchaSolution) { showToast(t("comment_error_captcha")); generateGbCaptcha(); return; }
+    if (containsProfanity(name + " " + text)) { showToast(t("comment_error_profanity")); return; }
+
+    const entry = { name, text, rating, ts: Date.now() };
+    const arr = getGuestbook();
+    arr.push(entry);
+    saveGuestbook(arr);
+    renderGuestbook();
+    gbForm.reset();
+    generateGbCaptcha();
+    showToast(t("wall_success"));
+
+    // best-effort Discord push (same webhook as comments)
+    sendToDiscord("comment", {
+      title: "\u{1F4AC} Wall message",
+      description: "**Where:** Community wall (site-wide)",
+      fields: [
+        { name: "Name", value: name, inline: true },
+        { name: "Rating", value: rating > 0 ? rating + " / 5 " + starsString(rating) : "—", inline: true },
+        { name: "Message", value: text, inline: false },
+      ],
+      footer: "Oelono community wall",
+    }).then(() => {}).catch(() => {});
+  });
+}
+
+function initGuestbook() {
+  generateGbCaptcha();
+  renderGuestbook();
+}
+initGuestbook();
 
 // Escape closes whichever overlay is open
 document.addEventListener("keydown", (e) => {
