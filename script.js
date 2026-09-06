@@ -4,10 +4,15 @@
    single file Decap CMS edits (see admin/config.yml).
    ========================================================= */
 
+// All three libraries are shown stacked at once (Blender → Games → Roblox),
+// so instead of a single "activeLibrary" + "activeCategory" the state now
+// tracks one active category per library. One search query is shared by
+// all three sections.
+const LIB_KEYS = ["blender", "games", "roblox"];
+
 const state = {
   products: [],
-  activeLibrary: "blender", // "blender" | "games" | "roblox"
-  activeCategory: "All",
+  activeCategory: { blender: "All", games: "All", roblox: "All" },
   query: "",
   lang: "en",
 };
@@ -390,11 +395,19 @@ function t(key) {
   return (translations[state.lang] && translations[state.lang][key]) ?? translations.en[key] ?? key;
 }
 
-const grid = document.getElementById("product-grid");
-const emptyState = document.getElementById("empty-state");
-const resultsCount = document.getElementById("results-count");
 const searchInput = document.getElementById("search-input");
-const chipsWrap = document.getElementById("category-chips");
+
+// Per-library DOM refs — one grid/empty-state/results-count/chips-wrap set
+// for each of the three stacked library sections.
+const els = {};
+LIB_KEYS.forEach(lib => {
+  els[lib] = {
+    grid: document.getElementById(`product-grid-${lib}`),
+    emptyState: document.getElementById(`empty-state-${lib}`),
+    resultsCount: document.getElementById(`results-count-${lib}`),
+    chipsWrap: document.getElementById(`category-chips-${lib}`),
+  };
+});
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -425,7 +438,6 @@ function setLanguage(lang) {
   try { localStorage.setItem("vaultframe-lang", lang); } catch (e) { /* ignore */ }
   applyStaticTranslations();
   renderCategoryChips(); // chip labels are library-dependent, so rebuild them for the new language
-  updateLibraryHeading();
   render(); // re-render products so card labels / category names / counts refresh
   if (typeof renderGuestbook === "function") renderGuestbook(); // refresh wall labels/counts
 }
@@ -446,7 +458,6 @@ function initLanguage() {
   document.documentElement.dir = initial === "ar" ? "rtl" : "ltr";
   applyStaticTranslations();
   renderCategoryChips();
-  updateLibraryHeading();
 }
 
 /* ---------- load data ---------- */
@@ -472,7 +483,7 @@ async function loadProducts() {
 }
 
 function renderSkeletons(n) {
-  grid.innerHTML = Array.from({ length: n }).map(() => `
+  const skeletonHtml = Array.from({ length: n }).map(() => `
     <div class="card rounded-xl overflow-hidden">
       <div class="skeleton h-44 w-full"></div>
       <div class="p-5 space-y-3">
@@ -482,17 +493,20 @@ function renderSkeletons(n) {
       </div>
     </div>
   `).join("");
+  LIB_KEYS.forEach(lib => {
+    if (els[lib].grid) els[lib].grid.innerHTML = skeletonHtml;
+  });
 }
 
 /* ---------- filtering ---------- */
-function getFiltered() {
+function getFiltered(lib) {
   const q = state.query.trim().toLowerCase();
   return state.products.filter(p => {
     // Products created before the "library" field existed are treated as
     // Blender assets, so nothing already in data/products.json disappears.
     const productLibrary = p.library || "blender";
-    const matchesLibrary = productLibrary === state.activeLibrary;
-    const matchesCategory = state.activeCategory === "All" || p.category === state.activeCategory;
+    const matchesLibrary = productLibrary === lib;
+    const matchesCategory = state.activeCategory[lib] === "All" || p.category === state.activeCategory[lib];
     const haystack = `${p.title} ${p.description} ${p.category}`.toLowerCase();
     const matchesQuery = q === "" || haystack.includes(q);
     return matchesLibrary && matchesCategory && matchesQuery;
@@ -500,16 +514,27 @@ function getFiltered() {
 }
 
 /* ---------- render ---------- */
+// Renders all three stacked library sections. Each section is independent
+// (its own grid/empty-state/results-count) but shares the one search query.
 function render() {
-  const items = getFiltered();
-  resultsCount.textContent = items.length ? t("results_count")(items.length) : "";
+  LIB_KEYS.forEach(lib => renderLibrarySection(lib));
+  // Comments button counts are shared/global across all cards on the page.
+  refreshCommentCounts();
+}
+
+function renderLibrarySection(lib) {
+  const { grid, emptyState, resultsCount } = els[lib];
+  if (!grid) return;
+
+  const items = getFiltered(lib);
+  if (resultsCount) resultsCount.textContent = items.length ? t("results_count")(items.length) : "";
 
   if (items.length === 0) {
     grid.innerHTML = "";
-    emptyState.classList.remove("hidden");
+    if (emptyState) emptyState.classList.remove("hidden");
     return;
   }
-  emptyState.classList.add("hidden");
+  if (emptyState) emptyState.classList.add("hidden");
 
   grid.innerHTML = items.map(cardTemplate).join("");
 
@@ -596,8 +621,6 @@ function render() {
       if (product) openCommentsModal(product);
     });
   });
-  // Refresh visible comment counts
-  refreshCommentCounts();
 }
 
 function cardTemplate(p) {
@@ -676,64 +699,36 @@ searchInput.addEventListener("input", (e) => {
   render();
 });
 
-// Builds the category-chip row for whichever library is currently active.
-// Called on load and every time the library tab changes.
+// Builds the category-chip row for every library's section (all three are
+// visible at once, so all three chip rows are built every time — on load
+// and whenever the language changes).
 function renderCategoryChips() {
-  const lib = LIBRARIES[state.activeLibrary] || LIBRARIES.blender;
-  chipsWrap.innerHTML = lib.categories.map(cat => {
-    const key = lib.chipKey[cat] || "";
-    const label = key ? t(key) : translateCategory(cat);
-    const isActive = cat === state.activeCategory;
-    return `<button data-cat="${escapeAttr(cat)}" class="chip${isActive ? " active" : ""} px-3.5 py-1.5 rounded-full text-xs">${escapeHtml(label)}</button>`;
-  }).join("");
-}
-
-chipsWrap.addEventListener("click", (e) => {
-  const btn = e.target.closest("[data-cat]");
-  if (!btn) return;
-  chipsWrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-  btn.classList.add("active");
-  state.activeCategory = btn.dataset.cat;
-  render();
-});
-
-// Library tabs (Blender Assets / My Games / Roblox Assets). Switching
-// libraries resets the category filter and search, rebuilds the chip row
-// for that library's categories, and re-renders the grid with only that
-// library's products — the download modal / 4-step ad flow underneath is
-// completely unaffected, since it only ever looks at the clicked product.
-const libraryTabsWrap = document.getElementById("library-tabs");
-const libraryHeadingEl = document.getElementById("library-heading-text");
-const librarySubEl = document.getElementById("library-sub-text");
-
-function updateLibraryHeading() {
-  if (libraryHeadingEl) libraryHeadingEl.textContent = t(`library_heading_${state.activeLibrary}`) || t("library_heading");
-  if (librarySubEl) librarySubEl.textContent = t(`library_sub_${state.activeLibrary}`) || t("library_sub");
-}
-
-function setLibrary(lib) {
-  if (!LIBRARIES[lib]) return;
-  state.activeLibrary = lib;
-  state.activeCategory = "All";
-  state.query = "";
-  searchInput.value = "";
-  if (libraryTabsWrap) {
-    libraryTabsWrap.querySelectorAll("[data-lib]").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.lib === lib);
-    });
-  }
-  renderCategoryChips();
-  updateLibraryHeading();
-  render();
-}
-
-if (libraryTabsWrap) {
-  libraryTabsWrap.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-lib]");
-    if (!btn) return;
-    setLibrary(btn.dataset.lib);
+  LIB_KEYS.forEach(lib => {
+    const chipsWrap = els[lib].chipsWrap;
+    if (!chipsWrap) return;
+    const libDef = LIBRARIES[lib];
+    chipsWrap.innerHTML = libDef.categories.map(cat => {
+      const key = libDef.chipKey[cat] || "";
+      const label = key ? t(key) : translateCategory(cat);
+      const isActive = cat === state.activeCategory[lib];
+      return `<button data-cat="${escapeAttr(cat)}" class="chip${isActive ? " active" : ""} px-3.5 py-1.5 rounded-full text-xs">${escapeHtml(label)}</button>`;
+    }).join("");
   });
 }
+
+// Each library's chip row only filters that library's own grid.
+LIB_KEYS.forEach(lib => {
+  const chipsWrap = els[lib].chipsWrap;
+  if (!chipsWrap) return;
+  chipsWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-cat]");
+    if (!btn) return;
+    chipsWrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+    state.activeCategory[lib] = btn.dataset.cat;
+    renderLibrarySection(lib);
+  });
+});
 
 /* =========================================================
    Download modal — ad-monetized unlock flow
