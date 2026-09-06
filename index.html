@@ -15,6 +15,7 @@
      Replace the "content" value below with the real verification code
      Google gives you in Search Console > Settings > Ownership verification > HTML tag. -->
 <meta name="google-site-verification" content="REPLACE_WITH_YOUR_GOOGLE_SEARCH_CONSOLE_CODE">
+<meta name="google-adsense-account" content="ca-pub-2827589221947089">
 
 <!-- Open Graph / Facebook / WhatsApp / Discord preview -->
 <meta property="og:type" content="website">
@@ -445,95 +446,86 @@ box-shadow:0 12px 30px -10px rgba(0,0,0,0.5);
 <p class="reveal reveal-2 text-[var(--ink-dim)] text-sm md:text-base mb-9 max-w-xl">A community-fed library of characters, environments, shaders and animations — every file checked before it's listed.</p>
 <!-- search -->
 <div class="reveal reveal-3 max-w-xl">
-<!-- LIBRARY TABS: switches the whole site between the three top-level libraries.
-     Each one reuses the same product grid, same category-chip mechanism, and
-     the same 4-step ad/download modal — only the data set (state.activeLibrary)
-     changes. -->
+<!-- Quick jump links: all three libraries are already rendered below,
+     one after another — these just scroll to a section, nothing needs
+     to be clicked to "choose" a library. -->
 <div id="library-tabs" class="flex flex-wrap gap-2 mb-4">
-<button data-lib="blender" class="chip active px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_blender">Blender Assets</button>
-<button data-lib="games" class="chip px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_games">My Games</button>
-<button data-lib="roblox" class="chip px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_roblox">Roblox Assets</button>
+<a href="#library-blender" class="chip inline-block px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_blender">Blender Assets</a>
+<a href="#library-games" class="chip inline-block px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_games">My Games</a>
+<a href="#library-roblox" class="chip inline-block px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_roblox">Roblox Assets</a>
 </div>
 <div class="relative">
 <svg class="search-icon absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-dim)]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
 <input id="search-input" type="text" data-i18n-placeholder="search_placeholder" placeholder="Search assets — try “cyberpunk character”"
 class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-[var(--ink)]">
 </div>
-<div id="category-chips" class="flex flex-wrap gap-2 mt-4">
-<!-- Populated dynamically by script.js (renderCategoryChips), because the
-     available categories differ per library (Blender vs Games vs Roblox). -->
-</div>
 </div>
 </div>
 </div>
 </section>
 
 
-<!-- كود التنسيق لإخفاء الإعلان على الهواتف -->
-<style>
-  .ad-wrapper {
-    display: block; /* يظهر على الشاشات الكبيرة */
-  }
-
-  /* إخفاء الإعلان تماماً على أي شاشة عرضها أقل من 768 بكسل (مثل التليفونات) */
-  @media (max-width: 767px) {
-    .ad-wrapper {
-      display: none !important;
-    }
-  }
-</style>
-
-<!-- كود الإعلان مدمج بداخل الغلاف -->
-<div class="ad-wrapper">
-  <script type="text/javascript">
-    atOptions = {
-      'key' : 'cede1f55f12c2d4341a47341cfadb4d6',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="https://www.highrevenueformat.com/cede1f55f12c2d4341a47341cfadb4d6/invoke.js"></script>
-</div>
-
-
 
    
-<!-- LIBRARY -->
+<!-- LIBRARY — all three libraries are shown stacked, one after another,
+     in a fixed order (Blender → Games → Roblox). Nothing needs to be
+     clicked to reveal a library; each has its own heading, its own
+     category chips and its own grid, and all three share the one
+     search box in the hero. -->
 <section id="library" class="max-w-7xl mx-auto px-6 pt-16 pb-4 md:pt-20 md:pb-6">
-<div class="flex items-end justify-between mb-8 flex-wrap gap-3">
-<div>
-<h2 id="library-heading-text" class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading">The library</h2>
-<p id="library-sub-text" class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub">Every file is inspected before it's listed. New drops weekly.</p>
-</div>
-<div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
-</div>
 
-<!-- Grid + 160x600 sidebar ad side by side. The ad is `sticky`, not
-     `fixed`, so it travels with the library section as you scroll but
-     can never escape this row to overlap the header, footer, or other
-     sections — and on narrow screens it just stacks below the grid. -->
-<div class="flex flex-col lg:flex-row items-start gap-6">
-<div class="flex-1 min-w-0 w-full">
-<div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-<div id="empty-state" class="hidden text-center py-20">
+<!-- BLENDER -->
+<div id="library-blender" class="mb-16 scroll-mt-24">
+<div class="flex items-end justify-between mb-6 flex-wrap gap-3">
+<div>
+<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading_blender">The Blender library</h2>
+<p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub_blender">Every file is inspected before it's listed. New drops weekly.</p>
+</div>
+<div id="results-count-blender" class="text-xs text-[var(--ink-dim)]"></div>
+</div>
+<div id="category-chips-blender" class="flex flex-wrap gap-2 mb-6"></div>
+<div id="product-grid-blender" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+<div id="empty-state-blender" class="hidden text-center py-20">
 <p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
 <p class="text-sm text-[var(--ink-dim)] mt-2" data-i18n="empty_sub">Try a different keyword or clear the category filter.</p>
 </div>
 </div>
 
+<!-- GAMES -->
+<div id="library-games" class="mb-16 scroll-mt-24">
+<div class="flex items-end justify-between mb-6 flex-wrap gap-3">
+<div>
+<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading_games">My Games</h2>
+<p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub_games">Playable builds and prototypes I've made — free to download.</p>
+</div>
+<div id="results-count-games" class="text-xs text-[var(--ink-dim)]"></div>
+</div>
+<div id="category-chips-games" class="flex flex-wrap gap-2 mb-6"></div>
+<div id="product-grid-games" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+<div id="empty-state-games" class="hidden text-center py-20">
+<p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
+<p class="text-sm text-[var(--ink-dim)] mt-2" data-i18n="empty_sub">Try a different keyword or clear the category filter.</p>
+</div>
+</div>
 
-<script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js"></script>
+<!-- ROBLOX -->
+<div id="library-roblox" class="scroll-mt-24">
+<div class="flex items-end justify-between mb-6 flex-wrap gap-3">
+<div>
+<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading_roblox">Roblox Assets</h2>
+<p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub_roblox">Scripts, models and maps for Roblox Studio (.rbxl / .rbxm).</p>
+</div>
+<div id="results-count-roblox" class="text-xs text-[var(--ink-dim)]"></div>
+</div>
+<div id="category-chips-roblox" class="flex flex-wrap gap-2 mb-6"></div>
+<div id="product-grid-roblox" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+<div id="empty-state-roblox" class="hidden text-center py-20">
+<p class="font-display text-xl text-[var(--ink-dim)]" data-i18n="empty_title">No assets match that search.</p>
+<p class="text-sm text-[var(--ink-dim)] mt-2" data-i18n="empty_sub">Try a different keyword or clear the category filter.</p>
 </div>
 </div>
+
 </section>
-
-<!-- NATIVE BANNER AD -->
-<div class="max-w-7xl mx-auto px-6">
-<script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js"></script>
-<div id="container-b0a70462aab028233ddf977a15e416ff"></div>
-</div>
 
 <!-- HOW IT WORKS -->
 <section id="how-it-works" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40">
@@ -930,8 +922,6 @@ init();
 })();
 </script>
 <script src="script.js"></script>
-<!-- SOCIAL BAR AD -->
-<script src="https://pl31127467.profitableratecpmnetwork.com/65/b3/5e/65b35e2bb31ceb181f4f5d0cdfb50227.js"></script>
 
 </body>
 </html>
