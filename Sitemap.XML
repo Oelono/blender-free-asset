@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Oelono Blender Asset — sitemap.xml
+
+  This is a single-page app, so the URLs below are the same page with
+  different in-page anchors/sections rather than separate files. That's
+  still useful to submit to Google Search Console: it tells Google the
+  canonical URL plus the main sections worth crawling/snippeting.
+
+  After you add real separate pages (if you ever split the three
+  libraries into their own URLs), add one <url> entry per page here and
+  update <lastmod> to the date you last changed that page.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://oelono.github.io/blender-free-asset/</loc>
+    <lastmod>2026-09-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://oelono.github.io/blender-free-asset/#library</loc>
+    <lastmod>2026-09-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://oelono.github.io/blender-free-asset/#how-it-works</loc>
+    <lastmod>2026-09-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+</urlset>
