@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://oelono.github.io/blender-free-asset/sitemap.xml
