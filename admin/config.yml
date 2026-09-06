@@ -22,15 +22,22 @@ collections:
           - label: "Products"
             name: "products"
             widget: "list"
-            summary: "{{fields.title}} — {{fields.category}}"
+            summary: "{{fields.title}} — {{fields.library}} / {{fields.category}}"
             fields:
+              - label: "Library"
+                name: "library"
+                widget: "select"
+                options: ["blender", "games", "roblox"]
+                default: "blender"
+                hint: "Which top-level section this shows up in: blender = Blender Assets, games = My Games, roblox = Roblox Assets. All three use the same 4-step ad/download flow."
               - { label: "Title", name: "title", widget: "string" }
               - { label: "Slug / ID", name: "id", widget: "string", hint: "Unique, no spaces, e.g. cyber-samurai-rig" }
               - { label: "Description", name: "description", widget: "text" }
               - label: "Category"
                 name: "category"
                 widget: "select"
-                options: ["Characters", "Environments", "Shaders", "Animations", "Assets"]
+                options: ["Characters", "Environments", "Shaders", "Animations", "Assets", "Full Games", "Demos", "Mods", "Scripts", "Models", "Maps"]
+                hint: "Pick the category matching this product's Library — Blender: Characters/Environments/Shaders/Animations/Assets. Games: Full Games/Demos/Mods. Roblox: Scripts/Models/Maps."
               - label: "Thumbnail"
                 name: "thumbnail"
                 widget: "image"
@@ -40,27 +47,39 @@ collections:
                 widget: "image"
                 required: false
                 hint: "Optional second image shown when the visitor hovers the card. Leave EMPTY unless you really have one — if left empty, the thumbnail simply stays visible on hover."
-              - label: "3D Model (GLB / GLTF)"
+              - label: "3D Model (GLB / GLTF) — Blender assets only"
                 name: "modelUrl"
                 widget: "file"
                 required: false
-                hint: "Upload a .glb or .gltf file. GLB is recommended because it can bundle textures and meshes into one file."
-              - { label: "Blender Version", name: "blenderVersion", widget: "string", hint: "e.g. 4.2+" }
-              - label: "Render Engine"
+                hint: "Upload a .glb or .gltf file. GLB is recommended because it can bundle textures and meshes into one file. Leave empty for Games/Roblox products."
+              - { label: "Blender Version (Blender assets only)", name: "blenderVersion", widget: "string", required: false, hint: "e.g. 4.2+. Leave empty for Games/Roblox." }
+              - label: "Render Engine (Blender assets only)"
                 name: "engine"
                 widget: "select"
                 options: ["Cycles", "Eevee", "Cycles / Eevee"]
+                required: false
+              - { label: "Platform (Games / Roblox)", name: "platform", widget: "string", required: false, hint: "e.g. \"Windows (.zip)\" for a game, or \"Roblox Studio (.rbxl)\" / \"Roblox Studio (.rbxm)\" for a Roblox asset." }
               - { label: "File Size", name: "fileSize", widget: "string", hint: "e.g. 184 MB" }
               - { label: "License", name: "license", widget: "string", default: "CC0 — Free for personal & commercial use" }
-              - label: "Sponsor Links"
+              - label: "Ad Video URL (Step 1 of the download flow, optional)"
+                name: "adVideoUrl"
+                widget: "file"
+                required: false
+                hint: "Upload or link an .mp4 to play as the 10-second video ad before sponsor steps. If left empty, an AdSense ad block is shown for 10 seconds instead."
+              - label: "Sponsor Links (Steps 2–4 of the download flow)"
                 name: "sponsorLinks"
                 widget: "list"
-                hint: "Links a visitor clicks through, in order, before the Google Drive link unlocks. Paste the same Adsterra link 4 times, or up to 4 different ones."
+                hint: "Links a visitor clicks through, in order, before the file unlocks. The flow always shows exactly 3 of these (after the video ad) — if you add fewer than 3, they repeat automatically."
                 min: 1
                 max: 4
                 field: { label: "Link", name: "url", widget: "string" }
               - label: "Google Drive Link"
                 name: "driveLink"
                 widget: "string"
-                hint: "The real file — revealed after the sponsor link is unlocked"
+                hint: "Fallback file location — used if Direct Download URL below is empty."
+              - label: "Direct Download URL (optional, preferred)"
+                name: "downloadUrl"
+                widget: "string"
+                required: false
+                hint: "A direct file link (e.g. your own host, or a GitHub Release asset). If set, the final button downloads this instead of opening Google Drive."
               - { label: "Featured", name: "featured", widget: "boolean", default: false, required: false }
