@@ -6,6 +6,7 @@
 
 const state = {
   products: [],
+  activeLibrary: "blender", // "blender" | "games" | "roblox"
   activeCategory: "All",
   query: "",
   lang: "en",
@@ -28,28 +29,47 @@ const translations = {
     chip_shaders: "Shaders",
     chip_animations: "Animations",
     chip_assets: "Assets",
+    chip_full_games: "Full games",
+    chip_demos: "Demos / Prototypes",
+    chip_dlc: "Mods / DLC",
+    chip_scripts: "Scripts",
+    chip_models: "Models",
+    chip_maps: "Maps",
+    lib_blender: "Blender Assets",
+    lib_games: "My Games",
+    lib_roblox: "Roblox Assets",
     library_heading: "The library",
     library_sub: "Every file is inspected before it's listed. New drops weekly.",
+    library_heading_blender: "The Blender library",
+    library_sub_blender: "Every file is inspected before it's listed. New drops weekly.",
+    library_heading_games: "My Games",
+    library_sub_games: "Playable builds and prototypes I've made — free to download.",
+    library_heading_roblox: "Roblox Assets",
+    library_sub_roblox: "Scripts, models and maps for Roblox Studio (.rbxl / .rbxm).",
     empty_title: "No assets match that search.",
     empty_sub: "Try a different keyword or clear the category filter.",
     how_heading: "How a download works",
     how1_title: "Pick your asset",
-    how1_desc: "Browse or search the library, then open any asset's download panel to see its specs.",
-    how2_title: "Unlock the link",
-    how2_desc: "A short sponsor page opens in a new tab — this is what keeps the library free to run.",
+    how1_desc: "Browse or search any library, then open its download panel to see the specs.",
+    how2_title: "Go through 4 quick steps",
+    how2_desc: "A 10-second video ad, then 3 short sponsor pages — this is what keeps everything free.",
     how3_title: "Grab the file",
-    how3_desc: "Your Google Drive link unlocks right after — no login, no waiting rooms.",
+    how3_desc: "The direct download button unlocks right after step 4 — no login, no waiting rooms.",
     footer_built: "Built by Oelono.",
     footer_admin: "Admin",
     footer_top: "Back to top",
     modal_filesize_label: "File size",
     modal_engine_label: "Render engine",
     modal_license_label: "License",
-    modal_drive_btn: "Open Google Drive file",
+    modal_drive_btn: "Download final file",
     modal_hint_default: "A sponsor page opens in a new tab to keep this library free.",
-    modal_hint_ready: "Your file is ready — the link opens Google Drive.",
+    modal_hint_ready: "Your file is ready — click below for the direct download.",
+    modal_hint_video: "Watching the ad — the next step unlocks automatically in a few seconds.",
     unlock_unlocking: (s) => `Unlocking in ${s}s…`,
-    unlock_ready: "Unlock download link",
+    unlock_ready: "Continue to next step",
+    step_video_label: "Ad",
+    step_of_label: (n, total) => `Step ${n} of ${total}`,
+    ad_playing_label: "Advertisement playing…",
     card_download: "Download",
     results_count: (n) => `${n} asset${n === 1 ? "" : "s"}`,
     nav_request_label: "Request a model",
@@ -117,28 +137,47 @@ const translations = {
     chip_shaders: "شيدرات",
     chip_animations: "أنيميشن",
     chip_assets: "أصول",
+    chip_full_games: "ألعاب كاملة",
+    chip_demos: "تجارب / نماذج أولية",
+    chip_dlc: "تعديلات / إضافات",
+    chip_scripts: "سكريبتات",
+    chip_models: "موديلات",
+    chip_maps: "خرائط",
+    lib_blender: "مكتبة بلندر",
+    lib_games: "ألعابي",
+    lib_roblox: "مكتبة روبلوكس",
     library_heading: "المكتبة",
     library_sub: "كل ملف يتم فحصه قبل إدراجه. إضافات جديدة أسبوعيًا.",
+    library_heading_blender: "مكتبة أصول بلندر",
+    library_sub_blender: "كل ملف يتم فحصه قبل إدراجه. إضافات جديدة أسبوعيًا.",
+    library_heading_games: "ألعابي",
+    library_sub_games: "ألعاب ونماذج تجريبية من صنعي — للتحميل مجانًا.",
+    library_heading_roblox: "مكتبة روبلوكس",
+    library_sub_roblox: "سكريبتات وموديلات وخرائط لروبلوكس ستوديو (.rbxl / .rbxm).",
     empty_title: "لا توجد أصول مطابقة لبحثك.",
     empty_sub: "جرّب كلمة بحث مختلفة أو ألغِ فلتر الفئة.",
     how_heading: "طريقة التحميل",
     how1_title: "اختر الأصل",
-    how1_desc: "تصفّح أو ابحث في المكتبة، ثم افتح لوحة التحميل لأي أصل لمعرفة مواصفاته.",
-    how2_title: "افتح الرابط",
-    how2_desc: "تُفتح صفحة راعٍ قصيرة في تبويب جديد — وهذا ما يبقي المكتبة مجانية.",
+    how1_desc: "تصفّح أو ابحث في أي مكتبة، ثم افتح لوحة التحميل لمعرفة مواصفاته.",
+    how2_title: "أكمل 4 خطوات سريعة",
+    how2_desc: "فيديو إعلاني لمدة 10 ثوانٍ، ثم 3 صفحات رعاة قصيرة — وهذا ما يبقي كل شيء مجانيًا.",
     how3_title: "احصل على الملف",
-    how3_desc: "رابط جوجل درايف يظهر مباشرة بعدها — بدون تسجيل دخول، وبدون انتظار.",
+    how3_desc: "زر التحميل المباشر يظهر بعد الخطوة الرابعة مباشرة — بدون تسجيل دخول وبدون انتظار.",
     footer_built: "من صنع Oelono.",
     footer_admin: "الإدارة",
     footer_top: "العودة للأعلى",
     modal_filesize_label: "حجم الملف",
     modal_engine_label: "محرك الرندر",
     modal_license_label: "الترخيص",
-    modal_drive_btn: "افتح ملف جوجل درايف",
+    modal_drive_btn: "تحميل الملف النهائي",
     modal_hint_default: "تُفتح صفحة راعٍ في تبويب جديد لإبقاء المكتبة مجانية.",
-    modal_hint_ready: "ملفك جاهز — الرابط يفتح جوجل درايف.",
+    modal_hint_ready: "ملفك جاهز — اضغط بالأسفل للتحميل المباشر.",
+    modal_hint_video: "بيتفرج على الإعلان — الخطوة الجاية هتفتح تلقائيًا بعد شوية.",
     unlock_unlocking: (s) => `فتح الرابط خلال ${s} ثوانٍ…`,
-    unlock_ready: "افتح رابط التحميل",
+    unlock_ready: "الانتقال للخطوة التالية",
+    step_video_label: "إعلان",
+    step_of_label: (n, total) => `الخطوة ${n} من ${total}`,
+    ad_playing_label: "الإعلان شغّال…",
     card_download: "تحميل",
     results_count: (n) => `${n} أصل`,
     nav_request_label: "طلب موديل جديد",
@@ -206,28 +245,47 @@ const translations = {
     chip_shaders: "Шейдеры",
     chip_animations: "Анимации",
     chip_assets: "Ассеты",
+    chip_full_games: "Полные игры",
+    chip_demos: "Демо / прототипы",
+    chip_dlc: "Моды / DLC",
+    chip_scripts: "Скрипты",
+    chip_models: "Модели",
+    chip_maps: "Карты",
+    lib_blender: "Ассеты Blender",
+    lib_games: "Мои игры",
+    lib_roblox: "Ассеты Roblox",
     library_heading: "Библиотека",
     library_sub: "Каждый файл проверяется перед публикацией. Новинки каждую неделю.",
+    library_heading_blender: "Библиотека Blender",
+    library_sub_blender: "Каждый файл проверяется перед публикацией. Новинки каждую неделю.",
+    library_heading_games: "Мои игры",
+    library_sub_games: "Играбельные сборки и прототипы — бесплатно для скачивания.",
+    library_heading_roblox: "Ассеты Roblox",
+    library_sub_roblox: "Скрипты, модели и карты для Roblox Studio (.rbxl / .rbxm).",
     empty_title: "Ничего не найдено по запросу.",
     empty_sub: "Попробуйте другое слово или сбросьте фильтр категории.",
     how_heading: "Как устроена загрузка",
     how1_title: "Выберите ассет",
-    how1_desc: "Просмотрите или найдите нужный файл, затем откройте панель загрузки, чтобы увидеть его характеристики.",
-    how2_title: "Откройте ссылку",
-    how2_desc: "В новой вкладке откроется короткая спонсорская страница — это то, что позволяет библиотеке оставаться бесплатной.",
+    how1_desc: "Просмотрите или найдите нужный файл в любой библиотеке, затем откройте панель загрузки.",
+    how2_title: "Пройдите 4 коротких шага",
+    how2_desc: "10-секундная видеореклама, затем 3 коротких спонсорских страницы — это позволяет всему оставаться бесплатным.",
     how3_title: "Заберите файл",
-    how3_desc: "Ссылка на Google Drive появится сразу после — без входа в аккаунт и без ожидания.",
+    how3_desc: "Кнопка прямой загрузки появится сразу после шага 4 — без входа в аккаунт и без ожидания.",
     footer_built: "Создано Oelono.",
     footer_admin: "Админка",
     footer_top: "Наверх",
     modal_filesize_label: "Размер файла",
     modal_engine_label: "Движок рендера",
     modal_license_label: "Лицензия",
-    modal_drive_btn: "Открыть файл на Google Drive",
+    modal_drive_btn: "Скачать финальный файл",
     modal_hint_default: "Спонсорская страница откроется в новой вкладке — это поддерживает библиотеку бесплатной.",
-    modal_hint_ready: "Файл готов — ссылка откроет Google Drive.",
+    modal_hint_ready: "Файл готов — нажмите ниже для прямой загрузки.",
+    modal_hint_video: "Идёт просмотр рекламы — следующий шаг откроется автоматически через несколько секунд.",
     unlock_unlocking: (s) => `Разблокировка через ${s} с…`,
-    unlock_ready: "Открыть ссылку на файл",
+    unlock_ready: "Перейти к следующему шагу",
+    step_video_label: "Реклама",
+    step_of_label: (n, total) => `Шаг ${n} из ${total}`,
+    ad_playing_label: "Реклама воспроизводится…",
     card_download: "Скачать",
     results_count: (n) => `${n} ассет(ов)`,
     nav_request_label: "Запросить модель",
@@ -287,9 +345,45 @@ const translations = {
 };
 
 const categoryLabels = {
-  en: { Characters: "Characters", Environments: "Environments", Shaders: "Shaders", Animations: "Animations", Assets: "Assets" },
-  ar: { Characters: "شخصيات", Environments: "بيئات", Shaders: "شيدرات", Animations: "أنيميشن", Assets: "أصول" },
-  ru: { Characters: "Персонажи", Environments: "Окружения", Shaders: "Шейдеры", Animations: "Анимации", Assets: "Ассеты" },
+  en: {
+    Characters: "Characters", Environments: "Environments", Shaders: "Shaders", Animations: "Animations", Assets: "Assets",
+    "Full Games": "Full games", "Demos": "Demos / Prototypes", "Mods": "Mods / DLC",
+    "Scripts": "Scripts", "Models": "Models", "Maps": "Maps",
+  },
+  ar: {
+    Characters: "شخصيات", Environments: "بيئات", Shaders: "شيدرات", Animations: "أنيميشن", Assets: "أصول",
+    "Full Games": "ألعاب كاملة", "Demos": "تجارب / نماذج أولية", "Mods": "تعديلات / إضافات",
+    "Scripts": "سكريبتات", "Models": "موديلات", "Maps": "خرائط",
+  },
+  ru: {
+    Characters: "Персонажи", Environments: "Окружения", Shaders: "Шейдеры", Animations: "Анимации", Assets: "Ассеты",
+    "Full Games": "Полные игры", "Demos": "Демо / прототипы", "Mods": "Моды / DLC",
+    "Scripts": "Скрипты", "Models": "Модели", "Maps": "Карты",
+  },
+};
+
+/* =========================================================
+   Libraries — three top-level sections that share the same
+   product grid, search box and 4-step download modal, but each
+   has its own category-chip set and its own slice of data/products.json
+   (filtered via each product's "library" field: "blender" | "games" | "roblox").
+   ========================================================= */
+const LIBRARIES = {
+  blender: {
+    categories: ["All", "Characters", "Environments", "Shaders", "Animations", "Assets"],
+    chipKey: {
+      All: "chip_all", Characters: "chip_characters", Environments: "chip_environments",
+      Shaders: "chip_shaders", Animations: "chip_animations", Assets: "chip_assets",
+    },
+  },
+  games: {
+    categories: ["All", "Full Games", "Demos", "Mods"],
+    chipKey: { All: "chip_all", "Full Games": "chip_full_games", Demos: "chip_demos", Mods: "chip_dlc" },
+  },
+  roblox: {
+    categories: ["All", "Scripts", "Models", "Maps"],
+    chipKey: { All: "chip_all", Scripts: "chip_scripts", Models: "chip_models", Maps: "chip_maps" },
+  },
 };
 
 function t(key) {
@@ -330,6 +424,8 @@ function setLanguage(lang) {
   document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   try { localStorage.setItem("vaultframe-lang", lang); } catch (e) { /* ignore */ }
   applyStaticTranslations();
+  renderCategoryChips(); // chip labels are library-dependent, so rebuild them for the new language
+  updateLibraryHeading();
   render(); // re-render products so card labels / category names / counts refresh
   if (typeof renderGuestbook === "function") renderGuestbook(); // refresh wall labels/counts
 }
@@ -349,6 +445,8 @@ function initLanguage() {
   document.documentElement.lang = initial;
   document.documentElement.dir = initial === "ar" ? "rtl" : "ltr";
   applyStaticTranslations();
+  renderCategoryChips();
+  updateLibraryHeading();
 }
 
 /* ---------- load data ---------- */
@@ -390,10 +488,14 @@ function renderSkeletons(n) {
 function getFiltered() {
   const q = state.query.trim().toLowerCase();
   return state.products.filter(p => {
+    // Products created before the "library" field existed are treated as
+    // Blender assets, so nothing already in data/products.json disappears.
+    const productLibrary = p.library || "blender";
+    const matchesLibrary = productLibrary === state.activeLibrary;
     const matchesCategory = state.activeCategory === "All" || p.category === state.activeCategory;
     const haystack = `${p.title} ${p.description} ${p.category}`.toLowerCase();
     const matchesQuery = q === "" || haystack.includes(q);
-    return matchesCategory && matchesQuery;
+    return matchesLibrary && matchesCategory && matchesQuery;
   });
 }
 
@@ -509,10 +611,10 @@ function cardTemplate(p) {
         ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true" onerror="this.closest('.card-media').classList.remove('has-preview'); this.remove()">` : ""}
         ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer>` : ""}
         <div class="absolute top-3 left-3 flex gap-1.5">
-          <span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || "")}</span>
+          ${(p.blenderVersion || p.platform) ? `<span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || p.platform)}</span>` : ""}
         </div>
         <div class="absolute top-3 right-3">
-          <span class="badge px-2 py-1 rounded" style="border-color:rgba(157,78,221,0.4); color:#C79BFF; background:rgba(157,78,221,0.08);">${escapeHtml(p.engine || "")}</span>
+          ${p.engine ? `<span class="badge px-2 py-1 rounded" style="border-color:rgba(157,78,221,0.4); color:#C79BFF; background:rgba(157,78,221,0.08);">${escapeHtml(p.engine)}</span>` : ""}
         </div>
       </div>
       <div class="p-5">
@@ -568,11 +670,23 @@ function escapeHtml(str = "") {
 }
 function escapeAttr(str = "") { return escapeHtml(str); }
 
-/* ---------- search + chips ---------- */
+/* ---------- search + chips + libraries ---------- */
 searchInput.addEventListener("input", (e) => {
   state.query = e.target.value;
   render();
 });
+
+// Builds the category-chip row for whichever library is currently active.
+// Called on load and every time the library tab changes.
+function renderCategoryChips() {
+  const lib = LIBRARIES[state.activeLibrary] || LIBRARIES.blender;
+  chipsWrap.innerHTML = lib.categories.map(cat => {
+    const key = lib.chipKey[cat] || "";
+    const label = key ? t(key) : translateCategory(cat);
+    const isActive = cat === state.activeCategory;
+    return `<button data-cat="${escapeAttr(cat)}" class="chip${isActive ? " active" : ""} px-3.5 py-1.5 rounded-full text-xs">${escapeHtml(label)}</button>`;
+  }).join("");
+}
 
 chipsWrap.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-cat]");
@@ -582,6 +696,44 @@ chipsWrap.addEventListener("click", (e) => {
   state.activeCategory = btn.dataset.cat;
   render();
 });
+
+// Library tabs (Blender Assets / My Games / Roblox Assets). Switching
+// libraries resets the category filter and search, rebuilds the chip row
+// for that library's categories, and re-renders the grid with only that
+// library's products — the download modal / 4-step ad flow underneath is
+// completely unaffected, since it only ever looks at the clicked product.
+const libraryTabsWrap = document.getElementById("library-tabs");
+const libraryHeadingEl = document.getElementById("library-heading-text");
+const librarySubEl = document.getElementById("library-sub-text");
+
+function updateLibraryHeading() {
+  if (libraryHeadingEl) libraryHeadingEl.textContent = t(`library_heading_${state.activeLibrary}`) || t("library_heading");
+  if (librarySubEl) librarySubEl.textContent = t(`library_sub_${state.activeLibrary}`) || t("library_sub");
+}
+
+function setLibrary(lib) {
+  if (!LIBRARIES[lib]) return;
+  state.activeLibrary = lib;
+  state.activeCategory = "All";
+  state.query = "";
+  searchInput.value = "";
+  if (libraryTabsWrap) {
+    libraryTabsWrap.querySelectorAll("[data-lib]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.lib === lib);
+    });
+  }
+  renderCategoryChips();
+  updateLibraryHeading();
+  render();
+}
+
+if (libraryTabsWrap) {
+  libraryTabsWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-lib]");
+    if (!btn) return;
+    setLibrary(btn.dataset.lib);
+  });
+}
 
 /* =========================================================
    Download modal — ad-monetized unlock flow
@@ -604,15 +756,35 @@ const stepIndicator = document.getElementById("step-indicator");
 const progressBar = document.getElementById("progress-bar");
 const progressLabel = document.getElementById("progress-label");
 const progressPercent = document.getElementById("progress-percent");
+const adVideoStep = document.getElementById("ad-video-step");
+const adVideo = document.getElementById("ad-video");
+const adVideoFallback = document.getElementById("ad-video-fallback");
+const adVideoCountdownEl = document.getElementById("ad-video-countdown");
+const adVideoCaption = document.getElementById("ad-video-caption");
 
+// Optional site-wide fallback video ad, used when a product doesn't define
+// its own `adVideoUrl`. Point this at an .mp4 you own/have rights to run as
+// a pre-download ad, e.g. "assets/ads/default-ad.mp4". Left empty by default
+// so, out of the box, step 1 simply shows the AdSense unit for 10s instead.
+window.DEFAULT_AD_VIDEO_URL = window.DEFAULT_AD_VIDEO_URL || "";
+
+// The full gated flow, for EVERY library (Blender / Games / Roblox):
+//   Step 1 -> 10s video ad (auto-plays, auto-advances, no click needed)
+//   Step 2, 3, 4 -> a sponsor link opens in a new tab, then a 10s dwell
+//                   countdown before the visitor can continue
+// After step 4, the "Download final file" button is revealed.
+const GATE_TOTAL_STEPS = 4;
+const VIDEO_STEP_SECONDS = 10;
 const COUNTDOWN_SECONDS = 10;
-// The first sponsor step is shorter \u2014 it's the entry point, so a long
-// wait there feels especially punishing. Subsequent steps keep 10s.
-const FIRST_STEP_SECONDS = 3;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 15.5; // matches r=15.5 in the SVG
 let countdownTimer = null;
+let videoTimer = null;
 let activeProduct = null;
+// activeStage counts completed gate steps, 0..GATE_TOTAL_STEPS.
+// 0 = nothing done. 1 = the video ad finished. 2..4 = that many sponsor
+// steps finished on top of the video. At 4, the final button is revealed.
 let activeStage = 0;
+let sponsorLinksPadded = [];
 // Reference to the sponsor tab opened for the stage currently being timed.
 // Polled every tick so a tab closed before COUNTDOWN_SECONDS elapses
 // cancels credit for that stage instead of silently letting it pass.
@@ -646,6 +818,16 @@ function getSponsorLinks(product) {
   return product.monetizedLink ? [product.monetizedLink] : [];
 }
 
+// Steps 2, 3 and 4 of the gate each need one sponsor link. Whatever the
+// product actually has configured (1, 2, 3, 4...) gets cycled/repeated so
+// there are always exactly `count` (3) of them — if a product has zero
+// sponsor links at all, those steps just become timed waits with no tab.
+function getPaddedSponsorLinks(product, count) {
+  const links = getSponsorLinks(product);
+  if (!links.length) return new Array(count).fill(null);
+  return Array.from({ length: count }, (_, i) => links[i % links.length]);
+}
+
 function stageHintText(n, total) {
   const hints = {
     en: `Step ${n} of ${total} — opening sponsor link in a new tab…`,
@@ -674,29 +856,34 @@ const driveStepLabel = {
 // advances by exactly one stage per confirmed click (see unlockBtn handler
 // below) — so there is no way to reach a later step without the button
 // for every prior step actually being clicked and its countdown finished.
-function renderStepIndicator(totalSponsorStages, currentStage) {
+// Renders a row of step pills: Step 1 (video ad), Step 2, Step 3, Step 4,
+// then a final "Download" pill. currentStage counts steps already completed
+// (0..totalSteps). Purely visual state — activeStage only ever advances by
+// exactly one per verified step, so there's no way to reach a later pill
+// without every prior step (including the 10s video) actually finishing.
+function renderStepIndicator(totalSteps, currentStage) {
   if (!stepIndicator) return;
-  if (totalSponsorStages <= 0) {
+  if (totalSteps <= 0) {
     stepIndicator.innerHTML = "";
     return;
   }
   const pills = [];
-  for (let i = 1; i <= totalSponsorStages; i++) {
+  for (let i = 1; i <= totalSteps; i++) {
     const done = i <= currentStage;
-    const isCurrent = i === currentStage + 1 && currentStage < totalSponsorStages;
+    const isVideo = i === 1;
+    const icon = done ? "✓" : (isVideo ? "🎬" : i);
+    const label = isVideo ? (t("step_video_label")) : `${state.lang === "ar" ? "خطوة" : "Step"} ${i}`;
     pills.push(`
       <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
         style="${done
           ? "background:rgba(0,240,255,0.12); border-color:rgba(0,240,255,0.4); color:var(--ink);"
-          : isCurrent
-            ? "background:rgba(0,240,255,0.05); border-color:rgba(0,240,255,0.25); color:var(--ink);"
-            : "background:transparent; border-color:var(--line); color:var(--ink-dim);"}">
-        ${done ? "✓" : i}
-        <span>${state.lang === "ar" ? "خطوة" : "Step"} ${i}</span>
+          : "background:transparent; border-color:var(--line); color:var(--ink-dim);"}">
+        ${icon}
+        <span>${label}</span>
       </div>
     `);
   }
-  const driveDone = currentStage >= totalSponsorStages;
+  const driveDone = currentStage >= totalSteps;
   pills.push(`
     <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
       style="${driveDone
@@ -741,33 +928,87 @@ function updateOverallProgress(totalSponsorStages, currentStage, countdownFracti
 function openModal(product) {
   activeProduct = product;
   activeStage = 0;
+  sponsorLinksPadded = getPaddedSponsorLinks(product, GATE_TOTAL_STEPS - 1); // 3 sponsor steps
 
-  modalBadge.textContent = product.blenderVersion || "Blender";
+  modalBadge.textContent = product.blenderVersion || product.platform || "";
   modalTitle.textContent = product.title;
   modalDesc.textContent = product.description || "";
   modalFilesize.textContent = product.fileSize || "—";
-  modalEngine.textContent = product.engine || "—";
+  modalEngine.textContent = product.engine || product.platform || "—";
   modalLicense.textContent = product.license || "—";
 
   // reset state
   driveBtn.classList.add("hidden");
   driveBtn.classList.remove("flex");
-  unlockBtn.classList.remove("hidden");
+  unlockBtn.classList.add("hidden");
   unlockBtn.disabled = true;
   unlockRingProgress.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
   unlockRingProgress.style.strokeDashoffset = "0";
 
-  const sponsorLinks = getSponsorLinks(product);
-  modalHint.textContent = sponsorLinks.length
-    ? stageHintText(1, sponsorLinks.length)
-    : t("modal_hint_default");
-  renderStepIndicator(sponsorLinks.length, 0);
+  renderStepIndicator(GATE_TOTAL_STEPS, 0);
+  updateOverallProgress(GATE_TOTAL_STEPS, 0, 0);
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
   document.body.style.overflow = "hidden";
 
-  startCountdown();
+  startVideoGate();
+}
+
+/* ---------- Step 1: the 10-second video ad ---------- */
+function startVideoGate() {
+  adVideoStep.classList.remove("hidden");
+  unlockBtn.classList.add("hidden");
+  driveBtn.classList.add("hidden");
+  modalHint.textContent = t("modal_hint_video");
+  if (adVideoCaption) adVideoCaption.textContent = `${t("step_of_label")(1, GATE_TOTAL_STEPS)} — ${t("ad_playing_label")}`;
+
+  const src = (activeProduct && activeProduct.adVideoUrl) || window.DEFAULT_AD_VIDEO_URL || "";
+  const showFallback = () => {
+    adVideo.classList.add("hidden");
+    adVideoFallback.classList.remove("hidden");
+    adVideoFallback.style.display = "flex";
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { /* AdSense not loaded (adblock) — the 10s timer still runs */ }
+  };
+
+  adVideoFallback.classList.add("hidden");
+  adVideoFallback.style.display = "none";
+  adVideo.classList.remove("hidden");
+  adVideo.onerror = showFallback;
+  if (src) {
+    adVideo.src = src;
+    adVideo.load();
+    adVideo.play().catch(() => { /* autoplay can be blocked; the countdown still runs regardless */ });
+  } else {
+    showFallback();
+  }
+
+  let remaining = VIDEO_STEP_SECONDS;
+  adVideoCountdownEl.textContent = remaining;
+  clearInterval(videoTimer);
+  videoTimer = setInterval(() => {
+    remaining -= 1;
+    adVideoCountdownEl.textContent = Math.max(remaining, 0);
+    updateOverallProgress(GATE_TOTAL_STEPS, 0, 1 - Math.max(remaining, 0) / VIDEO_STEP_SECONDS);
+    if (remaining <= 0) {
+      clearInterval(videoTimer);
+      try { adVideo.pause(); } catch (e) { /* no-op */ }
+      adVideoStep.classList.add("hidden");
+      activeStage = 1;
+      renderStepIndicator(GATE_TOTAL_STEPS, activeStage);
+      updateOverallProgress(GATE_TOTAL_STEPS, activeStage, 0);
+      beginSponsorStage();
+    }
+  }, 1000);
+}
+
+/* ---------- Steps 2–4: sponsor link + 10s dwell countdown each ---------- */
+function beginSponsorStage() {
+  unlockBtn.classList.remove("hidden");
+  unlockBtn.disabled = false;
+  unlockRingProgress.style.strokeDashoffset = "0";
+  unlockLabel.textContent = t("unlock_ready");
+  modalHint.textContent = stageHintText(activeStage + 1, GATE_TOTAL_STEPS);
 }
 
 // windowRef is the tab opened for the stage we're timing (or null if this
@@ -776,9 +1017,7 @@ function openModal(product) {
 // stage is cancelled instead of quietly being granted anyway.
 function startCountdown(windowRef) {
   sponsorWindow = windowRef || null;
-  // Stage 1 (activeStage === 1 when this is called for the first step)
-  // uses the shorter FIRST_STEP_SECONDS; later stages use COUNTDOWN_SECONDS.
-  const total = (activeStage === 1) ? FIRST_STEP_SECONDS : COUNTDOWN_SECONDS;
+  const total = COUNTDOWN_SECONDS;
   let remaining = total;
   unlockLabel.textContent = t("unlock_unlocking")(remaining);
 
@@ -793,6 +1032,7 @@ function startCountdown(windowRef) {
     remaining -= 1;
     const progress = 1 - remaining / total;
     unlockRingProgress.style.strokeDashoffset = `${RING_CIRCUMFERENCE * progress}`;
+    updateOverallProgress(GATE_TOTAL_STEPS, activeStage - 1, progress);
 
     if (remaining <= 0) {
       clearInterval(countdownTimer);
@@ -805,18 +1045,17 @@ function startCountdown(windowRef) {
 }
 
 // Runs once a stage's countdown finishes without its tab closing early.
-// If every sponsor stage now has a verified full countdown behind it,
-// reveal the Drive link; otherwise just re-enable the button so the
+// If all 4 gate steps (video + 3 sponsor stages) are now verified, reveal
+// the final direct-download button; otherwise re-enable the button so the
 // visitor can move on to the next stage.
 function onCountdownVerified() {
-  const sponsorLinks = getSponsorLinks(activeProduct);
-  if (activeStage >= sponsorLinks.length) {
-    driveBtn.href = (activeProduct && activeProduct.driveLink) || "#";
+  if (activeStage >= GATE_TOTAL_STEPS) {
+    driveBtn.href = (activeProduct && (activeProduct.downloadUrl || activeProduct.driveLink)) || "#";
     unlockBtn.classList.add("hidden");
     driveBtn.classList.remove("hidden");
     driveBtn.classList.add("flex");
     modalHint.textContent = t("modal_hint_ready");
-    updateOverallProgress(sponsorLinks.length, activeStage, 0);
+    updateOverallProgress(GATE_TOTAL_STEPS, activeStage, 0);
   } else {
     unlockBtn.disabled = false;
     unlockLabel.textContent = t("unlock_ready");
@@ -824,16 +1063,16 @@ function onCountdownVerified() {
 }
 
 // Called when the sponsor tab for the stage being timed closes before the
-// countdown completes. Rolls that stage's "done" credit back so the click
-// handler re-opens the same link (not the next one) on the next click.
+// countdown completes. Rolls that stage's "done" credit back (never below 1,
+// since the video step can't be undone) so the click handler re-opens the
+// same link on the next click instead of skipping ahead.
 function handleClosedEarly() {
   sponsorWindow = null;
   if (!activeProduct) return;
-  const sponsorLinks = getSponsorLinks(activeProduct);
 
-  activeStage = Math.max(0, activeStage - 1);
-  renderStepIndicator(sponsorLinks.length, activeStage);
-  updateOverallProgress(sponsorLinks.length, activeStage, 0);
+  activeStage = Math.max(1, activeStage - 1);
+  renderStepIndicator(GATE_TOTAL_STEPS, activeStage);
+  updateOverallProgress(GATE_TOTAL_STEPS, activeStage, 0);
 
   unlockRingProgress.style.strokeDashoffset = "0";
   unlockBtn.disabled = false;
@@ -842,15 +1081,17 @@ function handleClosedEarly() {
 }
 
 unlockBtn.addEventListener("click", () => {
-  if (unlockBtn.disabled || !activeProduct) return;
+  if (unlockBtn.disabled || !activeProduct || activeStage < 1) return;
 
-  const sponsorLinks = getSponsorLinks(activeProduct);
+  // activeStage is 1, 2 or 3 here (video already done); the sponsor link
+  // for the step about to be attempted is at index (activeStage - 1) in
+  // the padded 3-link array.
+  const link = sponsorLinksPadded[activeStage - 1];
 
   // Open this stage's sponsor link in a new tab. window.open returns null
   // when the browser's pop-up blocker prevents the tab from opening at
   // all — noopener means we can't detect that as "closed", so we check
   // for null explicitly instead of pretending the tab exists.
-  const link = sponsorLinks[activeStage];
   let openedWindow = null;
   if (link) {
     openedWindow = window.open(link, "_blank");
@@ -863,24 +1104,16 @@ unlockBtn.addEventListener("click", () => {
   }
 
   activeStage += 1;
-  renderStepIndicator(sponsorLinks.length, activeStage);
-
-  if (activeStage < sponsorLinks.length) {
-    // More sponsor links to go through — restart the countdown for the next one.
-    // activeStage only ever moves forward by 1 here, and the button stays
-    // disabled until a fresh countdown finishes without the tab being closed
-    // early, so repeatedly clicking / closing early cannot fast-forward
-    // past a step.
-    unlockBtn.disabled = true;
-    modalHint.textContent = stageHintText(activeStage + 1, sponsorLinks.length);
-    startCountdown(openedWindow);
-    return;
-  }
-
-  // Last sponsor stage — still needs its own full, un-interrupted
-  // countdown before the Drive link is revealed.
+  renderStepIndicator(GATE_TOTAL_STEPS, activeStage);
   unlockBtn.disabled = true;
-  modalHint.textContent = t("modal_hint_default");
+
+  // activeStage only ever moves forward by 1 here, and the button stays
+  // disabled until a fresh countdown finishes without the tab being closed
+  // early, so repeatedly clicking / closing early cannot fast-forward past
+  // a step — whether it's step 2, 3, or the final step 4.
+  modalHint.textContent = (activeStage < GATE_TOTAL_STEPS)
+    ? stageHintText(activeStage + 1, GATE_TOTAL_STEPS)
+    : t("modal_hint_default");
   startCountdown(openedWindow);
 });
 
@@ -889,6 +1122,9 @@ function closeModal() {
   modal.classList.remove("flex");
   document.body.style.overflow = "";
   clearInterval(countdownTimer);
+  clearInterval(videoTimer);
+  try { adVideo.pause(); } catch (e) { /* no-op */ }
+  adVideoStep.classList.add("hidden");
   activeProduct = null;
 }
 
