@@ -187,7 +187,7 @@ const translations = {
     comment_avg_text: (n) => `المتوسط: ${n.toFixed(1)} / 5`,
     wall_heading: "حائط المجتمع",
     wall_subheading: "سيبي رسالة عامة للموقع كله — ملاحظات، أفكار، أو حتى سلام. مش محتاجة تسجيل دخول.",
-    wall_form_title: "اكتبي رسالة",
+    wall_form_title: "اكتب/ي رسالة",
     wall_list_title: "أحدث الرسائل",
     wall_text_placeholder: "قولي حاجة للمجتمع…",
     wall_submit: "نشر الرسالة",
