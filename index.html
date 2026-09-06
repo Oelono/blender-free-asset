@@ -3,9 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oelono — Free Blender Assets for 3D Artists</title>
+<title>Oelono Blender Asset — Free Blender, Game & Roblox Assets</title>
 <link rel="icon" type="image/jpeg" href="we.png">
-<meta name="description" content="A free, community-fed library of high-quality Blender assets — characters, environments, shaders and animations, ready to drop into your scene.">
+<meta name="description" content="Oelono Blender Asset is a free, community-fed library of high-quality Blender assets, game builds and Roblox Studio files — characters, environments, shaders, animations, games and Roblox scripts, ready to drop into your project.">
+<meta name="keywords" content="Oelono Blender Asset, Oelono, Blender assets, free Blender models, Blender rigs, Roblox assets, Roblox scripts, Roblox Studio files, free games download, 3D assets library">
+<meta name="author" content="Oelono">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://oelono.github.io/blender-free-asset/">
+
+<!-- Google Search Console ownership verification.
+     Replace the "content" value below with the real verification code
+     Google gives you in Search Console > Settings > Ownership verification > HTML tag. -->
+<meta name="google-site-verification" content="REPLACE_WITH_YOUR_GOOGLE_SEARCH_CONSOLE_CODE">
+
+<!-- Open Graph / Facebook / WhatsApp / Discord preview -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Oelono Blender Asset">
+<meta property="og:title" content="Oelono Blender Asset — Free Blender, Game & Roblox Assets">
+<meta property="og:description" content="A free, community-fed library of Blender assets, indie games and Roblox Studio files — characters, environments, shaders, animations and more, ready to drop into your project.">
+<meta property="og:url" content="https://oelono.github.io/blender-free-asset/">
+<meta property="og:image" content="https://oelono.github.io/blender-free-asset/106993307.jpg">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ar_AR">
+<meta property="og:locale:alternate" content="ru_RU">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Oelono Blender Asset — Free Blender, Game & Roblox Assets">
+<meta name="twitter:description" content="Free Blender assets, indie games and Roblox Studio files — every file checked before it's listed.">
+<meta name="twitter:image" content="https://oelono.github.io/blender-free-asset/106993307.jpg">
+
+<!-- JSON-LD structured data: tells Google this site IS the "Oelono Blender Asset" brand,
+     so a search for that exact phrase can surface this site (and optionally a sitelinks
+     search box) directly in results. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://oelono.github.io/blender-free-asset/#website",
+      "url": "https://oelono.github.io/blender-free-asset/",
+      "name": "Oelono Blender Asset",
+      "alternateName": ["Oelono", "Oelono Blender Assets"],
+      "description": "Free library of Blender assets, indie games and Roblox Studio files.",
+      "inLanguage": ["en", "ar", "ru"],
+      "publisher": { "@id": "https://oelono.github.io/blender-free-asset/#organization" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://oelono.github.io/blender-free-asset/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://oelono.github.io/blender-free-asset/#organization",
+      "name": "Oelono Blender Asset",
+      "alternateName": "Oelono",
+      "url": "https://oelono.github.io/blender-free-asset/",
+      "logo": "https://oelono.github.io/blender-free-asset/106993307.jpg",
+      "sameAs": []
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": "https://oelono.github.io/blender-free-asset/#collection",
+      "url": "https://oelono.github.io/blender-free-asset/",
+      "name": "Oelono Blender Asset — Free Blender, Game & Roblox Assets",
+      "isPartOf": { "@id": "https://oelono.github.io/blender-free-asset/#website" },
+      "about": { "@id": "https://oelono.github.io/blender-free-asset/#organization" }
+    }
+  ]
+}
+</script>
+
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2827589221947089" crossorigin="anonymous"></script>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -372,18 +445,23 @@ box-shadow:0 12px 30px -10px rgba(0,0,0,0.5);
 <p class="reveal reveal-2 text-[var(--ink-dim)] text-sm md:text-base mb-9 max-w-xl">A community-fed library of characters, environments, shaders and animations — every file checked before it's listed.</p>
 <!-- search -->
 <div class="reveal reveal-3 max-w-xl">
+<!-- LIBRARY TABS: switches the whole site between the three top-level libraries.
+     Each one reuses the same product grid, same category-chip mechanism, and
+     the same 4-step ad/download modal — only the data set (state.activeLibrary)
+     changes. -->
+<div id="library-tabs" class="flex flex-wrap gap-2 mb-4">
+<button data-lib="blender" class="chip active px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_blender">Blender Assets</button>
+<button data-lib="games" class="chip px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_games">My Games</button>
+<button data-lib="roblox" class="chip px-4 py-2 rounded-full text-xs font-medium" data-i18n="lib_roblox">Roblox Assets</button>
+</div>
 <div class="relative">
 <svg class="search-icon absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-dim)]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
 <input id="search-input" type="text" data-i18n-placeholder="search_placeholder" placeholder="Search assets — try “cyberpunk character”"
 class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-[var(--ink)]">
 </div>
 <div id="category-chips" class="flex flex-wrap gap-2 mt-4">
-<button data-cat="All" class="chip active px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_all">All</button>
-<button data-cat="Characters" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_characters">Characters</button>
-<button data-cat="Environments" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_environments">Environments</button>
-<button data-cat="Shaders" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_shaders">Shaders</button>
-<button data-cat="Animations" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_animations">Animations</button>
-<button data-cat="Assets" class="chip px-3.5 py-1.5 rounded-full text-xs" data-i18n="chip_assets">Assets</button>
+<!-- Populated dynamically by script.js (renderCategoryChips), because the
+     available categories differ per library (Blender vs Games vs Roblox). -->
 </div>
 </div>
 </div>
@@ -406,6 +484,18 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 </style>
 
 <!-- كود الإعلان مدمج بداخل الغلاف -->
+<div class="ad-wrapper">
+  <script type="text/javascript">
+    atOptions = {
+      'key' : 'cede1f55f12c2d4341a47341cfadb4d6',
+      'format' : 'iframe',
+      'height' : 90,
+      'width' : 728,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="https://www.highrevenueformat.com/cede1f55f12c2d4341a47341cfadb4d6/invoke.js"></script>
+</div>
 
 
 
@@ -414,8 +504,8 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <section id="library" class="max-w-7xl mx-auto px-6 pt-16 pb-4 md:pt-20 md:pb-6">
 <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
 <div>
-<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading">The library</h2>
-<p class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub">Every file is inspected before it's listed. New drops weekly.</p>
+<h2 id="library-heading-text" class="font-display text-2xl md:text-3xl font-semibold" data-i18n="library_heading">The library</h2>
+<p id="library-sub-text" class="text-[var(--ink-dim)] text-sm mt-1" data-i18n="library_sub">Every file is inspected before it's listed. New drops weekly.</p>
 </div>
 <div id="results-count" class="text-xs text-[var(--ink-dim)]"></div>
 </div>
@@ -434,11 +524,16 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 </div>
 
 
-<script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js" onerror="window.__adBlocked=true"></script>
+<script type="text/javascript" src="https://www.highrevenueformat.com/65eeb729b2e37d03a0903b13c2428823/invoke.js"></script>
 </div>
 </div>
 </section>
 
+<!-- NATIVE BANNER AD -->
+<div class="max-w-7xl mx-auto px-6">
+<script async="async" data-cfasync="false" src="https://pl31127465.profitableratecpmnetwork.com/b0a70462aab028233ddf977a15e416ff/invoke.js"></script>
+<div id="container-b0a70462aab028233ddf977a15e416ff"></div>
+</div>
 
 <!-- HOW IT WORKS -->
 <section id="how-it-works" class="border-t border-[var(--line)] bg-[var(--bg-raised)]/40">
@@ -562,7 +657,26 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <div id="progress-bar" class="h-full rounded-full transition-all duration-500" style="width:0%; background:linear-gradient(90deg, #00F0FF, #9D4EDD);"></div>
 </div>
 </div>
-<div id="step-indicator" class="flex items-center justify-center gap-2 mb-4"></div>
+<div id="step-indicator" class="flex items-center justify-center gap-2 mb-4 flex-wrap"></div>
+
+<!-- STEP 1 of the 4-step flow: 10-second video ad gate.
+     Plays activeProduct.adVideoUrl if the product/CMS supplies one, or a
+     site-wide default video (window.DEFAULT_AD_VIDEO_URL, set in script.js).
+     If no video source can load, it falls back to a 10-second AdSense
+     display-ad "watch" step so the gate still always lasts 10s. -->
+<div id="ad-video-step" class="hidden mb-4">
+<div class="relative rounded-lg overflow-hidden" style="aspect-ratio:16/9;background:#000;">
+<video id="ad-video" muted playsinline autoplay class="w-full h-full object-cover"></video>
+<div id="ad-video-fallback" class="hidden absolute inset-0 items-center justify-center overflow-hidden" style="background:var(--bg-raised);">
+<ins class="adsbygoogle" style="display:block;width:100%;height:100%;" data-ad-client="ca-pub-2827589221947089" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
+</div>
+<div class="absolute bottom-2 right-2 text-[11px] px-2 py-1 rounded-full font-medium" style="background:rgba(0,0,0,0.65);color:#fff;">
+<span id="ad-video-countdown">10</span>s
+</div>
+</div>
+<p id="ad-video-caption" class="text-xs text-[var(--ink-dim)] text-center mt-2"></p>
+</div>
+
 <button id="unlock-btn" class="btn-primary w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2" disabled>
 <svg id="unlock-ring" width="18" height="18" viewBox="0 0 36 36" class="shrink-0">
 <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(10,10,10,0.25)" stroke-width="3"/>
@@ -572,8 +686,8 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 </button>
 <a id="drive-btn" target="_blank" rel="noopener"
 class="hidden btn-primary w-full py-3 rounded-lg text-sm items-center justify-center gap-2 mt-3">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14m0 0-5-5m5 5 5-5M5 21h14"/></svg>
-<span data-i18n="modal_drive_btn">Open Google Drive file</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m0 0-6-6m6 6 6-6M4 21h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<span data-i18n="modal_drive_btn">Download final file</span>
 </a>
 <p id="modal-hint" class="text-xs text-[var(--ink-dim)] text-center mt-3">A sponsor page opens in a new tab to keep this library free.</p>
 </div>
@@ -658,52 +772,6 @@ shadow-intensity="0.9" exposure="0.95" environment-image="neutral" interaction-p
 <input id="request-ref" type="text" data-i18n-placeholder="request_ref_placeholder" placeholder="Artstation / Pinterest / image URL…">
 </div>
 <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="request_submit">Send request</button>
-</form>
-</div>
-</div>
-
-
-<!-- COMMENTS MODAL -->
-<div id="comments-modal" class="overlay-modal fixed inset-0 z-50 hidden items-center justify-center p-4">
-<div class="overlay-panel relative w-full max-w-md rounded-xl p-6" style="max-height:88vh;overflow-y:auto;">
-<button id="comments-close" aria-label="Close" class="absolute top-4 right-4 text-[var(--ink-dim)] hover:text-[var(--ink)] transition-colors">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-</button>
-<h3 class="font-display text-lg font-semibold pr-6 mb-1" data-i18n="comments_title">Comments</h3>
-<p id="comments-asset-name" class="text-sm text-[var(--ink-dim)] mb-3"></p>
-<div id="comment-avg-wrap" class="mb-3" style="display:none;">
-  <span class="comment-avg"><span class="avg-stars" id="comment-avg-stars"></span><span id="comment-avg-text"></span></span>
-</div>
-<div id="comment-list"></div>
-<hr style="border-color:var(--line);margin:14px 0;">
-<form id="comment-form" class="space-y-4">
-<div class="form-field">
-<label for="comment-name" data-i18n="comment_name_label">Your name</label>
-<input id="comment-name" type="text" maxlength="40" required data-i18n-placeholder="comment_name_placeholder" placeholder="Anonymous">
-</div>
-<div class="form-field">
-<label data-i18n="comment_rating_label">Your rating</label>
-<div class="star-rating" id="star-rating">
-<input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
-<input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
-<input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
-<input type="radio" id="star2" name="rating" value="2"><label for="star2">&#9733;</label>
-<input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
-</div>
-</div>
-<div class="form-field">
-<label for="comment-text" data-i18n="comment_text_label">Your comment</label>
-<textarea id="comment-text" rows="3" maxlength="600" required data-i18n-placeholder="comment_text_placeholder" placeholder="Share your thoughts about this asset..."></textarea>
-</div>
-<div class="form-field">
-<label data-i18n="comment_captcha_label">Anti-bot check</label>
-<div class="captcha-box">
-<span class="cap-q" id="captcha-question">2 + 3 = ?</span>
-<button type="button" class="cap-refresh" id="captcha-refresh" title="New question">&#8635;</button>
-</div>
-<input id="captcha-answer" type="text" inputmode="numeric" maxlength="3" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="margin-top:8px;">
-</div>
-<button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="comment_submit">Post comment</button>
 </form>
 </div>
 </div>
@@ -863,89 +931,7 @@ init();
 </script>
 <script src="script.js"></script>
 <!-- SOCIAL BAR AD -->
-
-<!-- ADBLOCK WALL -->
-<div id="adblock-wall" class="hidden fixed inset-0 z-[999] flex items-center justify-center px-6" style="background:rgba(10,10,10,0.97);backdrop-filter:blur(4px);">
-<div class="max-w-md w-full text-center rounded-2xl p-8" style="background:var(--bg-raised);border:1px solid var(--line);">
-<div class="text-4xl mb-4">🛑</div>
-<h2 class="font-display text-xl mb-3" style="color:var(--ink);">لازم توقف مانع الإعلانات (AdBlock)</h2>
-<p class="text-sm mb-6" style="color:var(--ink-dim);">الموقع ده مجاني وبيتمول بالإعلانات فقط. من فضلك عطّل الـ AdBlock / uBlock من إعدادات المتصفح لهذا الموقع، بعدين اضغط "أعد المحاولة".</p>
-<button id="adblock-recheck" class="w-full py-3 rounded-lg font-semibold" style="background:var(--ink);color:var(--bg);">أعد المحاولة</button>
-</div>
-</div>
-
-<script>
-(function () {
-  var wall = document.getElementById("adblock-wall");
-  var recheckBtn = document.getElementById("adblock-recheck");
-
-  function detectAdblock(callback) {
-    // 1) Direct signal: any of our real ad-network <script> tags already
-    // failed to load (onerror="window.__adBlocked=true" on each). This is
-    // what catches network-level blockers like Brave Shields, which block
-    // the request itself rather than hiding an element with CSS.
-    if (window.__adBlocked === true) {
-      return callback(true);
-    }
-
-    // 2) Classic bait element: filter lists hide elements matched by these
-    // class/id names, so if the bait gets hidden/removed, a blocker is active.
-    var bait = document.createElement("div");
-    bait.className = "ad ads adsbox ad-banner adsbygoogle pub_300x250 text-ad textAds";
-    bait.style.cssText =
-      "position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;";
-    document.body.appendChild(bait);
-
-    // 3) Same-origin network bait: many blockers filter by URL pattern
-    // regardless of domain, so a request to a path that merely looks like
-    // an ad script gets blocked before it ever reaches the network. A
-    // normal browser gets back a plain 404; a blocker throws instead.
-    var netBlocked = false;
-    var netCheck = fetch("/pagead/ads.js", { method: "HEAD", cache: "no-store" }).catch(
-      function () {
-        netBlocked = true;
-      }
-    );
-
-    Promise.race([netCheck, new Promise(function (r) { setTimeout(r, 400); })]).then(
-      function () {
-        setTimeout(function () {
-          var blocked = window.__adBlocked === true || netBlocked;
-          var rect = bait.getBoundingClientRect();
-          var style = window.getComputedStyle(bait);
-
-          if (
-            bait.offsetParent === null ||
-            rect.height === 0 ||
-            style.display === "none" ||
-            style.visibility === "hidden"
-          ) {
-            blocked = true;
-          }
-
-          document.body.removeChild(bait);
-          callback(blocked);
-        }, 150);
-      }
-    );
-  }
-
-  function runCheck() {
-    detectAdblock(function (blocked) {
-      wall.classList.toggle("hidden", !blocked);
-      document.documentElement.style.overflow = blocked ? "hidden" : "";
-    });
-  }
-
-  if (recheckBtn) {
-    recheckBtn.addEventListener("click", runCheck);
-  }
-
-  window.addEventListener("load", function () {
-    setTimeout(runCheck, 500);
-  });
-})();
-</script>
+<script src="https://pl31127467.profitableratecpmnetwork.com/65/b3/5e/65b35e2bb31ceb181f4f5d0cdfb50227.js"></script>
 
 </body>
 </html>
