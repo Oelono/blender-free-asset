@@ -653,11 +653,7 @@ class="lib-search-input w-full bg-[var(--bg-raised)] border border-[var(--line)]
 </div>
 <div class="form-field">
 <label data-i18n="comment_captcha_label">Anti-bot check</label>
-<div class="captcha-box">
-<span class="cap-q" id="gb-captcha-question">2 + 3 = ?</span>
-<button type="button" class="cap-refresh" id="gb-captcha-refresh" title="New question">&#8635;</button>
-</div>
-<input id="gb-captcha-answer" type="text" inputmode="numeric" maxlength="3" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="margin-top:8px;">
+<div id="recaptcha-guestbook" style="margin-top:4px;"></div>
 </div>
 <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="wall_submit">Post message</button>
 </form>
