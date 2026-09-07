@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>من نحن — Oelono Blender Asset</title>
+<link rel="icon" type="image/jpeg" href="we.png">
+<meta name="description" content="تعرف على Oelono Blender Asset، منصة عربية متخصصة لدعم مصممي وفناني الثري دي ومستخدمي Blender بمكتبة متجددة من الأصول والمجسمات الجاهزة.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://oelono.github.io/about.html">
+<meta name="google-adsense-account" content="ca-pub-2827589221947089">
+
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2827589221947089" crossorigin="anonymous"></script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#0A0A0A;
+--bg-raised:#141414;
+--line:#262626;
+--ink:#FFFFFF;
+--ink-dim:#8F8F8F;
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+background:var(--bg);
+color:var(--ink);
+font-family:'Tajawal',sans-serif;
+overflow-x:hidden;
+}
+.font-display{ font-family:'Tajawal',sans-serif; font-weight:700; letter-spacing:0; }
+.btn-primary{
+background: var(--ink);
+color:#0A0A0A;
+font-weight:600;
+transition: transform .16s cubic-bezier(.22,.9,.3,1), box-shadow .16s ease;
+}
+.btn-primary:hover{
+transform: translateY(-1px) scale(1.015);
+box-shadow: 0 10px 26px -12px rgba(255,255,255,0.25);
+}
+.card{
+background: var(--bg-raised);
+border:1px solid var(--line);
+transition: border-color .2s cubic-bezier(.22,.9,.3,1), transform .2s cubic-bezier(.22,.9,.3,1);
+}
+.card:hover{
+border-color: var(--ink);
+transform: translateY(-4px);
+}
+.policy-card{
+background: var(--bg-raised);
+border:1px solid var(--line);
+}
+.policy-card p{
+line-height:2;
+color:var(--ink-dim);
+margin-bottom:1.1rem;
+}
+.policy-card h2{
+font-family:'Tajawal',sans-serif;
+font-weight:700;
+color:var(--ink);
+margin-top:2rem;
+margin-bottom:.75rem;
+}
+.policy-card h2:first-child{ margin-top:0; }
+.policy-card a{
+color:var(--ink);
+text-decoration:underline;
+text-decoration-color:var(--line);
+text-underline-offset:3px;
+transition: text-decoration-color .16s ease;
+}
+.policy-card a:hover{ text-decoration-color:var(--ink); }
+.team-avatar{
+width:76px; height:76px; border-radius:9999px;
+display:flex; align-items:center; justify-content:center;
+font-family:'Tajawal',sans-serif; font-weight:700; font-size:26px;
+color:#0A0A0A; flex-shrink:0;
+}
+.discord-chip{
+display:inline-flex; align-items:center; gap:6px;
+font-size:12px; color:var(--ink-dim);
+border:1px solid var(--line); border-radius:999px;
+padding:5px 12px; transition: all .16s ease;
+}
+.discord-chip:hover{ border-color:#5865F2; color:var(--ink); background:rgba(88,101,242,0.1); }
+
+/* ---------- Discord-style member badge (matches in-app look) ---------- */
+.discord-badge{
+display:inline-flex; align-items:center; gap:10px;
+background:linear-gradient(90deg,#1e1e24 0%,#2b1a3a 60%,#3a1f4d 100%);
+border:1px solid var(--line);
+border-radius:10px;
+padding:8px 14px 8px 8px;
+overflow:hidden;
+position:relative;
+text-decoration:none !important;
+transition: border-color .16s ease, transform .16s ease;
+}
+.discord-badge:hover{ border-color:#8a5cf6; transform:translateY(-2px); }
+.discord-badge img.db-avatar{
+width:40px; height:40px; border-radius:9999px; object-fit:cover; flex-shrink:0;
+border:2px solid rgba(255,255,255,0.08);
+}
+.discord-badge .db-name{
+font-family:'Tajawal',sans-serif; font-weight:700; font-size:15px; color:#fff;
+white-space:nowrap;
+}
+.discord-badge .db-tag{
+display:inline-flex; align-items:center; gap:4px;
+background:rgba(255,255,255,0.08); border-radius:6px;
+padding:3px 8px; font-size:11px; font-weight:700; color:#e7e7ea;
+letter-spacing:.3px;
+}
+::-webkit-scrollbar{ width:10px; }
+::-webkit-scrollbar-track{ background:var(--bg); }
+::-webkit-scrollbar-thumb{ background:#1F1F1F; border-radius:8px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- NAV -->
+<header class="sticky top-0 z-40 border-b border-[var(--line)] bg-[#0A0A0A]/90 backdrop-blur">
+<div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<a href="index.html" class="flex items-center gap-2.5">
+<img src="106993307.jpg" alt="Oelono" class="w-[26px] h-[26px] rounded-full object-cover">
+<span class="font-display text-lg font-semibold tracking-tight">Oelono</span>
+</a>
+<nav class="hidden md:flex items-center gap-8 text-sm text-[var(--ink-dim)]">
+<a href="index.html#library" class="hover:text-[var(--ink)] transition-colors">المكتبة</a>
+<a href="index.html#how-it-works" class="hover:text-[var(--ink)] transition-colors">آلية التحميل</a>
+<a href="about.html" class="hover:text-[var(--ink)] transition-colors">من نحن</a>
+<a href="index.html#contact" class="hover:text-[var(--ink)] transition-colors">تواصل معنا</a>
+</nav>
+<a href="index.html" class="btn-primary text-sm px-4 py-2 rounded-md">الرجوع للموقع</a>
+</div>
+</header>
+
+<!-- ABOUT HEADER -->
+<section class="border-b border-[var(--line)]">
+<div class="max-w-4xl mx-auto px-6 pt-16 pb-6 md:pt-20">
+<h1 class="font-display text-3xl md:text-4xl font-bold mb-3">من نحن؟</h1>
+<p class="text-sm text-[var(--ink-dim)]">تعرف على Oelono Blender Asset وفريق العمل</p>
+</div>
+</section>
+
+<!-- ABOUT CONTENT -->
+<section>
+<div class="max-w-4xl mx-auto px-6 py-12 md:py-16">
+<div class="policy-card rounded-2xl p-6 md:p-10">
+
+<p class="text-lg text-[var(--ink)] font-semibold mb-4">مرحباً بك في Oelono Blender Asset!</p>
+
+<p>نحن منصة متخصصة تهدف إلى دعم المصممين والفنانين ثلاثيي الأبعاد (3D Artists) ومستخدمي برنامج Blender. نوفر لك مكتبة متجددة من الأصول (Assets)، المجسمات، والملفات المجهزة لتسهيل عملك وتسريع سير مشاريعك التصميمية.</p>
+
+<h2 class="text-xl md:text-2xl">رؤيتنا</h2>
+<p>تقديم محتوى عالي الجودة وسهل الاستخدام، يسهم في تطوير مهارات المصمم العربي وتوفير الوقت والجهد في بناء البيئات والمجسمات المعقدة.</p>
+
+<h2 class="text-xl md:text-2xl">لماذا Oelono؟</h2>
+<p>نسعى دائماً إلى اختيار وتجهيز الأصول بعناية للتوافق المباشر مع برنامج بلندر، سواء كنت مبتدئاً تبحث عن موارد مجانية لتتعلم عليها أو محترفاً تبحث عن خامات وموديلات جاهزة للاستخدام في مشاريعك.</p>
+
+</div>
+</div>
+</section>
+
+<!-- TEAM -->
+<section class="border-t border-[var(--line)]">
+<div class="max-w-4xl mx-auto px-6 py-12 md:py-16">
+<h2 class="font-display text-2xl md:text-3xl font-semibold mb-2">فريق العمل</h2>
+<p class="text-sm text-[var(--ink-dim)] mb-8">تقدر تتواصل مع الفريق مباشرة عبر ديسكورد.</p>
+
+<div class="grid sm:grid-cols-2 gap-6">
+
+<!-- OWNER -->
+<div class="card rounded-xl p-6 flex flex-col gap-4">
+<div>
+<p class="font-semibold text-base">Owner</p>
+<p class="text-xs text-[var(--ink-dim)]">مؤسس ومالك الموقع</p>
+</div>
+<a href="https://discord.com/users/697176074727194634" target="_blank" rel="noopener" class="discord-badge w-fit">
+<img src="owner-avatar.png" alt="Oe_Bear" class="db-avatar">
+<span class="db-name">Oe_Bear</span>
+<span class="db-tag">⚔️ CYBR</span>
+</a>
+</div>
+
+<!-- FRIEND -->
+<div class="card rounded-xl p-6 flex flex-col gap-4">
+<div>
+<p class="font-semibold text-base">Friend of the Owner</p>
+<p class="text-xs text-[var(--ink-dim)]">مساعد ومتعاون في الموقع</p>
+</div>
+<a href="https://discord.com/users/798203108974788649" target="_blank" rel="noopener" class="discord-badge w-fit">
+<div class="team-avatar" style="width:40px;height:40px;font-size:16px;background:linear-gradient(135deg,#FF6B6B,#FFD24C);">F</div>
+<span class="db-name">Discord ID</span>
+<span class="db-tag">798203108974788649</span>
+</a>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-[var(--line)]">
+<div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--ink-dim)]">
+<span>© <span id="year"></span> Oelono. من صنع Oelono.</span>
+<div class="flex gap-6">
+<a href="index.html#contact" class="hover:text-[var(--ink)] transition-colors">تواصل معنا</a>
+<a href="about.html" class="hover:text-[var(--ink)] transition-colors">من نحن</a>
+<a href="privacy.html" class="hover:text-[var(--ink)] transition-colors">سياسة الخصوصية</a>
+<a href="index.html#top" class="hover:text-[var(--ink)] transition-colors">العودة للأعلى</a>
+</div>
+</div>
+</footer>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
