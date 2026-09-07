@@ -1190,6 +1190,31 @@ const CONTACT_EMAIL = "requests@oelono.dev"; // TODO: replace with your real inb
    ========================================================= */
 const WORKER_URL = "https://discord-bot.beenbeen123455678.workers.dev/submit";
 
+/* =========================================================
+   reCAPTCHA verification (via the oelono-comments Worker)
+   --------------------------------------------------------
+   The Worker holds the reCAPTCHA SECRET key (never exposed to the
+   browser) and checks the token against Google before we accept a
+   comment / wall message as human-submitted.
+   ========================================================= */
+const COMMENTS_API_URL = "https://oelono-comments.beenbeen123455678.workers.dev";
+
+async function verifyRecaptcha(token) {
+  if (!token) return false;
+  try {
+    const res = await fetch(`${COMMENTS_API_URL}/verify-captcha`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+    const data = await res.json();
+    return !!(data && data.success);
+  } catch (err) {
+    console.error("[reCAPTCHA] verify failed:", err);
+    return false;
+  }
+}
+
 async function sendToDiscord(type, { title, description, fields = [], footer = "" }) {
   if (!WORKER_URL || WORKER_URL.includes("YOUR-SUBDOMAIN")) {
     console.warn("[Discord] WORKER_URL not configured yet in script.js.");
@@ -1550,25 +1575,6 @@ function refreshCommentCounts() {
   });
 }
 
-// --- Captcha (simple math question) ---
-let captchaSolution = 0;
-function generateCaptcha() {
-  const a = Math.floor(Math.random() * 8) + 1;   // 1-8
-  const b = Math.floor(Math.random() * 8) + 1;   // 1-8
-  const ops = ["+", "-"];
-  const op = ops[Math.floor(Math.random() * ops.length)];
-  let q, ans;
-  if (op === "+") { q = a + " + " + b; ans = a + b; }
-  else {
-    // keep subtraction non-negative
-    const big = Math.max(a, b), small = Math.min(a, b);
-    q = big + " - " + small; ans = big - small;
-  }
-  captchaSolution = ans;
-  const qEl = document.getElementById("captcha-question");
-  if (qEl) qEl.textContent = q + " = ?";
-}
-
 // --- Comments modal ---
 const commentsModal = document.getElementById("comments-modal");
 const commentsClose = document.getElementById("comments-close");
@@ -1580,8 +1586,6 @@ const commentAvgText = document.getElementById("comment-avg-text");
 const commentForm = document.getElementById("comment-form");
 const commentNameInput = document.getElementById("comment-name");
 const commentTextInput = document.getElementById("comment-text");
-const captchaAnswerInput = document.getElementById("captcha-answer");
-const captchaRefreshBtn = document.getElementById("captcha-refresh");
 let activeCommentProduct = null;
 
 function starsString(n) {
@@ -1621,8 +1625,10 @@ function openCommentsModal(product) {
   activeCommentProduct = product;
   commentsAssetName.textContent = product.title || "";
   renderComments(product.id);
-  generateCaptcha();
   commentForm.reset();
+  if (window.grecaptcha && window.commentRecaptchaWidgetId !== null) {
+    grecaptcha.reset(window.commentRecaptchaWidgetId);
+  }
   commentsModal.classList.remove("hidden");
   commentsModal.classList.add("flex");
   document.body.style.overflow = "hidden";
@@ -1639,7 +1645,6 @@ commentsClose.addEventListener("click", closeCommentsModal);
 commentsModal.addEventListener("click", (e) => {
   if (e.target === commentsModal) closeCommentsModal();
 });
-if (captchaRefreshBtn) captchaRefreshBtn.addEventListener("click", generateCaptcha);
 
 commentForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -1647,12 +1652,23 @@ commentForm.addEventListener("submit", async (e) => {
   const text = commentTextInput.value.trim();
   const ratingInput = commentForm.querySelector('input[name="rating"]:checked');
   const rating = ratingInput ? parseInt(ratingInput.value, 10) : 0;
-  const capAns = (captchaAnswerInput.value || "").trim();
+  const recaptchaToken = window.grecaptcha && window.commentRecaptchaWidgetId !== null
+    ? grecaptcha.getResponse(window.commentRecaptchaWidgetId)
+    : "";
 
   if (!name) { showToast(t("comment_error_name")); return; }
   if (!text) { showToast(t("comment_error_text")); return; }
-  if (parseInt(capAns, 10) !== captchaSolution) { showToast(t("comment_error_captcha")); return; }
+  if (!recaptchaToken) { showToast(t("comment_error_captcha")); return; }
   if (containsProfanity(name + " " + text)) { showToast(t("comment_error_profanity")); return; }
+
+  const captchaOk = await verifyRecaptcha(recaptchaToken);
+  if (!captchaOk) {
+    showToast(t("comment_error_captcha"));
+    if (window.grecaptcha && window.commentRecaptchaWidgetId !== null) {
+      grecaptcha.reset(window.commentRecaptchaWidgetId);
+    }
+    return;
+  }
 
   const comment = {
     name: name,
@@ -1666,7 +1682,9 @@ commentForm.addEventListener("submit", async (e) => {
   renderComments(activeCommentProduct.id);
   refreshCommentCounts();
   commentForm.reset();
-  generateCaptcha();
+  if (window.grecaptcha && window.commentRecaptchaWidgetId !== null) {
+    grecaptcha.reset(window.commentRecaptchaWidgetId);
+  }
   showToast(t("comment_success"));
 
   // 2) Push to Discord (best-effort)
@@ -1698,11 +1716,8 @@ const gbCount = document.getElementById("gb-count");
 const gbAvgWrap = document.getElementById("gb-avg-wrap");
 const gbAvgStars = document.getElementById("gb-avg-stars");
 const gbAvgText = document.getElementById("gb-avg-text");
-const gbCaptchaQ = document.getElementById("gb-captcha-question");
-const gbCaptchaRefresh = document.getElementById("gb-captcha-refresh");
 const gbNameInput = document.getElementById("gb-name");
 const gbTextInput = document.getElementById("gb-text");
-const gbCaptchaAnswer = document.getElementById("gb-captcha-answer");
 
 // --- storage ---
 function getGuestbook() {
@@ -1713,23 +1728,6 @@ function getGuestbook() {
 }
 function saveGuestbook(arr) {
   try { localStorage.setItem(GUESTBOOK_KEY, JSON.stringify(arr)); } catch (e) {}
-}
-
-// --- wall captcha (kept separate from the asset-comments captcha) ---
-let gbCaptchaSolution = 0;
-function generateGbCaptcha() {
-  const a = Math.floor(Math.random() * 8) + 1;
-  const b = Math.floor(Math.random() * 8) + 1;
-  const ops = ["+", "-"];
-  const op = ops[Math.floor(Math.random() * ops.length)];
-  let q, ans;
-  if (op === "+") { q = a + " + " + b; ans = a + b; }
-  else {
-    const big = Math.max(a, b), small = Math.min(a, b);
-    q = big + " - " + small; ans = big - small;
-  }
-  gbCaptchaSolution = ans;
-  if (gbCaptchaQ) gbCaptchaQ.textContent = q + " = ?";
 }
 
 // --- render ---
@@ -1771,19 +1769,29 @@ function renderGuestbook() {
 
 // --- form ---
 if (gbForm) {
-  if (gbCaptchaRefresh) gbCaptchaRefresh.addEventListener("click", generateGbCaptcha);
   gbForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = gbNameInput.value.trim();
     const text = gbTextInput.value.trim();
     const ratingInput = gbForm.querySelector('input[name="gb-rating"]:checked');
     const rating = ratingInput ? parseInt(ratingInput.value, 10) : 0;
-    const capAns = (gbCaptchaAnswer.value || "").trim();
+    const recaptchaToken = window.grecaptcha && window.wallRecaptchaWidgetId !== null
+      ? grecaptcha.getResponse(window.wallRecaptchaWidgetId)
+      : "";
 
     if (!name) { showToast(t("comment_error_name")); return; }
     if (!text) { showToast(t("comment_error_text")); return; }
-    if (parseInt(capAns, 10) !== gbCaptchaSolution) { showToast(t("comment_error_captcha")); generateGbCaptcha(); return; }
+    if (!recaptchaToken) { showToast(t("comment_error_captcha")); return; }
     if (containsProfanity(name + " " + text)) { showToast(t("comment_error_profanity")); return; }
+
+    const captchaOk = await verifyRecaptcha(recaptchaToken);
+    if (!captchaOk) {
+      showToast(t("comment_error_captcha"));
+      if (window.grecaptcha && window.wallRecaptchaWidgetId !== null) {
+        grecaptcha.reset(window.wallRecaptchaWidgetId);
+      }
+      return;
+    }
 
     const entry = { name, text, rating, ts: Date.now() };
     const arr = getGuestbook();
@@ -1791,7 +1799,9 @@ if (gbForm) {
     saveGuestbook(arr);
     renderGuestbook();
     gbForm.reset();
-    generateGbCaptcha();
+    if (window.grecaptcha && window.wallRecaptchaWidgetId !== null) {
+      grecaptcha.reset(window.wallRecaptchaWidgetId);
+    }
     showToast(t("wall_success"));
 
     // best-effort Discord push (same webhook as comments)
@@ -1809,7 +1819,6 @@ if (gbForm) {
 }
 
 function initGuestbook() {
-  generateGbCaptcha();
   renderGuestbook();
 }
 initGuestbook();
