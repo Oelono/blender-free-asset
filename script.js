@@ -65,6 +65,7 @@ const translations = {
     footer_top: "Back to top",
     footer_contact: "Contact",
     footer_privacy: "Privacy Policy",
+    footer_terms: "Terms & Conditions",
     nav_about: "About",
     contact_heading: "Contact us",
     contact_desc: "Got a question, a bug report, or a takedown request? Reach out any time — we read every message.",
@@ -178,6 +179,7 @@ const translations = {
     footer_top: "العودة للأعلى",
     footer_contact: "تواصل معنا",
     footer_privacy: "سياسة الخصوصية",
+    footer_terms: "الشروط والأحكام",
     nav_about: "من نحن",
     contact_heading: "تواصل معنا",
     contact_desc: "عندك سؤال أو مشكلة أو طلب حذف محتوى؟ تواصل معنا في أي وقت — بنقرأ كل رسالة توصلنا.",
@@ -291,6 +293,7 @@ const translations = {
     footer_top: "Наверх",
     footer_contact: "Контакты",
     footer_privacy: "Политика конфиденциальности",
+    footer_terms: "Условия использования",
     nav_about: "О нас",
     contact_heading: "Связаться с нами",
     contact_desc: "Вопрос, сообщение об ошибке или запрос на удаление контента? Пишите в любое время — мы читаем каждое сообщение.",
@@ -1309,6 +1312,58 @@ reportForm.addEventListener("submit", async (e) => {
 });
 
 /* ---------------------------------------------------------
+   ABOUT / PRIVACY / TERMS — GLASS INFO MODALS
+   --------------------------------------------------------- */
+const infoModals = {
+  about: document.getElementById("about-modal"),
+  privacy: document.getElementById("privacy-modal"),
+  terms: document.getElementById("terms-modal"),
+};
+
+function openInfoModal(name) {
+  const modal = infoModals[name];
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+  document.body.style.overflow = "hidden";
+}
+
+function closeInfoModal(name) {
+  const modal = infoModals[name];
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  document.body.style.overflow = "";
+}
+
+function closeAllInfoModals() {
+  Object.keys(infoModals).forEach(closeInfoModal);
+}
+
+document.querySelectorAll("[data-info-modal]").forEach((btn) => {
+  btn.addEventListener("click", () => openInfoModal(btn.getAttribute("data-info-modal")));
+});
+
+Object.entries(infoModals).forEach(([name, modal]) => {
+  if (!modal) return;
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeInfoModal(name); });
+  modal.querySelectorAll("[data-info-close]").forEach((btn) => {
+    btn.addEventListener("click", () => closeInfoModal(name));
+  });
+});
+
+// link inside the privacy modal that jumps to the contact section
+document.querySelectorAll("[data-info-modal-jump]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const target = btn.getAttribute("data-info-modal-jump");
+    closeAllInfoModals();
+    document.body.style.overflow = "";
+    const el = document.querySelector(target);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  });
+});
+
+/* ---------------------------------------------------------
    REQUEST A MODEL MODAL
    --------------------------------------------------------- */
 const requestModal = document.getElementById("request-modal");
@@ -1710,6 +1765,7 @@ document.addEventListener("keydown", (e) => {
   if (!reportModal.classList.contains("hidden")) closeReportModal();
   if (!requestModal.classList.contains("hidden")) closeRequestModal();
   if (!commentsModal.classList.contains("hidden")) closeCommentsModal();
+  closeAllInfoModals();
 });
 
 initLanguage();
