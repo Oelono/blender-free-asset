@@ -674,7 +674,7 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="contact_heading">Contact us</h2>
 <p class="text-sm text-[var(--ink-dim)] mt-3 max-w-2xl" data-i18n="contact_desc">Got a question, a bug report, or a takedown request? Reach out any time — we read every message.</p>
 <div class="flex flex-wrap items-center gap-3 mt-6">
-<a href="https://mail.google.com/mail/?view=cm&fs=1&to=beenbeen123455678@gmail.com&su=Website%20inquiry" target="_blank" rel="noopener" class="btn-primary inline-flex items-center px-5 py-2.5 rounded-lg text-sm">beenbeen123455678@gmail.com</a>
+<a href="https://mail.google.com/mail/?view=cm&fs=1&to=beenbeen123455678@gmail.com&su=Website%20inquiry" target="_blank" rel="noopener" data-confirm-leave class="btn-primary inline-flex items-center px-5 py-2.5 rounded-lg text-sm">beenbeen123455678@gmail.com</a>
 </div>
 </div>
 </section>
@@ -684,12 +684,12 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <span>© <span id="year"></span> Oelono <span data-i18n="footer_built">Built by Oelono.</span></span>
 <div class="flex gap-6">
 <button id="open-request-modal-footer" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_request_label">Request a model</button>
-<a href="https://mail.google.com/mail/?view=cm&fs=1&to=beenbeen123455678@gmail.com&su=Website%20inquiry" target="_blank" rel="noopener" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_contact">Contact</a>
+<a href="https://mail.google.com/mail/?view=cm&fs=1&to=beenbeen123455678@gmail.com&su=Website%20inquiry" target="_blank" rel="noopener" data-confirm-leave class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_contact">Contact</a>
 <button type="button" data-info-modal="about" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_about">About</button>
 <button type="button" data-info-modal="privacy" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_privacy">Privacy Policy</button>
 <button type="button" data-info-modal="terms" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_terms">Terms &amp; Conditions</button>
-<a href="/admin/" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
-<a href="https://github.com/" target="_blank" rel="noopener" class="hover:text-[var(--ink)] transition-colors">GitHub</a>
+<a href="/admin/" data-confirm-leave class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
+<a href="https://github.com/" target="_blank" rel="noopener" data-confirm-leave class="hover:text-[var(--ink)] transition-colors">GitHub</a>
 <a href="#top" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_top">Back to top</a>
 </div>
 </div>
@@ -786,6 +786,18 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 <p>نعرض كذلك محتوى قد يحمل في مضمونه سيرا ذاتية لأشخاص، مستنداً إلى المراسلات أو المقابلات التي تتم بيننا، ورغم أننا سنطّلع على الشهادات والوثائق التي تبين المستوى والكفاءات، إلا أننا لا نضمن صحتها 100%، ومنه فإن أي مغالطات تقع على مسؤولية أصحابها.</p>
 <p>لا نتحمل مسؤولية الأضرار التي قد تكون ناتجة عن عدم حسن تطبيق بعض الشروحات.</p>
 <p>استعمالك وتصفحك للموقع يعني موافقتك الكاملة على جميع الشروط الواردة في هذه الصفحة. إذا كنت لا توافق على الشروط الموجودة في هذه الصفحة، لا يسمح لك تصفح الموقع ومشاهدة محتوياته، ويجب عليك التوقف عن استخدامه الآن.</p>
+</div>
+</div>
+</div>
+
+<!-- LEAVE-SITE CONFIRMATION MODAL -->
+<div id="leave-site-modal" class="glass-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+<div class="glass-panel relative w-full max-w-sm rounded-2xl p-6 md:p-7 text-center">
+<h3 class="font-display text-lg font-bold mb-2">مغادرة الموقع</h3>
+<p class="text-sm text-[var(--ink-dim)] mb-6">أنت على وشك الانتقال إلى صفحة خارج Oelono Blender Asset. هل توافق على المتابعة؟</p>
+<div class="flex items-center justify-center gap-3">
+<button type="button" id="leave-site-cancel" class="chip px-5 py-2.5 rounded-md text-sm">خروج</button>
+<a id="leave-site-confirm" href="#" class="btn-primary px-5 py-2.5 rounded-md text-sm">موافق</a>
 </div>
 </div>
 </div>
