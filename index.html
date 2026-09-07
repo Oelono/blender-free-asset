@@ -80,6 +80,9 @@
 <!-- Google AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2827589221947089" crossorigin="anonymous"></script>
 
+<!-- Google reCAPTCHA v2 (comments anti-bot check) -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -994,11 +997,7 @@ shadow-intensity="0.9" exposure="0.95" environment-image="neutral" interaction-p
 </div>
 <div class="form-field">
 <label data-i18n="comment_captcha_label">Anti-bot check</label>
-<div class="captcha-box">
-<span class="cap-q" id="captcha-question">2 + 3 = ?</span>
-<button type="button" class="cap-refresh" id="captcha-refresh" title="New question">&#8635;</button>
-</div>
-<input id="captcha-answer" type="text" inputmode="numeric" maxlength="3" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="margin-top:8px;">
+<div id="recaptcha-comment" style="margin-top:4px;"></div>
 </div>
 <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="comment_submit">Post comment</button>
 </form>
