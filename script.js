@@ -1364,6 +1364,46 @@ document.querySelectorAll("[data-info-modal-jump]").forEach((btn) => {
 });
 
 /* ---------------------------------------------------------
+   LEAVE-SITE CONFIRMATION (Admin / GitHub / Contact / any
+   link marked with data-confirm-leave)
+   --------------------------------------------------------- */
+const leaveSiteModal = document.getElementById("leave-site-modal");
+const leaveSiteConfirm = document.getElementById("leave-site-confirm");
+const leaveSiteCancel = document.getElementById("leave-site-cancel");
+
+function openLeaveSiteModal(url, target) {
+  leaveSiteConfirm.setAttribute("href", url);
+  if (target) {
+    leaveSiteConfirm.setAttribute("target", target);
+    leaveSiteConfirm.setAttribute("rel", "noopener");
+  } else {
+    leaveSiteConfirm.removeAttribute("target");
+  }
+  leaveSiteModal.classList.remove("hidden");
+  leaveSiteModal.classList.add("flex");
+  document.body.style.overflow = "hidden";
+}
+
+function closeLeaveSiteModal() {
+  leaveSiteModal.classList.add("hidden");
+  leaveSiteModal.classList.remove("flex");
+  document.body.style.overflow = "";
+}
+
+if (leaveSiteModal && leaveSiteConfirm && leaveSiteCancel) {
+  document.querySelectorAll("[data-confirm-leave]").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      openLeaveSiteModal(link.getAttribute("href"), link.getAttribute("target"));
+    });
+  });
+
+  leaveSiteCancel.addEventListener("click", closeLeaveSiteModal);
+  leaveSiteConfirm.addEventListener("click", closeLeaveSiteModal);
+  leaveSiteModal.addEventListener("click", (e) => { if (e.target === leaveSiteModal) closeLeaveSiteModal(); });
+}
+
+/* ---------------------------------------------------------
    REQUEST A MODEL MODAL
    --------------------------------------------------------- */
 const requestModal = document.getElementById("request-modal");
@@ -1766,6 +1806,7 @@ document.addEventListener("keydown", (e) => {
   if (!requestModal.classList.contains("hidden")) closeRequestModal();
   if (!commentsModal.classList.contains("hidden")) closeCommentsModal();
   closeAllInfoModals();
+  if (leaveSiteModal && !leaveSiteModal.classList.contains("hidden")) closeLeaveSiteModal();
 });
 
 initLanguage();
