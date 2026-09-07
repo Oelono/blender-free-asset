@@ -1771,7 +1771,7 @@ function renderGuestbook() {
 
 // --- form ---
 if (gbForm) {
-  gbCaptchaRefresh.addEventListener("click", generateGbCaptcha);
+  if (gbCaptchaRefresh) gbCaptchaRefresh.addEventListener("click", generateGbCaptcha);
   gbForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = gbNameInput.value.trim();
