@@ -420,6 +420,7 @@ box-shadow:0 12px 30px -10px rgba(0,0,0,0.5);
 <nav class="hidden md:flex items-center gap-8 text-sm text-[var(--ink-dim)]">
 <a href="#library" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_library">Library</a>
 <a href="#how-it-works" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_how">How it works</a>
+<a href="#contact" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_contact">Contact</a>
 <a href="https://github.com/" target="_blank" rel="noopener" class="hover:text-[var(--ink)] transition-colors">GitHub</a>
 </nav>
 <div class="flex items-center gap-4">
@@ -611,11 +612,21 @@ class="w-full bg-[var(--bg-raised)] border border-[var(--line)] rounded-lg pl-11
 </div>
 </section>
 
+<!-- CONTACT -->
+<section id="contact" class="border-t border-[var(--line)]">
+<div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
+<h2 class="font-display text-2xl md:text-3xl font-semibold" data-i18n="contact_heading">Contact us</h2>
+<p class="text-sm text-[var(--ink-dim)] mt-3 max-w-2xl" data-i18n="contact_desc">Got a question, a bug report, or a takedown request? Reach out any time — we read every message.</p>
+<a href="mailto:beenbeen123455678@gmail.com" class="btn-primary inline-flex items-center mt-6 px-5 py-2.5 rounded-lg text-sm">beenbeen123455678@gmail.com</a>
+</div>
+</section>
+
 <footer class="border-t border-[var(--line)]">
 <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--ink-dim)]">
 <span>© <span id="year"></span> Oelono <span data-i18n="footer_built">Built by Oelono.</span></span>
 <div class="flex gap-6">
 <button id="open-request-modal-footer" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_request_label">Request a model</button>
+<a href="#contact" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_contact">Contact</a>
 <a href="/admin/" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_admin">Admin</a>
 <a href="#top" class="hover:text-[var(--ink)] transition-colors" data-i18n="footer_top">Back to top</a>
 </div>
