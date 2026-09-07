@@ -653,7 +653,13 @@ class="lib-search-input w-full bg-[var(--bg-raised)] border border-[var(--line)]
 </div>
 <div class="form-field">
 <label data-i18n="comment_captcha_label">Anti-bot check</label>
-<div id="recaptcha-guestbook" style="margin-top:4px;"></div>
+<div class="flex items-center gap-3">
+<span id="gb-captcha-question" class="text-sm" style="white-space:nowrap;"></span>
+<input id="gb-captcha-answer" type="text" inputmode="numeric" autocomplete="off" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="max-width:110px;">
+<button type="button" id="gb-captcha-refresh" aria-label="New question" class="hover:text-[var(--ink)] transition-colors" style="color:var(--ink-dim);">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 22v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L21 8M3 16l2.64 2.36A9 9 0 0 0 20.49 15"/></svg>
+</button>
+</div>
 </div>
 <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="wall_submit">Post message</button>
 </form>
@@ -993,7 +999,13 @@ shadow-intensity="0.9" exposure="0.95" environment-image="neutral" interaction-p
 </div>
 <div class="form-field">
 <label data-i18n="comment_captcha_label">Anti-bot check</label>
-<div id="recaptcha-comment" style="margin-top:4px;"></div>
+<div class="flex items-center gap-3">
+<span id="captcha-question" class="text-sm" style="white-space:nowrap;"></span>
+<input id="captcha-answer" type="text" inputmode="numeric" autocomplete="off" required data-i18n-placeholder="comment_captcha_placeholder" placeholder="Your answer" style="max-width:110px;">
+<button type="button" id="captcha-refresh" aria-label="New question" class="hover:text-[var(--ink)] transition-colors" style="color:var(--ink-dim);">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 22v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L21 8M3 16l2.64 2.36A9 9 0 0 0 20.49 15"/></svg>
+</button>
+</div>
 </div>
 <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-sm" data-i18n="comment_submit">Post comment</button>
 </form>
