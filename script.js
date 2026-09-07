@@ -13,7 +13,9 @@ const LIB_KEYS = ["blender", "games", "roblox"];
 const state = {
   products: [],
   activeCategory: { blender: "All", games: "All", roblox: "All" },
-  query: "",
+  // Each library now has its own search query, so typing in one section
+  // never filters or scrolls the other two.
+  query: { blender: "", games: "", roblox: "" },
   lang: "en",
 };
 
@@ -28,6 +30,9 @@ const translations = {
     nav_how: "How it works",
     nav_browse: "Browse assets",
     search_placeholder: "Search assets — try “cyberpunk character”",
+    search_placeholder_blender: "Search the Blender library…",
+    search_placeholder_games: "Search My Games…",
+    search_placeholder_roblox: "Search Roblox Assets…",
     chip_all: "All",
     chip_characters: "Characters",
     chip_environments: "Environments",
@@ -142,6 +147,9 @@ const translations = {
     nav_how: "طريقة الاستخدام",
     nav_browse: "تصفّح الأصول",
     search_placeholder: "ابحث عن أصل — جرّب «شخصية سايبربانك»",
+    search_placeholder_blender: "ابحث في مكتبة بلندر…",
+    search_placeholder_games: "ابحث في ألعابي…",
+    search_placeholder_roblox: "ابحث في مكتبة روبلوكس…",
     chip_all: "الكل",
     chip_characters: "شخصيات",
     chip_environments: "بيئات",
@@ -256,6 +264,9 @@ const translations = {
     nav_how: "Как это работает",
     nav_browse: "Смотреть ассеты",
     search_placeholder: "Поиск ассетов — например, «киберпанк персонаж»",
+    search_placeholder_blender: "Поиск в библиотеке Blender…",
+    search_placeholder_games: "Поиск в разделе «Мои игры»…",
+    search_placeholder_roblox: "Поиск в ассетах Roblox…",
     chip_all: "Все",
     chip_characters: "Персонажи",
     chip_environments: "Окружения",
@@ -413,10 +424,8 @@ function t(key) {
   return (translations[state.lang] && translations[state.lang][key]) ?? translations.en[key] ?? key;
 }
 
-const searchInput = document.getElementById("search-input");
-
-// Per-library DOM refs — one grid/empty-state/results-count/chips-wrap set
-// for each of the three stacked library sections.
+// Per-library DOM refs — one grid/empty-state/results-count/chips-wrap/search
+// set for each of the three stacked library sections.
 const els = {};
 LIB_KEYS.forEach(lib => {
   els[lib] = {
@@ -424,6 +433,7 @@ LIB_KEYS.forEach(lib => {
     emptyState: document.getElementById(`empty-state-${lib}`),
     resultsCount: document.getElementById(`results-count-${lib}`),
     chipsWrap: document.getElementById(`category-chips-${lib}`),
+    searchInput: document.getElementById(`search-input-${lib}`),
   };
 });
 
@@ -518,7 +528,7 @@ function renderSkeletons(n) {
 
 /* ---------- filtering ---------- */
 function getFiltered(lib) {
-  const q = state.query.trim().toLowerCase();
+  const q = state.query[lib].trim().toLowerCase();
   return state.products.filter(p => {
     // Products created before the "library" field existed are treated as
     // Blender assets, so nothing already in data/products.json disappears.
@@ -712,9 +722,15 @@ function escapeHtml(str = "") {
 function escapeAttr(str = "") { return escapeHtml(str); }
 
 /* ---------- search + chips + libraries ---------- */
-searchInput.addEventListener("input", (e) => {
-  state.query = e.target.value;
-  render();
+// Each library has its own search box, so typing in it only re-renders
+// that library's own grid — no jumping/scrolling caused by other sections.
+LIB_KEYS.forEach(lib => {
+  const input = els[lib].searchInput;
+  if (!input) return;
+  input.addEventListener("input", (e) => {
+    state.query[lib] = e.target.value;
+    renderLibrarySection(lib);
+  });
 });
 
 // Builds the category-chip row for every library's section (all three are
