@@ -51,7 +51,12 @@ collections:
                 name: "modelUrl"
                 widget: "file"
                 required: false
-                hint: "Upload a .glb or .gltf file. GLB is recommended because it can bundle textures and meshes into one file. Leave empty for Games/Roblox products."
+                hint: "Upload a .glb or .gltf file. GLB is recommended because it can bundle textures and meshes into one file. Leave empty for Games/Roblox products. Optional — you can use this OR the Preview Video field below instead."
+              - label: "Preview Video (MP4) — alternative to the 3D Model"
+                name: "previewVideoUrl"
+                widget: "file"
+                required: false
+                hint: "Upload a short .mp4 clip to use as the card's hover preview / preview button instead of a 3D model. Only used when the 3D Model field above is left empty — if both are filled, the 3D Model wins."
               - { label: "Blender Version (Blender assets only)", name: "blenderVersion", widget: "string", required: false, hint: "e.g. 4.2+. Leave empty for Games/Roblox." }
               - label: "Render Engine (Blender assets only)"
                 name: "engine"
