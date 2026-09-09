@@ -17,6 +17,9 @@ const state = {
   // never filters or scrolls the other two.
   query: { blender: "", games: "", roblox: "" },
   lang: "en",
+  // Comments + guestbook, loaded from data/comments.json (the single
+  // shared source of truth for the whole site — see loadComments()).
+  commentsData: { comments: {}, guestbook: [] },
 };
 
 /* =========================================================
@@ -90,9 +93,12 @@ const translations = {
     results_count: (n) => `${n} asset${n === 1 ? "" : "s"}`,
     nav_request_label: "Request a model",
     card_preview3d: "3D preview",
+    card_preview_video: "Video preview",
     card_report: "Report broken link",
     viewer_title: "3D preview",
+    viewer_title_video: "Video preview",
     viewer_hint: "Drag to rotate · scroll to zoom. This is a lightweight preview — the downloaded .blend file may include extra materials, rigs and lighting.",
+    viewer_hint_video: "A short preview clip of this asset.",
     viewer_unavailable: "No 3D preview is available for this asset yet.",
     report_title: "Report a broken link",
     report_reason_label: "What's wrong?",
@@ -207,9 +213,12 @@ const translations = {
     results_count: (n) => `${n} أصل`,
     nav_request_label: "طلب موديل جديد",
     card_preview3d: "معاينة 3D",
+    card_preview_video: "معاينة فيديو",
     card_report: "إبلاغ عن رابط مكسور",
     viewer_title: "معاينة ثلاثية الأبعاد",
+    viewer_title_video: "معاينة فيديو",
     viewer_hint: "اسحب للتدوير · مرّر للتكبير. هذه معاينة مبسطة — ملف .blend الأصلي قد يحتوي على خامات وريغ وإضاءة إضافية.",
+    viewer_hint_video: "مقطع فيديو قصير لمعاينة هذا الأصل.",
     viewer_unavailable: "لا تتوفر معاينة 3D لهذا الأصل حاليًا.",
     report_title: "إبلاغ عن رابط مكسور",
     report_reason_label: "ما هي المشكلة؟",
@@ -324,9 +333,12 @@ const translations = {
     results_count: (n) => `${n} ассет(ов)`,
     nav_request_label: "Запросить модель",
     card_preview3d: "3D просмотр",
+    card_preview_video: "Видео предпросмотр",
     card_report: "Сообщить о неработающей ссылке",
     viewer_title: "3D просмотр",
+    viewer_title_video: "Видео предпросмотр",
     viewer_hint: "Перетащите, чтобы вращать · прокрутите для масштаба. Это упрощённый предпросмотр — файл .blend может содержать больше материалов, риг и освещения.",
+    viewer_hint_video: "Короткий видеоролик с превью этого ассета.",
     viewer_unavailable: "Для этого ассета пока нет 3D-предпросмотра.",
     report_title: "Сообщить о неработающей ссылке",
     report_reason_label: "Что не так?",
@@ -499,7 +511,7 @@ async function loadProducts() {
     // Normalize CMS paths ("/blender-free-asset/assets/..." -> "assets/...")
     // so thumbnails/preview images always resolve, wherever the site is hosted.
     state.products.forEach(p => {
-      ["thumbnail", "previewImage", "previewGif", "modelUrl", "posterImage"].forEach(k => {
+      ["thumbnail", "previewImage", "previewGif", "modelUrl", "posterImage", "previewVideoUrl"].forEach(k => {
         if (p[k]) p[k] = normalizeAssetPath(p[k]);
       });
     });
@@ -591,6 +603,8 @@ function renderLibrarySection(lib) {
     let leaveTimer = null;
     let safetyTimer = null;
 
+    const isVideo = viewer.tagName === "VIDEO";
+
     const loadViewer = () => {
       if (leaveTimer) { clearTimeout(leaveTimer); leaveTimer = null; }
       enterTimer = setTimeout(() => {
@@ -601,15 +615,17 @@ function renderLibrarySection(lib) {
             viewer.setAttribute("src", src);
             viewer.dataset.loaded = "1";
             media.classList.add("model-loading");
-            // When the model has finished streaming, mark ready + show it.
-            viewer.addEventListener("load", () => {
+            // When the media has finished streaming, mark ready + show it.
+            // model-viewer fires "load"; <video> fires "loadeddata".
+            viewer.addEventListener(isVideo ? "loadeddata" : "load", () => {
               media.classList.remove("model-loading");
               media.classList.add("model-ready");
+              if (isVideo) viewer.play().catch(() => {});
             }, { once: true });
             viewer.addEventListener("error", () => {
               media.classList.remove("model-loading");
             }, { once: true });
-            // Safety: if the model hasn't loaded in 15s, drop the spinner
+            // Safety: if the media hasn't loaded in 15s, drop the spinner
             // so the card doesn't look frozen.
             safetyTimer = setTimeout(() => {
               media.classList.remove("model-loading");
@@ -617,6 +633,9 @@ function renderLibrarySection(lib) {
           } else {
             media.classList.add("model-ready");
           }
+        } else if (isVideo) {
+          viewer.currentTime = 0;
+          viewer.play().catch(() => {});
         }
         media.classList.add("show-3d");
       }, 120);
@@ -628,6 +647,7 @@ function renderLibrarySection(lib) {
       leaveTimer = setTimeout(() => {
         leaveTimer = null;
         media.classList.remove("show-3d");
+        if (isVideo) viewer.pause();
       }, 120);
     };
 
@@ -655,12 +675,16 @@ function cardTemplate(p) {
   const thumb = p.thumbnail || "https://placehold.co/600x400/0B0C10/00F0FF?text=Vaultframe";
   const preview = p.previewImage || p.previewGif || ""; // optional hover preview (image or GIF)
   const hasModel = !!p.modelUrl; // optional GLB/GLTF for the 3D viewer
+  // Optional MP4 preview — only used when there's no 3D model (modelUrl wins if both are set).
+  const hasVideo = !hasModel && !!p.previewVideoUrl;
+  const hasMedia = hasModel || hasVideo; // either a 3D model OR a video preview
   return `
     <article class="card rounded-xl overflow-hidden group">
-      <div class="card-media relative h-44${hasModel ? " has-3d" : ""}${preview ? " has-preview" : ""}">
+      <div class="card-media relative h-44${hasMedia ? " has-3d" : ""}${preview ? " has-preview" : ""}">
         <img class="card-thumb" src="${escapeAttr(thumb)}" alt="${escapeAttr(p.title)}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/600x400/0B0C10/00F0FF?text=Vaultframe'">
         ${preview ? `<img class="card-preview" src="${escapeAttr(preview)}" alt="" loading="lazy" aria-hidden="true" onerror="this.closest('.card-media').classList.remove('has-preview'); this.remove()">` : ""}
         ${hasModel ? `<model-viewer class="card-3d-viewer" data-model-src="${escapeAttr(p.modelUrl)}" alt="3D preview of ${escapeAttr(p.title)}" camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none" shadow-intensity="0.8" exposure="1"></model-viewer>` : ""}
+        ${hasVideo ? `<video class="card-3d-viewer card-video-preview" data-model-src="${escapeAttr(p.previewVideoUrl)}" muted loop playsinline preload="none" aria-hidden="true"></video>` : ""}
         <div class="absolute top-3 left-3 flex gap-1.5">
           ${(p.blenderVersion || p.platform) ? `<span class="badge px-2 py-1 rounded">${escapeHtml(p.blenderVersion || p.platform)}</span>` : ""}
         </div>
@@ -678,10 +702,10 @@ function cardTemplate(p) {
         </div>
         <div class="card-actions-row">
           <div style="display:flex;align-items:center;gap:8px;">
-            ${hasModel
+            ${hasMedia
               ? `<button data-viewer-id="${escapeAttr(p.id)}" class="btn-3d">
                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
-                   ${escapeHtml(t("card_preview3d"))}
+                   ${escapeHtml(hasModel ? t("card_preview3d") : t("card_preview_video"))}
                  </button>`
               : `<span></span>`}
             <button data-comments-id="${escapeAttr(p.id)}" class="comment-count-btn">
@@ -1215,6 +1239,58 @@ async function verifyRecaptcha(token) {
   }
 }
 
+/* =========================================================
+   Persist a comment or guestbook entry to data/comments.json.
+   This calls the SAME Worker as reCAPTCHA verification
+   (COMMENTS_API_URL), on a new "/submit-comment" route. That
+   route re-checks the honeypot/basic shape server-side, then
+   commits the updated data/comments.json straight to the repo
+   via the GitHub Contents API — see comments-worker/worker.js
+   for the deployable Worker source and setup notes.
+
+   `payload` is either:
+     { type: "comment",   productId, comment: {name,text,rating,ts} }
+     { type: "guestbook", entry: {name,text,rating,ts} }
+
+   On success, the Worker also returns the fresh comments.json so we
+   can update state.commentsData immediately without waiting for the
+   GitHub Pages rebuild (which normally takes under a minute).
+   Returns true/false.
+   ========================================================= */
+async function saveCommentRemote(payload) {
+  try {
+    const res = await fetch(`${COMMENTS_API_URL}/submit-comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) return false;
+    const data = await res.json().catch(() => null);
+    if (data && data.comments) {
+      // Server confirmed + returned the updated file — use it as-is.
+      state.commentsData = {
+        comments: data.comments.comments || {},
+        guestbook: data.comments.guestbook || [],
+      };
+    } else {
+      // Fallback: append optimistically on the client so the UI still
+      // reflects the new entry this session, even if the Worker didn't
+      // echo the file back.
+      if (payload.type === "comment") {
+        const id = payload.productId;
+        if (!Array.isArray(state.commentsData.comments[id])) state.commentsData.comments[id] = [];
+        state.commentsData.comments[id].push(payload.comment);
+      } else if (payload.type === "guestbook") {
+        state.commentsData.guestbook.push(payload.entry);
+      }
+    }
+    return true;
+  } catch (err) {
+    console.error("[comments] save failed:", err);
+    return false;
+  }
+}
+
 async function sendToDiscord(type, { title, description, fields = [], footer = "" }) {
   if (!WORKER_URL || WORKER_URL.includes("YOUR-SUBDOMAIN")) {
     console.warn("[Discord] WORKER_URL not configured yet in script.js.");
@@ -1260,21 +1336,41 @@ function showToast(message) {
 const viewerModal = document.getElementById("viewer-modal");
 const viewerClose = document.getElementById("viewer-close");
 const viewerTitleEl = document.getElementById("viewer-title");
+const viewerHintEl = document.getElementById("viewer-hint");
 const modelViewerEl = document.getElementById("model-viewer-el");
+const videoViewerEl = document.getElementById("video-viewer-el");
 
 function openViewerModal(product) {
-  if (!product.modelUrl) {
+  const hasModel = !!product.modelUrl;
+  const hasVideo = !hasModel && !!product.previewVideoUrl;
+  if (!hasModel && !hasVideo) {
     showToast(t("viewer_unavailable"));
     return;
   }
-  viewerTitleEl.textContent = product.title || t("viewer_title");
-  modelViewerEl.setAttribute("alt", product.title || "3D preview");
-  if (product.posterImage || product.thumbnail) {
-    modelViewerEl.setAttribute("poster", product.posterImage || product.thumbnail);
+
+  viewerTitleEl.textContent = product.title || (hasModel ? t("viewer_title") : t("viewer_title_video"));
+  if (viewerHintEl) viewerHintEl.textContent = hasModel ? t("viewer_hint") : t("viewer_hint_video");
+
+  if (hasModel) {
+    modelViewerEl.classList.remove("hidden");
+    videoViewerEl.classList.add("hidden");
+    modelViewerEl.setAttribute("alt", product.title || "3D preview");
+    if (product.posterImage || product.thumbnail) {
+      modelViewerEl.setAttribute("poster", product.posterImage || product.thumbnail);
+    } else {
+      modelViewerEl.removeAttribute("poster");
+    }
+    modelViewerEl.setAttribute("src", product.modelUrl);
+    videoViewerEl.removeAttribute("src");
+    videoViewerEl.pause();
   } else {
-    modelViewerEl.removeAttribute("poster");
+    videoViewerEl.classList.remove("hidden");
+    modelViewerEl.classList.add("hidden");
+    modelViewerEl.removeAttribute("src");
+    videoViewerEl.setAttribute("src", product.previewVideoUrl);
+    videoViewerEl.play().catch(() => {});
   }
-  modelViewerEl.setAttribute("src", product.modelUrl);
+
   viewerModal.classList.remove("hidden");
   viewerModal.classList.add("flex");
   document.body.style.overflow = "hidden";
@@ -1285,6 +1381,9 @@ function closeViewerModal() {
   viewerModal.classList.remove("flex");
   document.body.style.overflow = "";
   modelViewerEl.removeAttribute("src"); // stop rendering once hidden
+  videoViewerEl.pause();
+  videoViewerEl.removeAttribute("src");
+  videoViewerEl.load();
 }
 
 viewerClose.addEventListener("click", closeViewerModal);
@@ -1544,30 +1643,38 @@ function containsProfanity(text) {
   return false;
 }
 
-// --- localStorage helpers ---
-const COMMENTS_KEY = "vaultframe_comments_v1";
-function getAllComments() {
+/* =========================================================
+   COMMENTS STORAGE — single source of truth is data/comments.json.
+   The file is fetched once on load (loadComments, below) and kept in
+   state.commentsData. Comments are NEVER kept in localStorage anymore:
+   submitting a comment POSTs it to the comments Worker, which commits
+   the update to data/comments.json in the repo. The card counters and
+   the comments modal both read straight from state.commentsData, so
+   every visitor sees the same comments — not just their own browser.
+   ========================================================= */
+async function loadComments() {
   try {
-    return JSON.parse(localStorage.getItem(COMMENTS_KEY) || "{}");
-  } catch (e) { return {}; }
+    const res = await fetch("data/comments.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to load comments.json");
+    const json = await res.json();
+    state.commentsData = {
+      comments: (json && typeof json.comments === "object" && json.comments) || {},
+      guestbook: (json && Array.isArray(json.guestbook)) ? json.guestbook : [],
+    };
+  } catch (err) {
+    console.error(err);
+    state.commentsData = { comments: {}, guestbook: [] };
+  }
 }
-function saveAllComments(all) {
-  try { localStorage.setItem(COMMENTS_KEY, JSON.stringify(all)); } catch (e) {}
-}
+
 function getCommentsFor(productId) {
-  const all = getAllComments();
-  return Array.isArray(all[productId]) ? all[productId] : [];
-}
-function addCommentToStore(productId, comment) {
-  const all = getAllComments();
-  if (!Array.isArray(all[productId])) all[productId] = [];
-  all[productId].push(comment);
-  saveAllComments(all);
+  const list = state.commentsData.comments[productId];
+  return Array.isArray(list) ? list : [];
 }
 
 // --- Refresh the visible comment count badges on cards ---
 function refreshCommentCounts() {
-  const all = getAllComments();
+  const all = state.commentsData.comments;
   document.querySelectorAll("[data-cmt-for]").forEach(span => {
     const id = span.getAttribute("data-cmt-for");
     const list = Array.isArray(all[id]) ? all[id] : [];
@@ -1677,8 +1784,26 @@ commentForm.addEventListener("submit", async (e) => {
     ts: Date.now(),
   };
 
-  // 1) Save locally so it shows immediately
-  addCommentToStore(activeCommentProduct.id, comment);
+  const submitBtn = commentForm.querySelector('[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
+
+  // Save it to data/comments.json (via the comments Worker) — this is the
+  // ONLY place the comment is stored. There's no localStorage fallback:
+  // if this fails, the comment is not shown, because it wouldn't be visible
+  // to anyone else anyway.
+  const saved = await saveCommentRemote({
+    type: "comment",
+    productId: activeCommentProduct.id,
+    comment,
+  });
+
+  if (submitBtn) submitBtn.disabled = false;
+
+  if (!saved) {
+    showToast(t("comment_error_save"));
+    return;
+  }
+
   renderComments(activeCommentProduct.id);
   refreshCommentCounts();
   commentForm.reset();
@@ -1687,7 +1812,8 @@ commentForm.addEventListener("submit", async (e) => {
   }
   showToast(t("comment_success"));
 
-  // 2) Push to Discord (best-effort)
+  // Best-effort Discord notification for the site owner (in addition to,
+  // not instead of, the saved comment above).
   sendToDiscord("comment", {
     title: "\u{1F4AC} New Comment",
     description: "**Asset:** " + (activeCommentProduct.title || "Unknown"),
@@ -1699,9 +1825,6 @@ commentForm.addEventListener("submit", async (e) => {
     footer: "Vaultframe comments",
   }).then(() => {}).catch(() => {});
 });
-
-// Periodically refresh counts (in case comments added from another tab)
-window.addEventListener("storage", refreshCommentCounts);
 
 /* =========================================================
    SITE-WIDE COMMUNITY WALL (guestbook)
