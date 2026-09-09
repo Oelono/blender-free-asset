@@ -47,6 +47,7 @@
       "title": "Sample Roblox Script Pack — Replace me",
       "library": "roblox",
       "id": "sample-roblox-pack",
+      "previewVideoUrl": "assets/uploads/we.mp4",
       "description": "Placeholder entry for the Roblox Assets library. Duplicate this block in the CMS for each script, model or map you upload, then update the title, category (Scripts / Models / Maps), thumbnail and download link.",
       "fileSize": "3 MB",
       "category": "Scripts",
