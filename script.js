@@ -23,12 +23,11 @@ const state = {
 };
 
 /* =========================================================
-   Translations — UI chrome only. Product titles/descriptions
-   are entered once via the CMS and shown as-is in every language;
-   ask if you also want per-language product fields later.
+   UI strings — single English source. The site now relies on
+   automatic (browser/Google) translation instead of hand-maintained
+   per-language dictionaries, so we only need one set of strings.
    ========================================================= */
-const translations = {
-  en: {
+const strings = {
     nav_library: "Library",
     nav_how: "How it works",
     nav_browse: "Browse assets",
@@ -136,6 +135,7 @@ const translations = {
     comment_error_text: "Please write a comment.",
     comment_error_captcha: "Wrong answer to the anti-bot check.",
     comment_error_profanity: "Please keep your comment respectful.",
+    comment_error_save: "Couldn't save your comment — please try again.",
     comment_empty: "No comments yet. Be the first!",
     comment_avg_text: (n) => `Average: ${n.toFixed(1)} / 5`,
     wall_heading: "Community wall",
@@ -147,266 +147,8 @@ const translations = {
     wall_empty: "No messages yet. Be the first to write on the wall!",
     wall_success: "Your message is on the wall — thanks!",
     wall_count_label: (n) => `${n} ${n === 1 ? "message" : "messages"}`,
-  },
-  ar: {
-    nav_library: "المكتبة",
-    nav_how: "طريقة الاستخدام",
-    nav_browse: "تصفّح الأصول",
-    search_placeholder: "ابحث عن أصل — جرّب «شخصية سايبربانك»",
-    search_placeholder_blender: "ابحث في مكتبة بلندر…",
-    search_placeholder_games: "ابحث في ألعابي…",
-    search_placeholder_roblox: "ابحث في مكتبة روبلوكس…",
-    chip_all: "الكل",
-    chip_characters: "شخصيات",
-    chip_environments: "بيئات",
-    chip_shaders: "شيدرات",
-    chip_animations: "أنيميشن",
-    chip_assets: "أصول",
-    chip_full_games: "ألعاب كاملة",
-    chip_demos: "تجارب / نماذج أولية",
-    chip_dlc: "تعديلات / إضافات",
-    chip_scripts: "سكريبتات",
-    chip_models: "موديلات",
-    chip_maps: "خرائط",
-    lib_blender: "مكتبة بلندر",
-    lib_games: "ألعابي",
-    lib_roblox: "مكتبة روبلوكس",
-    library_heading: "المكتبة",
-    library_sub: "كل ملف يتم فحصه قبل إدراجه. إضافات جديدة أسبوعيًا.",
-    library_heading_blender: "مكتبة أصول بلندر",
-    library_sub_blender: "كل ملف يتم فحصه قبل إدراجه. إضافات جديدة أسبوعيًا.",
-    library_heading_games: "ألعابي",
-    library_sub_games: "ألعاب ونماذج تجريبية من صنعي — للتحميل مجانًا.",
-    library_heading_roblox: "مكتبة روبلوكس",
-    library_sub_roblox: "سكريبتات وموديلات وخرائط لروبلوكس ستوديو (.rbxl / .rbxm).",
-    empty_title: "لا توجد أصول مطابقة لبحثك.",
-    empty_sub: "جرّب كلمة بحث مختلفة أو ألغِ فلتر الفئة.",
-    how_heading: "طريقة التحميل",
-    how1_title: "اختر الأصل",
-    how1_desc: "تصفّح أو ابحث في أي مكتبة، ثم افتح لوحة التحميل لمعرفة مواصفاته.",
-    how2_title: "أكمل 4 خطوات سريعة",
-    how2_desc: "فيديو إعلاني لمدة 10 ثوانٍ، ثم 3 صفحات رعاة قصيرة — وهذا ما يبقي كل شيء مجانيًا.",
-    how3_title: "احصل على الملف",
-    how3_desc: "زر التحميل المباشر يظهر بعد الخطوة الرابعة مباشرة — بدون تسجيل دخول وبدون انتظار.",
-    footer_built: "من صنع Oelono.",
-    footer_admin: "الإدارة",
-    footer_top: "العودة للأعلى",
-    footer_contact: "تواصل معنا",
-    footer_privacy: "سياسة الخصوصية",
-    footer_terms: "الشروط والأحكام",
-    nav_about: "من نحن",
-    contact_heading: "تواصل معنا",
-    contact_desc: "عندك سؤال أو مشكلة أو طلب حذف محتوى؟ تواصل معنا في أي وقت — بنقرأ كل رسالة توصلنا.",
-    modal_filesize_label: "حجم الملف",
-    modal_engine_label: "محرك الرندر",
-    modal_license_label: "الترخيص",
-    modal_drive_btn: "تحميل الملف النهائي",
-    modal_hint_default: "تُفتح صفحة راعٍ في تبويب جديد لإبقاء المكتبة مجانية.",
-    modal_hint_ready: "ملفك جاهز — اضغط بالأسفل للتحميل المباشر.",
-    modal_hint_video: "بيتفرج على الإعلان — الخطوة الجاية هتفتح تلقائيًا بعد شوية.",
-    unlock_unlocking: (s) => `فتح الرابط خلال ${s} ثوانٍ…`,
-    unlock_ready: "الانتقال للخطوة التالية",
-    step_video_label: "إعلان",
-    step_of_label: (n, total) => `الخطوة ${n} من ${total}`,
-    ad_playing_label: "الإعلان شغّال…",
-    card_download: "تحميل",
-    results_count: (n) => `${n} أصل`,
-    nav_request_label: "طلب موديل جديد",
-    card_preview3d: "معاينة 3D",
-    card_preview_video: "معاينة فيديو",
-    card_report: "إبلاغ عن رابط مكسور",
-    viewer_title: "معاينة ثلاثية الأبعاد",
-    viewer_title_video: "معاينة فيديو",
-    viewer_hint: "اسحب للتدوير · مرّر للتكبير. هذه معاينة مبسطة — ملف .blend الأصلي قد يحتوي على خامات وريغ وإضاءة إضافية.",
-    viewer_hint_video: "مقطع فيديو قصير لمعاينة هذا الأصل.",
-    viewer_unavailable: "لا تتوفر معاينة 3D لهذا الأصل حاليًا.",
-    report_title: "إبلاغ عن رابط مكسور",
-    report_reason_label: "ما هي المشكلة؟",
-    report_reason_dead: "رابط التحميل لا يعمل",
-    report_reason_wrong: "الملف لا يطابق الوصف",
-    report_reason_corrupt: "الملف تالف / لا يفتح",
-    report_reason_other: "شيء آخر",
-    report_note_label: "تفاصيل (اختياري)",
-    report_note_placeholder: "أي شيء يساعدنا على الإصلاح بشكل أسرع…",
-    report_submit: "إرسال البلاغ",
-    report_success: "شكرًا — سنراجع هذا الأصل قريبًا.",
-    request_title: "طلب موديل جديد",
-    request_sub: "أخبرنا بما تحتاجه — إذا كان يناسب المكتبة، سنضيفه لقائمة الانتظار.",
-    request_desc_label: "ما هو الموديل الذي تحتاجه؟",
-    request_desc_placeholder: "مثال: محل حداد من العصور الوسطى بجدران متعددة منخفضة التفاصيل",
-    request_category_label: "الفئة",
-    request_contact_label: "البريد الإلكتروني (اختياري)",
-    request_contact_placeholder: "you@example.com",
-    request_ref_label: "رابط مرجعي (اختياري)",
-    request_ref_placeholder: "آرت ستيشن / بينترست / رابط صورة…",
-    request_submit: "إرسال الطلب",
-    request_success: "شكرًا — تم إرسال طلبك.",
-    request_error: "من فضلك اكتب وصف الموديل المطلوب.",
-    comments_title: "التعليقات",
-    comment_name_label: "اسمك",
-    comment_name_placeholder: "مجهول",
-    comment_rating_label: "تقييمك",
-    comment_text_label: "تعليقك",
-    comment_text_placeholder: "شارك رأيك حول هذا الأصل...",
-    comment_captcha_label: "اختبار منع الروبوتات",
-    comment_captcha_placeholder: "إجابتك",
-    comment_submit: "نشر التعليق",
-    comment_success: "شكراً لتعليقك!",
-    comment_error_name: "الرجاء إدخال اسمك.",
-    comment_error_text: "الرجاء كتابة تعليق.",
-    comment_error_captcha: "إجابة خاطئة لاختبار منع الروبوتات.",
-    comment_error_profanity: "الرجاء الحفاظ على احترام التعليق.",
-    comment_empty: "لا توجد تعليقات بعد. كن أول من يعلّق!",
-    comment_avg_text: (n) => `المتوسط: ${n.toFixed(1)} / 5`,
-    wall_heading: "حائط المجتمع",
-    wall_subheading: "سيبي رسالة عامة للموقع كله — ملاحظات، أفكار، أو حتى سلام. مش محتاجة تسجيل دخول.",
-    wall_form_title: "اكتب/ي رسالة",
-    wall_list_title: "أحدث الرسائل",
-    wall_text_placeholder: "قولي حاجة للمجتمع…",
-    wall_submit: "نشر الرسالة",
-    wall_empty: "لا توجد رسائل بعد. كوني أول من يكتب على الحائط!",
-    wall_success: "رسالتك على الحائط — شكراً!",
-    wall_count_label: (n) => `${n} ${n === 1 ? "رسالة" : "رسائل"}`,
-  },
-  ru: {
-    nav_library: "Библиотека",
-    nav_how: "Как это работает",
-    nav_browse: "Смотреть ассеты",
-    search_placeholder: "Поиск ассетов — например, «киберпанк персонаж»",
-    search_placeholder_blender: "Поиск в библиотеке Blender…",
-    search_placeholder_games: "Поиск в разделе «Мои игры»…",
-    search_placeholder_roblox: "Поиск в ассетах Roblox…",
-    chip_all: "Все",
-    chip_characters: "Персонажи",
-    chip_environments: "Окружения",
-    chip_shaders: "Шейдеры",
-    chip_animations: "Анимации",
-    chip_assets: "Ассеты",
-    chip_full_games: "Полные игры",
-    chip_demos: "Демо / прототипы",
-    chip_dlc: "Моды / DLC",
-    chip_scripts: "Скрипты",
-    chip_models: "Модели",
-    chip_maps: "Карты",
-    lib_blender: "Ассеты Blender",
-    lib_games: "Мои игры",
-    lib_roblox: "Ассеты Roblox",
-    library_heading: "Библиотека",
-    library_sub: "Каждый файл проверяется перед публикацией. Новинки каждую неделю.",
-    library_heading_blender: "Библиотека Blender",
-    library_sub_blender: "Каждый файл проверяется перед публикацией. Новинки каждую неделю.",
-    library_heading_games: "Мои игры",
-    library_sub_games: "Играбельные сборки и прототипы — бесплатно для скачивания.",
-    library_heading_roblox: "Ассеты Roblox",
-    library_sub_roblox: "Скрипты, модели и карты для Roblox Studio (.rbxl / .rbxm).",
-    empty_title: "Ничего не найдено по запросу.",
-    empty_sub: "Попробуйте другое слово или сбросьте фильтр категории.",
-    how_heading: "Как устроена загрузка",
-    how1_title: "Выберите ассет",
-    how1_desc: "Просмотрите или найдите нужный файл в любой библиотеке, затем откройте панель загрузки.",
-    how2_title: "Пройдите 4 коротких шага",
-    how2_desc: "10-секундная видеореклама, затем 3 коротких спонсорских страницы — это позволяет всему оставаться бесплатным.",
-    how3_title: "Заберите файл",
-    how3_desc: "Кнопка прямой загрузки появится сразу после шага 4 — без входа в аккаунт и без ожидания.",
-    footer_built: "Создано Oelono.",
-    footer_admin: "Админка",
-    footer_top: "Наверх",
-    footer_contact: "Контакты",
-    footer_privacy: "Политика конфиденциальности",
-    footer_terms: "Условия использования",
-    nav_about: "О нас",
-    contact_heading: "Связаться с нами",
-    contact_desc: "Вопрос, сообщение об ошибке или запрос на удаление контента? Пишите в любое время — мы читаем каждое сообщение.",
-    modal_filesize_label: "Размер файла",
-    modal_engine_label: "Движок рендера",
-    modal_license_label: "Лицензия",
-    modal_drive_btn: "Скачать финальный файл",
-    modal_hint_default: "Спонсорская страница откроется в новой вкладке — это поддерживает библиотеку бесплатной.",
-    modal_hint_ready: "Файл готов — нажмите ниже для прямой загрузки.",
-    modal_hint_video: "Идёт просмотр рекламы — следующий шаг откроется автоматически через несколько секунд.",
-    unlock_unlocking: (s) => `Разблокировка через ${s} с…`,
-    unlock_ready: "Перейти к следующему шагу",
-    step_video_label: "Реклама",
-    step_of_label: (n, total) => `Шаг ${n} из ${total}`,
-    ad_playing_label: "Реклама воспроизводится…",
-    card_download: "Скачать",
-    results_count: (n) => `${n} ассет(ов)`,
-    nav_request_label: "Запросить модель",
-    card_preview3d: "3D просмотр",
-    card_preview_video: "Видео предпросмотр",
-    card_report: "Сообщить о неработающей ссылке",
-    viewer_title: "3D просмотр",
-    viewer_title_video: "Видео предпросмотр",
-    viewer_hint: "Перетащите, чтобы вращать · прокрутите для масштаба. Это упрощённый предпросмотр — файл .blend может содержать больше материалов, риг и освещения.",
-    viewer_hint_video: "Короткий видеоролик с превью этого ассета.",
-    viewer_unavailable: "Для этого ассета пока нет 3D-предпросмотра.",
-    report_title: "Сообщить о неработающей ссылке",
-    report_reason_label: "Что не так?",
-    report_reason_dead: "Ссылка на скачивание не работает",
-    report_reason_wrong: "Файл не соответствует описанию",
-    report_reason_corrupt: "Файл повреждён / не открывается",
-    report_reason_other: "Другое",
-    report_note_label: "Подробности (необязательно)",
-    report_note_placeholder: "Всё, что поможет нам быстрее это исправить…",
-    report_submit: "Отправить сообщение",
-    report_success: "Спасибо — мы проверим этот ассет.",
-    request_title: "Запросить модель",
-    request_sub: "Расскажите, что вам нужно — если это подходит библиотеке, мы добавим её в очередь.",
-    request_desc_label: "Какая модель вам нужна?",
-    request_desc_placeholder: "например: низкополигональная кузница в средневековом стиле с модульными стенами",
-    request_category_label: "Категория",
-    request_contact_label: "Email (необязательно)",
-    request_contact_placeholder: "you@example.com",
-    request_ref_label: "Ссылка-референс (необязательно)",
-    request_ref_placeholder: "Artstation / Pinterest / ссылка на изображение…",
-    request_submit: "Отправить запрос",
-    request_success: "Спасибо — ваш запрос отправлен.",
-    request_error: "Пожалуйста, опишите нужную модель.",
-    comments_title: "Комментарии",
-    comment_name_label: "Ваше имя",
-    comment_name_placeholder: "Аноним",
-    comment_rating_label: "Ваша оценка",
-    comment_text_label: "Ваш комментарий",
-    comment_text_placeholder: "Поделитесь мыслями об этом ассете...",
-    comment_captcha_label: "Проверка от ботов",
-    comment_captcha_placeholder: "Ваш ответ",
-    comment_submit: "Опубликовать",
-    comment_success: "Спасибо за комментарий!",
-    comment_error_name: "Пожалуйста, введите имя.",
-    comment_error_text: "Пожалуйста, напишите комментарий.",
-    comment_error_captcha: "Неверный ответ на проверку.",
-    comment_error_profanity: "Пожалуйста, будьте вежливы в комментарии.",
-    comment_empty: "Пока нет комментариев. Будьте первым!",
-    comment_avg_text: (n) => `Средняя: ${n.toFixed(1)} / 5`,
-    wall_heading: "Стена сообщества",
-    wall_subheading: "Оставьте публичное сообщение для всего сайта — отзывы, идеи или просто поздоровайтесь. Без регистрации.",
-    wall_form_title: "Написать сообщение",
-    wall_list_title: "Последние сообщения",
-    wall_text_placeholder: "Скажите что-нибудь сообществу…",
-    wall_submit: "Опубликовать",
-    wall_empty: "Пока нет сообщений. Будьте первым на стене!",
-    wall_success: "Ваше сообщение на стене — спасибо!",
-    wall_count_label: (n) => `${n} ${n === 1 ? "сообщение" : "сообщений"}`,
-  },
 };
 
-const categoryLabels = {
-  en: {
-    Characters: "Characters", Environments: "Environments", Shaders: "Shaders", Animations: "Animations", Assets: "Assets",
-    "Full Games": "Full games", "Demos": "Demos / Prototypes", "Mods": "Mods / DLC",
-    "Scripts": "Scripts", "Models": "Models", "Maps": "Maps",
-  },
-  ar: {
-    Characters: "شخصيات", Environments: "بيئات", Shaders: "شيدرات", Animations: "أنيميشن", Assets: "أصول",
-    "Full Games": "ألعاب كاملة", "Demos": "تجارب / نماذج أولية", "Mods": "تعديلات / إضافات",
-    "Scripts": "سكريبتات", "Models": "موديلات", "Maps": "خرائط",
-  },
-  ru: {
-    Characters: "Персонажи", Environments: "Окружения", Shaders: "Шейдеры", Animations: "Анимации", Assets: "Ассеты",
-    "Full Games": "Полные игры", "Demos": "Демо / прототипы", "Mods": "Моды / DLC",
-    "Scripts": "Скрипты", "Models": "Модели", "Maps": "Карты",
-  },
-};
 
 /* =========================================================
    Libraries — three top-level sections that share the same
@@ -433,7 +175,7 @@ const LIBRARIES = {
 };
 
 function t(key) {
-  return (translations[state.lang] && translations[state.lang][key]) ?? translations.en[key] ?? key;
+  return strings[key] ?? key;
 }
 
 // Per-library DOM refs — one grid/empty-state/results-count/chips-wrap/search
@@ -452,10 +194,16 @@ LIB_KEYS.forEach(lib => {
 document.getElementById("year").textContent = new Date().getFullYear();
 
 /* =========================================================
-   Language switching
+   Static text fill-in
+   --------------------------------------------------------
+   The site content is written once, in English, and the manual
+   3-language translation system (and its ~400-line dictionary)
+   has been removed. Visitors who want another language use the
+   browser's/Google's automatic "Translate this page" feature
+   (see the Google Translate widget wired up in index.html) —
+   it covers every language, not just the three we used to
+   hand-maintain, and needs zero upkeep on our side.
    ========================================================= */
-const langSwitcher = document.getElementById("lang-switcher");
-
 function applyStaticTranslations() {
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.dataset.i18n;
@@ -465,37 +213,11 @@ function applyStaticTranslations() {
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
-  langSwitcher.querySelectorAll("button").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.lang === state.lang);
-  });
 }
-
-function setLanguage(lang) {
-  if (!translations[lang]) lang = "en";
-  state.lang = lang;
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-  try { localStorage.setItem("vaultframe-lang", lang); } catch (e) { /* ignore */ }
-  applyStaticTranslations();
-  renderCategoryChips(); // chip labels are library-dependent, so rebuild them for the new language
-  render(); // re-render products so card labels / category names / counts refresh
-  if (typeof renderGuestbook === "function") renderGuestbook(); // refresh wall labels/counts
-}
-
-langSwitcher.addEventListener("click", (e) => {
-  const btn = e.target.closest("[data-lang]");
-  if (!btn) return;
-  setLanguage(btn.dataset.lang);
-});
 
 function initLanguage() {
-  let saved = null;
-  try { saved = localStorage.getItem("vaultframe-lang"); } catch (e) { /* ignore */ }
-  const browserLang = (navigator.language || "en").slice(0, 2);
-  const initial = saved || (translations[browserLang] ? browserLang : "en");
-  state.lang = initial;
-  document.documentElement.lang = initial;
-  document.documentElement.dir = initial === "ar" ? "rtl" : "ltr";
+  document.documentElement.lang = "en";
+  document.documentElement.dir = "ltr";
   applyStaticTranslations();
   renderCategoryChips();
 }
@@ -693,7 +415,7 @@ function cardTemplate(p) {
         </div>
       </div>
       <div class="p-5">
-        <div class="text-xs text-[var(--ink-dim)] mb-1.5">${escapeHtml(translateCategory(p.category))}</div>
+        <div class="text-xs text-[var(--ink-dim)] mb-1.5">${escapeHtml(p.category || "")}</div>
         <h3 class="font-semibold leading-snug mb-1.5">${escapeHtml(p.title)}</h3>
         <p class="text-sm text-[var(--ink-dim)] line-clamp-2 mb-4">${escapeHtml(p.description || "")}</p>
         <div class="flex items-center justify-between">
@@ -721,10 +443,6 @@ function cardTemplate(p) {
       </div>
     </article>
   `;
-}
-
-function translateCategory(cat) {
-  return (categoryLabels[state.lang] && categoryLabels[state.lang][cat]) || cat || "";
 }
 
 /* Normalize image/file paths coming from the CMS.
@@ -767,7 +485,7 @@ function renderCategoryChips() {
     const libDef = LIBRARIES[lib];
     chipsWrap.innerHTML = libDef.categories.map(cat => {
       const key = libDef.chipKey[cat] || "";
-      const label = key ? t(key) : translateCategory(cat);
+      const label = key ? t(key) : (cat || "");
       const isActive = cat === state.activeCategory[lib];
       return `<button data-cat="${escapeAttr(cat)}" class="chip${isActive ? " active" : ""} px-3.5 py-1.5 rounded-full text-xs">${escapeHtml(label)}</button>`;
     }).join("");
@@ -843,21 +561,9 @@ let sponsorLinksPadded = [];
 // cancels credit for that stage instead of silently letting it pass.
 let sponsorWindow = null;
 
-const closedEarlyHint = {
-  en: "That sponsor tab was closed too early — reopen it and keep it open for the full countdown.",
-  ar: "قفلت صفحة الراعي بدري — افتحها تاني وسيبها لحد ما العداد يخلص.",
-  ru: "Спонсорская вкладка была закрыта слишком рано — откройте её снова и дождитесь окончания отсчёта.",
-};
-const reopenLabel = {
-  en: "Reopen sponsor link",
-  ar: "افتح رابط الراعي تاني",
-  ru: "Открыть спонсорскую ссылку снова",
-};
-const popupBlockedHint = {
-  en: "Your browser blocked that tab from opening — allow pop-ups for this site, then try again.",
-  ar: "المتصفح منع فتح الصفحة — لازم تسمح بالنوافذ المنبثقة (pop-ups) لهذا الموقع وتجرب تاني.",
-  ru: "Браузер заблокировал открытие вкладки — разрешите всплывающие окна для этого сайта и попробуйте снова.",
-};
+const closedEarlyHint = "That sponsor tab was closed too early — reopen it and keep it open for the full countdown.";
+const reopenLabel = "Reopen sponsor link";
+const popupBlockedHint = "Your browser blocked that tab from opening — allow pop-ups for this site, then try again.";
 
 // Returns the ordered list of sponsor links for a product.
 // Supports the new "sponsorLinks" list field, and falls back to the
@@ -882,24 +588,11 @@ function getPaddedSponsorLinks(product, count) {
 }
 
 function stageHintText(n, total) {
-  const hints = {
-    en: `Step ${n} of ${total} — opening sponsor link in a new tab…`,
-    ar: `الخطوة ${n} من ${total} — بيفتح رابط الراعي في تبويب جديد…`,
-    ru: `Шаг ${n} из ${total} — открывается спонсорская ссылка в новой вкладке…`,
-  };
-  return hints[state.lang] || hints.en;
+  return `Step ${n} of ${total} — opening sponsor link in a new tab…`;
 }
 
-const stepReadyLabel = {
-  en: (n) => `Step ${n} complete`,
-  ar: (n) => `الخطوة ${n} خلصت`,
-  ru: (n) => `Шаг ${n} завершён`,
-};
-const driveStepLabel = {
-  en: "Drive file download",
-  ar: "تحميل ملف درايف",
-  ru: "Скачать файл с Drive",
-};
+const stepReadyLabel = (n) => `Step ${n} complete`;
+const driveStepLabel = "Drive file download";
 
 // Renders a row of step pills: Step 1, Step 2, ... Step N, Drive download.
 // - completed steps: filled/checked
@@ -925,7 +618,7 @@ function renderStepIndicator(totalSteps, currentStage) {
     const done = i <= currentStage;
     const isVideo = i === 1;
     const icon = done ? "✓" : (isVideo ? "🎬" : i);
-    const label = isVideo ? (t("step_video_label")) : `${state.lang === "ar" ? "خطوة" : "Step"} ${i}`;
+    const label = isVideo ? (t("step_video_label")) : `Step ${i}`;
     pills.push(`
       <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
         style="${done
@@ -943,22 +636,14 @@ function renderStepIndicator(totalSteps, currentStage) {
         ? "background:rgba(157,78,221,0.12); border-color:rgba(157,78,221,0.4); color:#C79BFF;"
         : "background:transparent; border-color:var(--line); color:var(--ink-dim);"}">
       ${driveDone ? "✓" : "🔒"}
-      <span>${driveStepLabel[state.lang] || driveStepLabel.en}</span>
+      <span>${driveStepLabel}</span>
     </div>
   `);
   stepIndicator.innerHTML = pills.join("");
 }
 
-const remainingStepsText = {
-  en: (n) => n === 1 ? "Almost done — 1 step left" : `${n} steps left`,
-  ar: (n) => n === 1 ? "قربت تخلص — خطوة واحدة باقية" : `متبقي ${n} خطوات`,
-  ru: (n) => n === 1 ? "Почти готово — остался 1 шаг" : `Осталось шагов: ${n}`,
-};
-const allDoneText = {
-  en: "All steps complete!",
-  ar: "خلصت كل الخطوات!",
-  ru: "Все шаги пройдены!",
-};
+const remainingStepsText = (n) => n === 1 ? "Almost done — 1 step left" : `${n} steps left`;
+const allDoneText = "All steps complete!";
 
 // Overall progress across every step, including the final "in progress"
 // countdown fraction — so the bar creeps forward smoothly during each
@@ -974,8 +659,8 @@ function updateOverallProgress(totalSponsorStages, currentStage, countdownFracti
 
   const remaining = totalSponsorStages - currentStage;
   progressLabel.textContent = remaining > 0
-    ? (remainingStepsText[state.lang] || remainingStepsText.en)(remaining)
-    : (allDoneText[state.lang] || allDoneText.en);
+    ? remainingStepsText(remaining)
+    : allDoneText;
 }
 
 function openModal(product) {
@@ -1129,8 +814,8 @@ function handleClosedEarly() {
 
   unlockRingProgress.style.strokeDashoffset = "0";
   unlockBtn.disabled = false;
-  unlockLabel.textContent = reopenLabel[state.lang] || reopenLabel.en;
-  modalHint.textContent = closedEarlyHint[state.lang] || closedEarlyHint.en;
+  unlockLabel.textContent = reopenLabel;
+  modalHint.textContent = closedEarlyHint;
 }
 
 unlockBtn.addEventListener("click", () => {
@@ -1150,7 +835,7 @@ unlockBtn.addEventListener("click", () => {
     openedWindow = window.open(link, "_blank");
     if (!openedWindow) {
       unlockLabel.textContent = t("unlock_ready");
-      modalHint.textContent = popupBlockedHint[state.lang] || popupBlockedHint.en;
+      modalHint.textContent = popupBlockedHint;
       unlockBtn.disabled = false;
       return; // stage not credited — nothing to time, nothing advances
     }
