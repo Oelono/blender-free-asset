@@ -267,12 +267,27 @@ html[lang="ru"] .badge{ font-family:'Inter',sans-serif; font-weight:700; letter-
 [dir="rtl"] .stat-divider{ border-left:none; border-right:1px solid var(--line); }
 [dir="rtl"] dd{ text-align:left; }
 [dir="rtl"] .hero-rule{ margin-left:auto; }
-/* lightweight switcher */
-.lang-switch button{
-color:var(--ink-dim);
-transition: color .16s ease;
+/* lightweight Google Translate widget styling — blends the default
+   Google dropdown into the dark header instead of its default look,
+   and hides the top banner iframe it injects on the <body> while a
+   translation is active. */
+#google_translate_element{ display:flex; align-items:center; }
+#google_translate_element .goog-te-gadget{ font-family:inherit; font-size:0; color:transparent; }
+#google_translate_element .goog-te-gadget > span > a{ display:none !important; } /* hide "powered by" link icon spam */
+#google_translate_element .goog-te-combo{
+  font-size:12px;
+  font-family:inherit;
+  color:var(--ink-dim);
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:9999px;
+  padding:6px 10px;
+  cursor:pointer;
 }
-.lang-switch button.active{ color:var(--ink); }
+.goog-te-banner-frame.skiptranslate{ display:none !important; }
+body{ top:0 !important; }
+.goog-tooltip, .goog-tooltip:hover{ display:none !important; }
+.goog-text-highlight{ background:none !important; box-shadow:none !important; }
 
 /* ---------- drifting sand-grain particle layer ---------- */
 #sand-canvas{
@@ -505,11 +520,7 @@ box-shadow:0 12px 30px -10px rgba(0,0,0,0.5);
 <a href="#how-it-works" class="hover:text-[var(--ink)] transition-colors" data-i18n="nav_how">How it works</a>
 </nav>
 <div class="flex items-center gap-4">
-<div id="lang-switcher" class="lang-switch flex items-center gap-1 text-xs border border-[var(--line)] rounded-full px-1 py-1">
-<button data-lang="en" class="px-2 py-1 rounded-full">EN</button>
-<button data-lang="ar" class="px-2 py-1 rounded-full">AR</button>
-<button data-lang="ru" class="px-2 py-1 rounded-full">RU</button>
-</div>
+<div id="google_translate_element" class="notranslate"></div>
 <a href="#library" class="btn-primary text-sm px-4 py-2 rounded-md" data-i18n="nav_browse">Browse assets</a>
 <button id="open-request-modal" class="chip text-sm px-4 py-2 rounded-md hidden sm:inline-flex items-center gap-1.5">
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
@@ -1131,6 +1142,26 @@ init();
 })();
 </script>
 <script src="script.js"></script>
+
+<!-- =========================================================
+     Automatic translation (Google Translate widget)
+     ---------------------------------------------------------
+     Replaces the old hand-maintained EN/AR/RU dictionary in
+     script.js. The site content stays in English; this widget
+     translates the live page into whatever language the visitor
+     picks — covers every language Google supports, not just
+     three, and needs zero maintenance on our side. The actual
+     target div lives in the header nav.
+     ========================================================= -->
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+      { pageLanguage: "en", autoDisplay: false },
+      "google_translate_element"
+    );
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
 
 </body>
 </html>
