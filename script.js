@@ -1515,9 +1515,14 @@ commentForm.addEventListener("submit", async (e) => {
    SITE-WIDE COMMUNITY WALL (guestbook)
    - Same engine as the asset comments: math captcha,
      profanity filter, 1-5 star rating, Discord push.
-   - Stored per-browser in localStorage (site-wide, not per-asset).
+   - Persisted the SAME way the per-asset comments are: via the
+     comments-worker (saveCommentRemote), which commits straight
+     into data/comments.json on GitHub so every visitor sees it —
+     NOT localStorage. (Previously this section only saved to the
+     current browser's localStorage and never called the Worker at
+     all, which is why wall messages used to appear instantly for
+     the poster but never reached GitHub for anyone else.)
    ========================================================= */
-const GUESTBOOK_KEY = "vaultframe_guestbook_v1";
 const gbForm = document.getElementById("guestbook-form");
 const gbList = document.getElementById("guestbook-list");
 const gbCount = document.getElementById("gb-count");
@@ -1527,15 +1532,10 @@ const gbAvgText = document.getElementById("gb-avg-text");
 const gbNameInput = document.getElementById("gb-name");
 const gbTextInput = document.getElementById("gb-text");
 
-// --- storage ---
+// --- storage: reads straight from the server-loaded state, same
+//     source of truth as the per-asset comments ---
 function getGuestbook() {
-  try {
-    const arr = JSON.parse(localStorage.getItem(GUESTBOOK_KEY) || "[]");
-    return Array.isArray(arr) ? arr : [];
-  } catch (e) { return []; }
-}
-function saveGuestbook(arr) {
-  try { localStorage.setItem(GUESTBOOK_KEY, JSON.stringify(arr)); } catch (e) {}
+  return Array.isArray(state.commentsData.guestbook) ? state.commentsData.guestbook : [];
 }
 
 // --- render ---
@@ -1602,14 +1602,23 @@ if (gbForm) {
     }
 
     const entry = { name, text, rating, ts: Date.now() };
-    const arr = getGuestbook();
-    arr.push(entry);
-    saveGuestbook(arr);
-    renderGuestbook();
-    gbForm.reset();
+    const submitBtn = gbForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    const saved = await saveCommentRemote({ type: "guestbook", entry });
+
+    if (submitBtn) submitBtn.disabled = false;
     if (window.grecaptcha && window.wallRecaptchaWidgetId !== null) {
       grecaptcha.reset(window.wallRecaptchaWidgetId);
     }
+
+    if (!saved) {
+      showToast(t("comment_error_save"));
+      return;
+    }
+
+    renderGuestbook();
+    gbForm.reset();
     showToast(t("wall_success"));
 
     // best-effort Discord push (same webhook as comments)
@@ -1644,6 +1653,15 @@ document.addEventListener("keydown", (e) => {
 
 initLanguage();
 loadProducts();
+// Pull the shared data/comments.json from GitHub so every visitor sees
+// the same comments/guestbook messages, not just whoever is currently
+// submitting one. (This call used to be missing entirely — the function
+// existed but nothing ever invoked it, so comment counts/badges and the
+// guestbook only ever reflected the current browser's own session.)
+loadComments().then(() => {
+  refreshCommentCounts();
+  renderGuestbook();
+});
 // ===== البلاغات والطلبات عبر Discord =====
 // (تم نقل المنطق إلى sendToDiscord أعلاه — هذه دوال مساعدة للأزرار الديناميكية)
 
